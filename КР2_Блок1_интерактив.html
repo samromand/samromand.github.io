@@ -1345,7 +1345,7 @@ async function saveResult() {
   // Save to JSONBin
   try {
     const getResp = await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745/latest', {
-      headers: { 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' }
+      headers: { 'X-Master-Key': '$2a$10$Qy2L0o5GXgfOVRzcKIrXjOVn5epvNXjA4KBTsTMLrc.8vtO5ShnyO' }
     });
     const getData = await getResp.json();
     const existing = Array.isArray(getData.record) ? getData.record : [];
@@ -1357,7 +1357,7 @@ async function saveResult() {
     });
     await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' },
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$Qy2L0o5GXgfOVRzcKIrXjOVn5epvNXjA4KBTsTMLrc.8vtO5ShnyO' },
       body: JSON.stringify(existing),
     });
     console.log('Saved to JSONBin');
@@ -1365,23 +1365,32 @@ async function saveResult() {
 }
 
 async function loadResults() {
-  document.getElementById('resultsEmpty2').textContent = 'Загрузка результатов...';
-  document.getElementById('resultsEmpty2').style.display = 'block';
+  const emptyEl = document.getElementById('resultsEmpty2');
+  emptyEl.textContent = 'Загрузка результатов...';
+  emptyEl.style.display = 'block';
   document.getElementById('resultsTable2').style.display = 'none';
 
   try {
     const resp = await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745/latest', {
-      headers: { 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' }
+      headers: {
+        'X-Master-Key': '$2a$10$Qy2L0o5GXgfOVRzcKIrXjOVn5epvNXjA4KBTsTMLrc.8vtO5ShnyO',
+        'X-Access-Key':  '$2a$10$Qy2L0o5GXgfOVRzcKIrXjOVn5epvNXjA4KBTsTMLrc.8vtO5ShnyO',
+      }
     });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      emptyEl.textContent = 'Ошибка ' + resp.status + ': ' + txt.slice(0, 120);
+      return;
+    }
     const data = await resp.json();
+    console.log('JSONBin response:', JSON.stringify(data).slice(0, 200));
     const records = (Array.isArray(data.record) ? data.record : [])
       .filter(r => !r.init)
       .sort((a,b) => (b.ts||0)-(a.ts||0));
     renderResults(records);
   } catch(e) {
     console.warn('JSONBin load failed:', e);
-    document.getElementById('resultsEmpty2').textContent = 'Не удалось загрузить результаты.';
-    renderResults([]);
+    emptyEl.textContent = 'Ошибка загрузки: ' + e.message;
   }
 }
 
@@ -1573,7 +1582,7 @@ async function clearResults() {
   try {
     await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' },
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$Qy2L0o5GXgfOVRzcKIrXjOVn5epvNXjA4KBTsTMLrc.8vtO5ShnyO' },
       body: JSON.stringify([]),
     });
   } catch(e) { console.warn('Clear failed:', e); }
