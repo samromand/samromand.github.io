@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You for the Music – Fill in the Blanks</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ee;
+    --surface: #fffdf9;
+    --border: #e2d9cc;
+    --text: #1a1410;
+    --muted: #7a6a58;
+    --accent: #c8873a;
+    --accent-light: #f5e6d3;
+    --correct: #2d8a4e;
+    --correct-bg: #e6f4ec;
+    --wrong: #c0392b;
+    --wrong-bg: #fcecea;
+    --hint-color: #7c4dbd;
+    --hint-bg: #f0eafa;
+    --hint-border: #b89edc;
+    --cell-size: 32px;
+    --cell-border: #b8a898;
+    --cell-focus: #c8873a;
+    --shadow: 0 2px 16px rgba(60,40,10,0.08);
+    /* Extra right margin so hint buttons don't overlap card border */
+    --hint-btn-w: 32px;
+    --hint-gap: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  .page-wrapper {
+    /* Extra right space for the hint buttons that float outside the card */
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .song-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 5vw, 42px);
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .subtitle { color: var(--muted); font-size: 15px; margin-top: 6px; }
+
+  .author {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 8px;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+  }
+
+  .instructions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 36px;
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+  .instructions strong { color: var(--text); }
+
+  /* ── Card + hint button layout ─────────────────────────────────────────── */
+  .lyrics-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    /* Right padding leaves room so text doesn't go under the hint buttons */
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.7s 0.2s ease both;
+    /* overflow visible so hint buttons can sit just outside the right edge */
+    overflow: visible;
+  }
+
+  .section { margin-bottom: 32px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section.is-chorus .section-label { color: var(--accent); }
+
+  /* Each lyric line is wrapped in a row that can host the hint button */
+  .line-row {
+    position: relative;
+    margin-bottom: 12px;
+    /* right padding = button width + gap, so text never overlaps button */
+    padding-right: calc(var(--hint-btn-w) + var(--hint-gap) + 4px);
+  }
+
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px 8px;
+    line-height: 1;
+  }
+
+  /* ── Hint button ────────────────────────────────────────────────────────── */
+  .hint-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--hint-btn-w);
+    height: var(--hint-btn-w);
+    border-radius: 50%;
+    border: 1.5px solid var(--hint-border);
+    background: var(--hint-bg);
+    color: var(--hint-color);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s, opacity 0.2s;
+    opacity: 0.55;
+  }
+  .hint-btn:hover  { background: #e4d8f5; opacity: 1; transform: translateY(-50%) scale(1.08); }
+  .hint-btn:active { transform: translateY(-50%) scale(0.94); }
+  /* Dim when no empty cells remain on this line */
+  .hint-btn.exhausted {
+    opacity: 0.2;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  /* ── Cells ──────────────────────────────────────────────────────────────── */
+  .plain-text {
+    font-size: 16px;
+    color: var(--text);
+    line-height: var(--cell-size);
+    white-space: pre;
+  }
+
+  .cell-group {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 3px;
+  }
+  .gap-before { margin-left: 6px; }
+
+  .cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 1.5px solid var(--cell-border);
+    border-radius: 6px;
+    background: #ffffff;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    caret-color: transparent;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    cursor: text;
+    -webkit-appearance: none;
+  }
+  .cell:focus {
+    border-color: var(--cell-focus);
+    box-shadow: 0 0 0 3px rgba(200,135,58,0.18);
+    background: #ffffff;
+  }
+
+  /* Filled by student */
+  .cell.filled {
+    background: #fdefd8;
+    border-color: #c8a06a;
+  }
+
+  /* Mirror (non-primary chorus) — empty */
+  .cell.synced-mirror {
+    background: #ffffff;
+    border-color: #d9b88a;
+    border-style: dashed;
+    color: var(--muted);
+    cursor: default;
+  }
+  /* Mirror — filled via sync */
+  .cell.synced-mirror.filled {
+    background: #fdefd8;
+    border-color: #c8a06a;
+    border-style: solid;
+  }
+
+  /* Hint-revealed cell */
+  .cell.hinted {
+    background: var(--hint-bg) !important;
+    border-color: var(--hint-border) !important;
+    border-style: solid !important;
+    color: var(--hint-color) !important;
+    cursor: default;
+  }
+
+  /* Check results */
+  .cell.correct {
+    background: var(--correct-bg) !important;
+    border-color: var(--correct) !important;
+    color: var(--correct) !important;
+  }
+  .cell.wrong {
+    background: var(--wrong-bg) !important;
+    border-color: var(--wrong) !important;
+    color: var(--wrong) !important;
+  }
+
+  /* ── Controls ───────────────────────────────────────────────────────────── */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.35s ease both;
+  }
+
+  button.main-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+  }
+  button.main-btn:active { transform: scale(0.97); }
+
+  .btn-check {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(200,135,58,0.35);
+  }
+  .btn-check:hover { opacity: 0.92; box-shadow: 0 6px 18px rgba(200,135,58,0.4); }
+
+  .btn-reset {
+    background: var(--surface);
+    color: var(--muted);
+    border: 1.5px solid var(--border) !important;
+  }
+  .btn-reset:hover { background: var(--bg); }
+
+  .score-banner {
+    display: none;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    animation: pop 0.3s ease both;
+  }
+  .score-banner span {
+    color: var(--accent);
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity:0; transform:translateY(-14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes pop {
+    0%   { transform:scale(0.85); opacity:0; }
+    70%  { transform:scale(1.04); }
+    100% { transform:scale(1); opacity:1; }
+  }
+
+  @media (max-width: 600px) {
+    .lyrics-card { padding: 24px 18px; }
+    :root { --cell-size: 28px; --hint-btn-w: 26px; --hint-gap: 6px; }
+    .plain-text { font-size: 15px; }
+  }
+
+  /* ── Login overlay ──────────────────────────────────────────────────────── */
+  #login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(60,40,10,0.13);
+    padding: 48px 44px 40px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .login-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+
+  .login-card h2 {
+    font-family: "DM Serif Display", serif;
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .login-card h2 em { font-style: italic; color: var(--accent); }
+
+  .login-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .pin-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .pin-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .pin-digit {
+    width: 54px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    text-align: center;
+    font-family: "DM Serif Display", serif;
+    font-size: 26px;
+    color: var(--text);
+    caret-color: transparent;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+  }
+
+  .pin-digit:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,135,58,0.18);
+    background: #fff;
+  }
+
+  .pin-digit.pin-error {
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+    animation: shake 0.35s ease;
+  }
+
+  .pin-error-msg {
+    font-size: 13px;
+    color: var(--wrong);
+    min-height: 20px;
+    margin-bottom: 4px;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+
+  /* ── Welcome banner ─────────────────────────────────────────────────────── */
+  #welcome-banner {
+    display: none;
+    text-align: center;
+    margin-bottom: 18px;
+    animation: fadeDown 0.5s ease both;
+  }
+
+  .welcome-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-light);
+    border: 1px solid #e0c49a;
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .welcome-pill .wave { font-size: 16px; }
+
+</style>
+</head>
+<body>
+
+<!-- ── Login overlay ─────────────────────────────────────────────────────── -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-badge">English Listening Quiz</div>
+    <h2>Thank You for the <em>Music</em></h2>
+    <div class="login-subtitle">Enter your 4-digit PIN to begin</div>
+    <div class="pin-label">Your PIN</div>
+    <div class="pin-inputs" id="pin-inputs">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+    </div>
+    <div class="pin-error-msg" id="pin-error"></div>
+  </div>
+</div>
+
+<!-- ── Welcome banner (shown after login) ───────────────────────────────── -->
+<div id="welcome-banner">
+  <span class="welcome-pill"><span class="wave">&#128075;</span> <span id="welcome-name"></span></span>
+</div>
+
+<div class="page-wrapper">
+
+  <header>
+    <div class="song-badge">Listening Exercise</div>
+    <h1>Thank You for the <em>Music</em></h1>
+    <div class="subtitle">ABBA &nbsp;·&nbsp; Fill in the blanks</div>
+    <div class="author">Interactive exercise by Roman Samoylov</div>
+  </header>
+
+  <div class="instructions">
+    <strong>Instructions:</strong> Listen to the song 2–3 times and fill in the missing words.
+    Each box represents <strong>one letter</strong> — use the number of boxes as a hint.
+    After typing a letter the cursor moves automatically.
+    All choruses are <strong>linked</strong> — filling one fills the others automatically.
+    The <span style="color:var(--hint-color);font-weight:600">?</span> button next to each line reveals
+    one random missing letter — but hinted letters <strong>don't count</strong> toward your score.
+    Press <strong>Check</strong> when you're done.
+  </div>
+
+  <div class="lyrics-card" id="lyrics"></div>
+
+  <div class="controls">
+    <button class="main-btn btn-check" onclick="checkAnswers()">Check answers</button>
+    <button class="main-btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+  <div class="score-banner" id="score"></div>
+
+</div>
+<script>
+
+// ─── PIN auth ─────────────────────────────────────────────────────────────────
+const USERS = {
+  '1095': 'Roman Samoylov',
+  '7914': 'Anastasia Dikareva',
+  '3108': 'Aleksandr Zakharov',
+  '9572': 'Daniil Koryakov',
+  '6664': 'Ekaterina Krylova',
+  '4469': 'Taisia Pavlova',
+  '8617': 'Nikita Panfilov',
+  '5874': 'Ilia Sotirov',
+  '5336': 'Natalia Trubitsyna',
+  '7721': 'Danil Shamsutdinov',
+  '8369': 'Anastasia Sharapova',
+  '4580': 'Varvara Akimova',
+};
+
+const pinDigits = Array.from(document.querySelectorAll('.pin-digit'));
+const pinError  = document.getElementById('pin-error');
+
+pinDigits.forEach((el, i) => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      el.value = '';
+      if (i > 0) pinDigits[i - 1].focus();
+      clearPinError();
+    } else if (e.key === 'ArrowLeft' && i > 0) {
+      e.preventDefault(); pinDigits[i - 1].focus();
+    } else if (e.key === 'ArrowRight' && i < 3) {
+      e.preventDefault(); pinDigits[i + 1].focus();
+    }
+  });
+
+  el.addEventListener('input', e => {
+    const val = el.value.replace(/[^0-9]/g, '').slice(-1);
+    el.value = val;
+    clearPinError();
+    if (val && i < 3) pinDigits[i + 1].focus();
+    // Check when last digit entered
+    if (i === 3 && val) checkPin();
+  });
+
+  // Prevent non-numeric
+  el.addEventListener('keypress', e => {
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+  });
+});
+
+// Auto-focus first digit on load
+window.addEventListener('load', () => pinDigits[0].focus());
+
+function getPin() {
+  return pinDigits.map(d => d.value).join('');
+}
+
+function clearPinError() {
+  pinError.textContent = '';
+  pinDigits.forEach(d => d.classList.remove('pin-error'));
+}
+
+function showPinError(msg) {
+  pinError.textContent = msg;
+  pinDigits.forEach(d => d.classList.add('pin-error'));
+  setTimeout(() => {
+    pinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+    pinError.textContent = '';
+    pinDigits[0].focus();
+  }, 900);
+}
+
+function checkPin() {
+  const pin = getPin();
+  const name = USERS[pin];
+  if (name) {
+    // Correct PIN — hide overlay, show quiz
+    const overlay = document.getElementById('login-overlay');
+    overlay.style.transition = 'opacity 0.4s';
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 400);
+
+    const banner = document.getElementById('welcome-banner');
+    document.getElementById('welcome-name').textContent = 'Welcome, ' + name + '!';
+    banner.style.display = 'block';
+
+    // Now init the quiz (deferred until after login)
+    initQuiz();
+  } else {
+    showPinError('Incorrect PIN. Please try again.');
+  }
+}
+
+
+function initQuiz() {
+// ─── Chorus template ──────────────────────────────────────────────────────────
+const CHORUS_LINES = [
+  [ "So I say thank you for the music, the ", ["songs"], " I'm ", ["singing"] ],
+  [ "Thanks for ", ["all"], " ", ["the"], " ", ["joy"], " they're ", ["bringing"] ],
+  [ "Who can ", ["live"], " ", ["without"], " ", ["it"], "? I ask ", ["in"], " ", ["all"], " ", ["honesty"] ],
+  [ "What ", ["would"], " ", ["life"], " ", ["be"], "?" ],
+  [ "Without a song or a ", ["dance"], ", what ", ["are"], " ", ["we"], "?" ],
+  [ "So I say thank you for the music, ", ["for"], " ", ["giving"], " ", ["it"], " ", ["to"], " ", ["me"] ],
+];
+
+const CHORUS_FINAL_LINES = [
+  ...CHORUS_LINES,
+  [ "So I say thank you for the music, ", ["for"], " ", ["giving"], " ", ["it"], " ", ["to"], " ", ["me"] ],
+];
+
+const lyrics = [
+  { label: "Verse 1", isChorus: false, lines: [
+    [ "I'm nothing ", ["special"], ", in fact I'm a bit of a ", ["bore"] ],
+    [ "If I tell a joke, you've ", ["probably"], " ", ["heard"], " it before" ],
+    [ "But I have a talent, a ", ["wonderful"], " ", ["thing"] ],
+    [ "'Cause everyone listens when I ", ["start"], " ", ["to"], " ", ["sing"] ],
+    [ "I'm so ", ["grateful"], " and ", ["proud"] ],
+    [ "All I want is to sing it ", ["out"], " ", ["loud"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Verse 2", isChorus: false, lines: [
+    [ ["Mother"], " says I was a ", ["dancer"], " before I ", ["could"], " ", ["walk"] ],
+    [ "Mhm, she says I ", ["began"], " to sing long before I ", ["could"], " ", ["talk"] ],
+    [ "And I've ", ["often"], " ", ["wondered"], ", how ", ["did"], " it ", ["all"], " ", ["start"], "?" ],
+    [ "Who ", ["found"], " ", ["out"], " that nothing can ", ["capture"], " a ", ["heart"] ],
+    [ "Like a ", ["melody"], " can?" ],
+    [ "Well, ", ["whoever"], " it was, I'm a ", ["fan"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Bridge", isChorus: false, lines: [
+    [ "I've been so ", ["lucky"] ],
+    [ "I am the ", ["girl"], " with ", ["golden"], " ", ["hair"] ],
+    [ "I ", ["wanna"], " sing it out to ", ["everybody"] ],
+    [ "What a ", ["joy"], ", what a ", ["life"], ", what a ", ["chance"] ],
+  ]},
+  { label: "Chorus (final)", isChorus: true, lines: CHORUS_FINAL_LINES },
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const allCells = [];
+const syncMap  = {};
+// lineRows[i] = { cells: [...inputs], hintBtn }  for each rendered line-row
+const lineRows = [];
+
+// ─── Build DOM ────────────────────────────────────────────────────────────────
+const container = document.getElementById('lyrics');
+
+lyrics.forEach(section => {
+  const sec = document.createElement('div');
+  sec.className = 'section' + (section.isChorus ? ' is-chorus' : '');
+
+  const lbl = document.createElement('div');
+  lbl.className = 'section-label';
+  lbl.textContent = section.label;
+  sec.appendChild(lbl);
+
+  section.lines.forEach((tokens, lineIdx) => {
+    // Wrapper row (holds the line + floating hint button)
+    const row = document.createElement('div');
+    row.className = 'line-row';
+
+    const lineEl = document.createElement('div');
+    lineEl.className = 'line';
+
+    const syncLineIdx = (section.isChorus && lineIdx >= CHORUS_LINES.length)
+      ? CHORUS_LINES.length - 1 : lineIdx;
+
+    let blankIdx = 0;
+    let prevWasBlank = false;
+    const rowCells = [];   // cells belonging to this row
+
+    tokens.forEach(token => {
+      if (typeof token === 'string') {
+        if (token !== '') {
+          const span = document.createElement('span');
+          span.className = 'plain-text';
+          span.textContent = token;
+          lineEl.appendChild(span);
+        }
+        prevWasBlank = false;
+      } else {
+        const word = token[0];
+        const group = document.createElement('div');
+        group.className = 'cell-group';
+        if (prevWasBlank) group.classList.add('gap-before');
+
+        word.split('').forEach((ch, charIdx) => {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.maxLength = 1;
+          input.className = 'cell';
+          input.autocomplete = 'off';
+          input.autocorrect = 'off';
+          input.autocapitalize = 'off';
+          input.spellcheck = false;
+          input.dataset.answer = ch.toLowerCase();
+          input.dataset.hinted = '0';
+
+          if (section.isChorus) {
+            const sid = `c_${syncLineIdx}_${blankIdx}_${charIdx}`;
+            input.dataset.syncId = sid;
+            if (!syncMap[sid]) syncMap[sid] = [];
+            input.dataset.primary = syncMap[sid].length === 0 ? '1' : '0';
+            if (input.dataset.primary === '0') input.classList.add('synced-mirror');
+            syncMap[sid].push(input);
+          } else {
+            input.dataset.syncId = '';
+            input.dataset.primary = '1';
+          }
+
+          input.addEventListener('keydown', onKeyDown);
+          input.addEventListener('input', onInput);
+
+          group.appendChild(input);
+          allCells.push(input);
+          rowCells.push(input);
+        });
+
+        blankIdx++;
+        lineEl.appendChild(group);
+        prevWasBlank = true;
+      }
+    });
+
+    // Only add hint button if this row has any blanks
+    let hintBtn = null;
+    if (rowCells.length > 0) {
+      hintBtn = document.createElement('button');
+      hintBtn.className = 'hint-btn';
+      hintBtn.textContent = '?';
+      hintBtn.title = 'Reveal one random missing letter (won\'t count toward score)';
+      const rowIdx = lineRows.length;
+      hintBtn.addEventListener('click', () => giveHint(rowIdx));
+      row.appendChild(hintBtn);
+    }
+
+    row.appendChild(lineEl);
+    sec.appendChild(row);
+
+    lineRows.push({ cells: rowCells, hintBtn });
+  });
+
+  container.appendChild(sec);
+});
+
+// ─── Hint logic ───────────────────────────────────────────────────────────────
+function giveHint(rowIdx) {
+  const { cells } = lineRows[rowIdx];
+
+  // Collect primary empty non-hinted cells in this row
+  // (For chorus rows, we work on primary cells; mirrors follow via sync)
+  const eligible = cells.filter(c =>
+    c.dataset.primary === '1' &&
+    c.value === '' &&
+    c.dataset.hinted === '0'
+  );
+
+  // Also consider non-primary cells if there are no primary empty ones
+  // (e.g. row is entirely mirrors — shouldn't happen normally but be safe)
+  const fallback = cells.filter(c =>
+    c.value === '' && c.dataset.hinted === '0'
+  );
+
+  const pool = eligible.length > 0 ? eligible : fallback;
+  if (pool.length === 0) return;  // all filled
+
+  // Pick one at random
+  const target = pool[Math.floor(Math.random() * pool.length)];
+  revealHint(target);
+  updateHintBtn(rowIdx);
+}
+
+function revealHint(cell) {
+  const answer = cell.dataset.answer;
+  cell.value = answer;
+  cell.dataset.hinted = '1';
+  cell.classList.remove('correct', 'wrong', 'synced-mirror', 'filled');
+  cell.classList.add('hinted');
+  cell.readOnly = true;
+  cell.tabIndex = -1;
+
+  // Propagate to chorus mirrors — mark them hinted too
+  const sid = cell.dataset.syncId;
+  if (sid && syncMap[sid]) {
+    syncMap[sid].forEach(peer => {
+      if (peer === cell) return;
+      peer.value = answer;
+      peer.dataset.hinted = '1';
+      peer.classList.remove('correct', 'wrong', 'synced-mirror', 'filled');
+      peer.classList.add('hinted');
+      peer.readOnly = true;
+      peer.tabIndex = -1;
+      // Update the hint button of the peer's row
+      updateHintBtnForCell(peer);
+    });
+  }
+}
+
+function updateHintBtn(rowIdx) {
+  const { cells, hintBtn } = lineRows[rowIdx];
+  if (!hintBtn) return;
+  const anyEmpty = cells.some(c => c.value === '' && c.dataset.hinted === '0');
+  hintBtn.classList.toggle('exhausted', !anyEmpty);
+}
+
+function updateHintBtnForCell(cell) {
+  // Find which row this cell belongs to and refresh its button
+  for (let i = 0; i < lineRows.length; i++) {
+    if (lineRows[i].cells.includes(cell)) {
+      updateHintBtn(i);
+      break;
+    }
+  }
+}
+
+// ─── Sync helpers ─────────────────────────────────────────────────────────────
+function setFilled(cell, filled) {
+  cell.classList.toggle('filled', filled);
+}
+
+function propagateSync(sourceCell) {
+  const sid = sourceCell.dataset.syncId;
+  if (!sid) return;
+  const peers = syncMap[sid];
+  if (!peers) return;
+  const hasVal = sourceCell.value !== '';
+  peers.forEach(peer => {
+    if (peer === sourceCell) return;
+    peer.value = sourceCell.value;
+    peer.classList.remove('correct', 'wrong', 'hinted');
+    peer.dataset.hinted = '0';
+    setFilled(peer, hasVal);
+    if (peer.dataset.primary === '0') {
+      peer.classList.toggle('synced-mirror', !hasVal);
+    }
+    updateHintBtnForCell(peer);
+  });
+}
+
+// ─── Input handling ───────────────────────────────────────────────────────────
+function getCellIndex(el) { return allCells.indexOf(el); }
+
+function focusCell(idx) {
+  if (idx >= 0 && idx < allCells.length) {
+    allCells[idx].focus();
+    allCells[idx].select();
+  }
+}
+
+// Move focus to nearest non-hinted cell from idx, stepping by dir (+1 or -1)
+function focusSkipHinted(idx, dir) {
+  let i = idx;
+  while (i >= 0 && i < allCells.length) {
+    if (allCells[i].dataset.hinted !== '1') {
+      focusCell(i);
+      return;
+    }
+    i += dir;
+  }
+}
+
+function onInput(e) {
+  const el = e.target;
+  if (el.value.length === 0) return;
+  el.value = el.value.slice(-1);
+  el.dataset.hinted = '0';
+  el.classList.remove('correct', 'wrong', 'synced-mirror', 'hinted');
+  setFilled(el, true);
+  propagateSync(el);
+  updateHintBtnForCell(el);
+  focusSkipHinted(getCellIndex(el) + 1, +1);
+}
+
+function onKeyDown(e) {
+  const el = e.target;
+  const idx = getCellIndex(el);
+
+  if (e.key === 'Backspace') {
+    if (el.value === '') {
+      e.preventDefault();
+      // Find previous non-hinted cell, clear it, and focus it
+      let i = idx - 1;
+      while (i >= 0 && allCells[i].dataset.hinted === '1') i--;
+      if (i >= 0) {
+        const prev = allCells[i];
+        prev.value = '';
+        prev.dataset.hinted = '0';
+        prev.classList.remove('correct', 'wrong', 'hinted');
+        setFilled(prev, false);
+        if (prev.dataset.primary === '0') prev.classList.add('synced-mirror');
+        propagateSync(prev);
+        updateHintBtnForCell(prev);
+        prev.focus();
+      }
+    } else {
+      el.value = '';
+      el.dataset.hinted = '0';
+      el.classList.remove('correct', 'wrong', 'hinted');
+      setFilled(el, false);
+      if (el.dataset.primary === '0') el.classList.add('synced-mirror');
+      propagateSync(el);
+      updateHintBtnForCell(el);
+    }
+    e.stopPropagation();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault(); focusSkipHinted(idx - 1, -1);
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault(); focusSkipHinted(idx + 1, +1);
+  }
+}
+
+// ─── Check & Reset ────────────────────────────────────────────────────────────
+function checkAnswers() {
+  let correct = 0, total = 0;
+
+  allCells.forEach(cell => {
+    if (cell.dataset.hinted === '1') {
+      // Keep purple, count toward total but give 0 points
+      cell.classList.remove('correct', 'wrong', 'filled');
+      cell.classList.add('hinted');
+      if (cell.dataset.primary === '1') total++;
+      return;
+    }
+
+    cell.classList.remove('correct', 'wrong', 'synced-mirror', 'hinted', 'filled');
+    const typed  = cell.value.toLowerCase().trim();
+    const answer = cell.dataset.answer;
+    cell.classList.add(typed === answer ? 'correct' : 'wrong');
+
+    if (cell.dataset.primary === '1') {
+      total++;
+      if (typed === answer) correct++;
+    }
+  });
+
+  const pct = total > 0 ? Math.round(correct / total * 100) : 100;
+  const banner = document.getElementById('score');
+  banner.style.display = 'block';
+  banner.innerHTML = `Score: <span>${correct}&thinsp;/&thinsp;${total}</span> correct letters &nbsp;(${pct}%)`;
+}
+
+function resetAll() {
+  allCells.forEach(cell => {
+    cell.value = '';
+    cell.dataset.hinted = '0';
+    cell.readOnly = false;
+    cell.tabIndex = 0;
+    cell.classList.remove('correct', 'wrong', 'filled', 'hinted');
+    if (cell.dataset.primary === '0') cell.classList.add('synced-mirror');
+  });
+  lineRows.forEach((_, i) => updateHintBtn(i));
+  document.getElementById('score').style.display = 'none';
+  allCells[0]?.focus();
+}
+
+}
+</script>
+</body>
+</html>
