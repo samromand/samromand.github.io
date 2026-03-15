@@ -401,7 +401,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#EEF2F7;color:#222;min-h
 
 </div>
 
-<div id="app">
+<div id="app" style="display:none">
 
   <!-- Top bar -->
   <div class="topbar">
@@ -427,43 +427,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#EEF2F7;color:#222;min-h
   </div>
 
   <!-- Teacher dashboard (only in teacher mode) -->
-  <div id="teacherDashboard" style="display:none;position:relative;z-index:1;">
-    <div class="section">
-      <div class="sec-head" style="background:#1a3a5c;border-color:#1a3a5c;">
-        <h2 style="color:white;">📊 Результаты учеников</h2>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <span id="resultCount" style="font-size:.78rem;color:rgba(255,255,255,.7);"></span>
-          <button onclick="loadResults()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:6px;padding:3px 10px;font-size:.75rem;cursor:pointer;font-family:inherit;margin-right:6px;">🔄 Обновить</button>
-          <button onclick="clearResults()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:6px;padding:3px 10px;font-size:.75rem;cursor:pointer;font-family:inherit;">🗑 Очистить</button>
-        </div>
-      </div>
-      <div class="qblock" id="resultsTableWrap">
-        <div id="resultsEmpty" style="text-align:center;padding:32px;color:#aaa;font-size:.9rem;">
-          Пока нет результатов. Ученики ещё не прошли тест.
-        </div>
-        <div id="resultsTable" style="display:none;overflow-x:auto;">
-          <table style="width:100%;border-collapse:collapse;font-size:.84rem;">
-            <thead>
-              <tr style="background:#F0F4FA;">
-                <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #D8DFE8;color:#666;">ФИО</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Баллы</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Дробная</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Оценка</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Зад.1</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Зад.2</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Зад.3</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Зад.4</th>
-                <th style="padding:10px 12px;text-align:center;border-bottom:2px solid #D8DFE8;color:#666;">Зад.5</th>
-                <th style="padding:10px 12px;text-align:left;border-bottom:2px solid #D8DFE8;color:#666;">Время</th>
-              </tr>
-            </thead>
-            <tbody id="resultsTbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Score panel (student after submit) -->
   <div class="score-panel" id="scorePanel">
     <div>
@@ -799,11 +762,11 @@ const multiDone = {}; // which multi questions are checked
 function startMode(m) {
   MODE = m;
   document.getElementById('mode-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
   document.getElementById('modeBadge').textContent = m === 'teacher' ? '👨‍🏫 Режим учителя' : '🎓 ' + (studentFullName || 'Режим ученика');
 
   const app = document.getElementById('app');
   if (m === 'student') {
+    app.style.display = 'block';
     app.classList.add('student-mode');
     document.getElementById('resetBtn').style.display = 'none';
     document.getElementById('scorePanel').style.display = 'none';
@@ -831,9 +794,7 @@ function switchMode() {
   document.getElementById('mode-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   document.getElementById('studentResult').style.display = 'none';
-  document.getElementById('teacherDashboard').style.display = 'none';
   document.getElementById('teacherScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
   document.querySelectorAll('.section').forEach(s => s.style.display = 'block');
   document.getElementById('inputSurname').value = '';
   document.getElementById('inputName').value = '';
