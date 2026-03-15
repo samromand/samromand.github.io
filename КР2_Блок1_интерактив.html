@@ -1342,14 +1342,26 @@ async function saveResult() {
     details,
   };
 
-  // Save to shared window.storage (works within same Claude artifact)
+  // Save to JSONBin
   try {
-    const key = 'result:' + now.getTime();
-    await window.storage.set(key, JSON.stringify(record), true);
-    console.log('Result saved to storage:', key);
-  } catch(e) {
-    console.warn('Storage save failed:', e);
-  }
+    const getResp = await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745/latest', {
+      headers: { 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' }
+    });
+    const getData = await getResp.json();
+    const existing = Array.isArray(getData.record) ? getData.record : [];
+    existing.push({
+      name: record.name, total: record.total, frac: record.frac,
+      grade: record.grade, s1: record.s1, s2: record.s2,
+      s3: record.s3, s4: record.s4, s5: record.s5,
+      time: record.time, ts: record.ts, details: record.details,
+    });
+    await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' },
+      body: JSON.stringify(existing),
+    });
+    console.log('Saved to JSONBin');
+  } catch(e) { console.warn('JSONBin save failed:', e); }
 }
 
 async function loadResults() {
@@ -1358,20 +1370,17 @@ async function loadResults() {
   document.getElementById('resultsTable2').style.display = 'none';
 
   try {
-      const list = await window.storage.list('result:', true);
-    const keys = list?.keys || [];
-    const records = [];
-    for (const k of keys) {
-      try {
-        const r = await window.storage.get(k, true);
-        if (r?.value) records.push({ key: k, ...JSON.parse(r.value) });
-      } catch(e) {}
-    }
-    records.sort((a,b) => (b.ts||0)-(a.ts||0));
+    const resp = await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745/latest', {
+      headers: { 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' }
+    });
+    const data = await resp.json();
+    const records = (Array.isArray(data.record) ? data.record : [])
+      .filter(r => !r.init)
+      .sort((a,b) => (b.ts||0)-(a.ts||0));
     renderResults(records);
   } catch(e) {
-    console.warn('[storage] load failed:', e);
-    document.getElementById('resultsEmpty2').textContent = 'Ошибка загрузки: ' + e.message;
+    console.warn('JSONBin load failed:', e);
+    document.getElementById('resultsEmpty2').textContent = 'Не удалось загрузить результаты.';
     renderResults([]);
   }
 }
@@ -1562,11 +1571,12 @@ function toggleDetail(id) {
 async function clearResults() {
   if (!confirm('Удалить все результаты? Это действие нельзя отменить.')) return;
   try {
-    const list = await window.storage.list('result:', true);
-    for (const k of (list?.keys || [])) {
-      try { await window.storage.delete(k, true); } catch(e) {}
-    }
-  } catch(e) {}
+    await fetch('https://api.jsonbin.io/v3/b/69b6ff20c3097a1dd529c745', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$ZfnNLkqTHdEL0uQ0yNHHaOcOfnTbXksxExOK2U6vIcuWas7v9lwLu' },
+      body: JSON.stringify([]),
+    });
+  } catch(e) { console.warn('Clear failed:', e); }
   renderResults([]);
 }
 
