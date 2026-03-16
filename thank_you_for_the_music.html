@@ -939,18 +939,20 @@ async function saveResult(correct, total, pct) {
 
 async function readBin() {
   const r = await fetch(BIN_URL + '/latest', {
-    headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
+    method: 'GET',
+    mode: 'cors',
+    headers: { 'X-Master-Key': BIN_KEY }
   });
   if (!r.ok) throw new Error('readBin HTTP ' + r.status);
   const j = await r.json();
-  // With X-Bin-Meta:false the response IS the record directly
   return j.record !== undefined ? j.record : j;
 }
 
 async function writeBin(data) {
   await fetch(BIN_URL, {
     method: 'PUT',
-    headers: HEADERS,
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
     body: JSON.stringify(data),
   });
 }
@@ -1199,6 +1201,11 @@ function checkPin() {
 }
 
 
+// ─── Globals (must be accessible by checkAnswers/resetAll outside initQuiz)
+let allCells = [];
+let syncMap  = {};
+let lineRows = [];
+
 function initQuiz() {
 // ─── Chorus template ──────────────────────────────────────────────────────────
 const CHORUS_LINES = [
@@ -1243,11 +1250,10 @@ const lyrics = [
   { label: "Chorus (final)", isChorus: true, lines: CHORUS_FINAL_LINES },
 ];
 
-// ─── State ────────────────────────────────────────────────────────────────────
-const allCells = [];
-const syncMap  = {};
-// lineRows[i] = { cells: [...inputs], hintBtn }  for each rendered line-row
-const lineRows = [];
+// ─── State (using globals declared above initQuiz)
+allCells.length = 0;
+Object.keys(syncMap).forEach(k => delete syncMap[k]);
+lineRows.length = 0;
 
 // ─── Build DOM ────────────────────────────────────────────────────────────────
 const container = document.getElementById('lyrics');
