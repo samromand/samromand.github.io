@@ -754,6 +754,43 @@
     padding: 40px 0;
   }
 
+
+  /* ── Audio player ───────────────────────────────────────────────────────── */
+  .player-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeDown 0.6s 0.15s ease both;
+  }
+
+  .player-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .player-wrap audio {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    accent-color: var(--accent);
+  }
+
+  /* Chromium-style tweak for a cleaner look */
+  .player-wrap audio::-webkit-media-controls-panel {
+    background: var(--surface);
+  }
+
 </style>
 </head>
 <body>
@@ -848,6 +885,13 @@
     The <span style="color:var(--hint-color);font-weight:600">?</span> button next to each line reveals
     one random missing letter — but hinted letters <strong>don't count</strong> toward your score.
     Press <strong>Check</strong> when you're done.
+  </div>
+
+  <div class="player-wrap">
+    <span class="player-label">&#9835; Listen</span>
+    <audio controls preload="metadata" src="ABBA_-_Thank_You_for_the_Music_(SkySound.cc).mp3">
+      Your browser does not support the audio element.
+    </audio>
   </div>
 
   <div class="lyrics-card" id="lyrics"></div>
