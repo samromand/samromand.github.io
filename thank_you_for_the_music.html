@@ -379,6 +379,17 @@
     padding: 20px;
   }
 
+  #vocab-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 110;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
   /* ── Under construction ─────────────────────────────────────────────────── */
   #staff-dashboard {
     position: fixed;
@@ -791,6 +802,519 @@
     background: var(--surface);
   }
 
+
+  /* ── Manual entry form ──────────────────────────────────────────────────── */
+  .manual-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: none;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+  }
+  .manual-form.open { display: flex; }
+
+  .manual-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .manual-field label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .manual-field select,
+  .manual-field input[type="number"] {
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .manual-field select:focus,
+  .manual-field input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  .manual-field select { min-width: 200px; }
+  .manual-field input[type="number"] { width: 100px; }
+
+  .dash-btn-add { background: #e8f5ee; color: var(--correct); }
+  .dash-btn-add:hover { opacity: 0.8; }
+  .dash-btn-add.active { background: var(--correct); color: #fff; }
+
+  .result-card.manual { border-left: 3px solid #888; }
+  .result-score.manual-score { color: #444; }
+  .manual-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #f0f0f0;
+    color: #888;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+
+  /* ── Dashboard tabs ─────────────────────────────────────────────────────── */
+  .dash-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .dash-tab {
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .dash-tab:hover { color: var(--text); background: var(--bg); }
+  .dash-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .dash-panel { display: none; }
+  .dash-panel.active { display: block; }
+
+  /* ── Answer key lyrics ──────────────────────────────────────────────────── */
+  .ak-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 36px;
+    box-shadow: var(--shadow);
+  }
+
+  .ak-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .ak-section { margin-bottom: 24px; }
+
+  .ak-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .is-chorus .ak-section-label { color: var(--accent); }
+
+  .ak-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 4px 6px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+
+  .ak-plain {
+    font-size: 16px;
+    color: var(--text);
+    line-height: 32px;
+    white-space: pre;
+  }
+
+  .ak-group {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .ak-group.gap-before { margin-left: 6px; }
+
+  .ak-cell {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--cell-border);
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: transparent;   /* hidden until revealed */
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+  }
+
+  .ak-cell:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* Revealed word */
+  .ak-cell.revealed {
+    background: #e8f5ee;
+    border-color: #6dbf8a;
+    color: #1e6b3a;
+    cursor: default;
+  }
+  .ak-cell.revealed:hover {
+    background: #e8f5ee;
+    border-color: #6dbf8a;
+  }
+
+  /* Mirror revealed (synced chorus) */
+  .ak-cell.mirror-revealed {
+    background: #e8f5ee;
+    border-color: #6dbf8a;
+    color: #1e6b3a;
+    cursor: default;
+  }
+
+  /* Reset button */
+  .ak-reset-wrap {
+    text-align: right;
+    margin-bottom: 12px;
+  }
+  .ak-reset-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .ak-reset-btn:hover { background: var(--bg); color: var(--text); }
+
+
+  /* ── Vocabulary page (shared: student + staff) ──────────────────────────── */
+  #vocab-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 115;
+    overflow-y: auto;
+    padding: 36px 24px 80px;
+  }
+
+  .vocab-wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .vocab-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .vocab-title {
+    font-family: "DM Serif Display", serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-top: 6px;
+  }
+  .vocab-title em { font-style: italic; color: var(--accent); }
+  .vocab-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  /* Category filter tabs */
+  .vocab-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .vf-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .vf-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .vf-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Section blocks */
+  .vocab-section { margin-bottom: 36px; }
+
+  .vocab-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Level group */
+  .vocab-level-group { margin-bottom: 24px; }
+
+  .vocab-level-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .level-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .level-b1b2  { background: #e8f5ee; color: #2a7a4a; }
+  .level-b2c1  { background: #fff8e0; color: #8a6a00; }
+  .level-c1c2  { background: #fceaea; color: #a02020; }
+
+  .level-toggle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* Item cards */
+  .vocab-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .vocab-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .vocab-item:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(200,135,58,0.1); }
+
+  .vocab-item-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .vocab-phrase {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: "DM Serif Display", serif;
+  }
+
+  .vocab-arrow {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .vocab-translation {
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .vocab-stars {
+    margin-left: auto;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Expandable detail */
+  .vocab-detail {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .vocab-detail.open { display: block; }
+
+  .vocab-detail .note-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .vocab-detail .context-line {
+    font-style: italic;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .vocab-detail .cefr-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
+
+  /* Back button */
+  .vocab-back-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .vocab-back-btn:hover { background: var(--bg); color: var(--text); }
+
+  /* Vocabulary button in student view */
+  .btn-vocab {
+    background: #ede8f5;
+    color: #6a3faa;
+    border: none;
+  }
+  .btn-vocab:hover { opacity: 0.85; }
+
+
+  /* ── Answer review panel ────────────────────────────────────────────────── */
+  .result-card.expandable { cursor: default; }
+
+  .result-expand-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .result-expand-btn:hover { background: var(--bg); color: var(--text); border-color: var(--cell-border); }
+  .result-expand-btn.open  { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+  .answer-review {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .answer-review.open { display: block; }
+
+  /* Мини-версия текста песни */
+  .ar-section { margin-bottom: 20px; }
+
+  .ar-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ar-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px 4px;
+    margin-bottom: 6px;
+    line-height: 1;
+  }
+
+  .ar-plain {
+    font-size: 13px;
+    color: var(--text);
+    white-space: pre;
+    line-height: 26px;
+  }
+
+  .ar-group { display: inline-flex; gap: 2px; }
+  .ar-group.gap-before { margin-left: 4px; }
+
+  .ar-cell {
+    width: 22px;
+    height: 26px;
+    border-radius: 4px;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .ar-cell.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); }
+  .ar-cell.wrong   { background: var(--wrong-bg);   border-color: var(--wrong);   color: var(--wrong); }
+  .ar-cell.hinted  { background: var(--hint-bg);    border-color: var(--hint-border); color: var(--hint-color); }
+  .ar-cell.empty   { background: #f5f5f5; border-color: #ccc; color: #ccc; }
+
 </style>
 </head>
 <body>
@@ -809,8 +1333,9 @@
       <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
     </div>
     <div class="pin-error-msg" id="pin-error"></div>
-    <div class="staff-link-wrap">
+    <div class="staff-link-wrap" style="display:flex;gap:12px;justify-content:center;">
       <button class="staff-link" onclick="openStaffLogin()">🔒 Staff Only</button>
+      <button class="staff-link" onclick="openVocabLogin()" style="color:#6a3faa">📚 Language Notes</button>
     </div>
   </div>
 </div>
@@ -837,6 +1362,25 @@
   </div>
 </div>
 
+<!-- ── Vocab login overlay ───────────────────────────────────────────────── -->
+<div id="vocab-overlay" style="display:none">
+  <div class="login-card">
+    <div class="login-badge" style="background:#ede8f5;color:#6a3faa">Language Notes</div>
+    <h2>Useful <em>Language</em></h2>
+    <div class="login-subtitle">Enter the 4-digit PIN to continue</div>
+    <div class="pin-label">PIN</div>
+    <div class="pin-inputs" id="vocab-pin-inputs">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+    </div>
+    <div class="pin-error-msg" id="vocab-pin-error"></div>
+    <button class="staff-back-link" onclick="closeVocabLogin()">&#8592; Back</button>
+  </div>
+</div>
+
+
 <!-- ── Staff dashboard ───────────────────────────────────────────────────── -->
 <div id="staff-dashboard" style="display:none">
   <div class="dash-wrap">
@@ -846,20 +1390,93 @@
         <h2 class="dash-title">Results — <em>Thank You for the Music</em></h2>
       </div>
       <div class="dash-actions">
+        <button class="dash-btn dash-btn-add" id="btn-add-manual" onclick="toggleManualForm()">&#43; Paper result</button>
         <button class="dash-btn dash-btn-refresh" onclick="loadResults()">&#8635; Refresh</button>
         <button class="dash-btn dash-btn-danger" onclick="deleteAllResults()">&#128465; Clear all</button>
         <button class="dash-btn dash-btn-back" onclick="closeStaffDashboard()">&#8592; Back</button>
       </div>
     </div>
-    <div id="dash-status" class="dash-status"></div>
-    <!-- Chart (shown when ≥1 finished result) -->
-    <div id="chart-section" style="display:none">
-      <div class="dash-section-label">Leaderboard</div>
-      <div id="bar-chart" class="bar-chart"></div>
+
+    <!-- Manual entry form -->
+    <div class="manual-form" id="manual-form">
+      <div class="manual-field">
+        <label>Participant</label>
+        <select id="manual-name">
+          <option value="">— select name —</option>
+          <option>Roman Samoylov</option>
+          <option>Anastasia Dikareva</option>
+          <option>Aleksandr Zakharov</option>
+          <option>Daniil Koryakov</option>
+          <option>Ekaterina Krylova</option>
+          <option>Taisia Pavlova</option>
+          <option>Nikita Panfilov</option>
+          <option>Ilia Sotirov</option>
+          <option>Natalia Trubitsyna</option>
+          <option>Danil Shamsutdinov</option>
+          <option>Anastasia Sharapova</option>
+          <option>Varvara Akimova</option>
+        </select>
+      </div>
+      <div class="manual-field">
+        <label>Score (0–300)</label>
+        <input type="number" id="manual-score" min="0" max="300" placeholder="e.g. 245">
+      </div>
+      <button class="dash-btn dash-btn-add" onclick="submitManualResult()" style="align-self:flex-end">Save</button>
+      <button class="dash-btn dash-btn-back" onclick="toggleManualForm()" style="align-self:flex-end">Cancel</button>
     </div>
-    <!-- Results table -->
-    <div class="dash-section-label" style="margin-top:28px">Attempts</div>
-    <div id="results-list" class="results-list"></div>
+
+    <!-- Tabs -->
+    <div class="dash-tabs">
+      <button class="dash-tab active" id="tab-results" onclick="switchTab('results')">&#128202; Results</button>
+      <button class="dash-tab" id="tab-answers" onclick="switchTab('answers')">&#9670; Answer Key</button>
+    </div>
+
+    <!-- Panel: Results -->
+    <div class="dash-panel active" id="panel-results">
+      <div id="dash-status" class="dash-status"></div>
+      <div id="chart-section" style="display:none">
+        <div class="dash-section-label">Leaderboard</div>
+        <div id="bar-chart" class="bar-chart"></div>
+      </div>
+      <div class="dash-section-label" style="margin-top:28px">Attempts</div>
+      <div id="results-list" class="results-list"></div>
+    </div>
+
+    <!-- Panel: Answer Key -->
+    <div class="dash-panel" id="panel-answers">
+      <div class="ak-hint">&#128161; Click any cell in a word to reveal the whole word. Choruses are synchronised.</div>
+      <div class="ak-reset-wrap">
+        <button class="ak-reset-btn" onclick="akResetAll()">&#8635; Hide all answers</button>
+      </div>
+      <div class="ak-card" id="ak-lyrics"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Vocabulary page ───────────────────────────────────────────────────── -->
+<div id="vocab-page">
+  <div class="vocab-wrap">
+    <div class="vocab-top">
+      <div>
+        <div class="login-badge">Language Focus</div>
+        <h2 class="vocab-title">Useful Language from <em>Thank You for the Music</em></h2>
+        <div class="vocab-subtitle">Click any item to expand • CEFR levels B1–C2</div>
+      </div>
+      <button class="vocab-back-btn" id="vocab-back-btn">&#8592; Back</button>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="vocab-filters">
+      <button class="vf-btn active" onclick="vocabFilter('all')">All</button>
+      <button class="vf-btn" onclick="vocabFilter('vocab')">&#128218; Vocabulary &amp; Collocations</button>
+      <button class="vf-btn" onclick="vocabFilter('grammar')">&#9881; Grammar</button>
+      <button class="vf-btn" onclick="vocabFilter('b1b2')">🟢 B1–B2</button>
+      <button class="vf-btn" onclick="vocabFilter('b2c1')">🟡 B2–C1</button>
+      <button class="vf-btn" onclick="vocabFilter('c1c2')">🔴 C1–C2</button>
+    </div>
+
+    <div id="vocab-content"></div>
   </div>
 </div>
 
@@ -899,6 +1516,7 @@
   <div class="controls">
     <button class="main-btn btn-check" onclick="checkAnswers()">Check answers</button>
     <button class="main-btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="main-btn btn-reset" onclick="location.reload()">&#8962; Home</button>
   </div>
   <div class="score-banner" id="score"></div>
 
@@ -963,7 +1581,7 @@ async function registerAttempt(name) {
 }
 
 // ─── Called after checkAnswers() ──────────────────────────────────────────────
-async function saveResult(correct, total, pct) {
+async function saveResult(correct, total, pct, answers) {
   try {
     const data = await readBin();
     const results = data.results || [];
@@ -975,6 +1593,7 @@ async function saveResult(correct, total, pct) {
       startedAt: idx >= 0 ? results[idx].startedAt : new Date().toISOString(),
       finishedAt: new Date().toISOString(),
       correct, total, pct,
+      answers: answers || [],
     };
     if (idx >= 0) results[idx] = updated; else results.push(updated);
     await writeBin({ results });
@@ -1002,6 +1621,52 @@ async function writeBin(data) {
 }
 
 // ─── Dashboard rendering ───────────────────────────────────────────────────────
+// ─── Manual entry ─────────────────────────────────────────────────────────────
+function toggleManualForm() {
+  const form = document.getElementById('manual-form');
+  const btn  = document.getElementById('btn-add-manual');
+  const open = form.classList.toggle('open');
+  btn.classList.toggle('active', open);
+  if (open) {
+    document.getElementById('manual-name').focus();
+    document.getElementById('manual-score').value = '';
+  }
+}
+
+async function submitManualResult() {
+  const nameEl  = document.getElementById('manual-name');
+  const scoreEl = document.getElementById('manual-score');
+  const name    = nameEl.value.trim();
+  const score   = parseInt(scoreEl.value, 10);
+
+  if (!name) { nameEl.focus(); return; }
+  if (isNaN(score) || score < 0 || score > 300) { scoreEl.focus(); return; }
+
+  const entry = {
+    id: 'manual_' + Date.now(),
+    name,
+    status: 'finished',
+    source: 'manual',
+    startedAt: new Date().toISOString(),
+    finishedAt: new Date().toISOString(),
+    correct: score,
+    total: 300,
+    pct: Math.round(score / 300 * 100),
+  };
+
+  try {
+    const data = await readBin();
+    const results = data.results || [];
+    results.push(entry);
+    await writeBin({ results });
+    toggleManualForm();
+    await loadResults();
+  } catch(e) {
+    alert('Failed to save. Check connection.');
+    console.error(e);
+  }
+}
+
 async function loadResults() {
   const status = document.getElementById('dash-status');
   status.textContent = 'Loading…';
@@ -1057,23 +1722,171 @@ function renderList(results) {
     list.innerHTML = '<div class="dash-empty">No attempts yet.</div>';
     return;
   }
-  list.innerHTML = results.map(r => {
+  list.innerHTML = '';
+  results.forEach(r => {
     const isFinished = r.status === 'finished';
+    const isManual   = r.source === 'manual';
+    const canExpand  = isFinished && !isManual && r.answers && r.answers.length > 0;
     const time = isFinished
       ? `Finished ${formatTime(r.finishedAt)}`
       : `Started ${formatTime(r.startedAt)}`;
-    const scoreHtml = isFinished
-      ? `<div class="result-score">${r.correct}<span style="font-size:14px;color:var(--muted)">/300</span></div>`
+    const manualTag  = isManual ? `<span class="manual-tag">paper</span>` : '';
+    const scoreHtml  = isFinished
+      ? `<div class="result-score ${isManual ? 'manual-score' : ''}">${r.correct}<span style="font-size:14px;color:var(--muted)">/300</span></div>`
       : `<div class="result-score in-progress-score">⏳ In progress</div>`;
-    return `<div class="result-card ${isFinished ? 'finished' : 'in-progress'}">
-      <div>
-        <div class="result-name">${r.name}</div>
+    const expandBtn  = canExpand
+      ? `<button class="result-expand-btn" onclick="toggleAnswerReview(this, '${r.id}')">&#9660; Answers</button>`
+      : '';
+
+    const card = document.createElement('div');
+    card.className = `result-card ${isFinished ? (isManual ? 'manual' : 'finished') : 'in-progress'}`;
+    card.dataset.rid = r.id;
+    card.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div class="result-name">${r.name}${manualTag}</div>
         <div class="result-meta">${time}</div>
       </div>
       ${scoreHtml}
-      <button class="result-delete" title="Delete this result" onclick="deleteResult('${r.id}')">&#10005;</button>
-    </div>`;
-  }).join('');
+      ${expandBtn}
+      <button class="result-delete" title="Delete this result" onclick="deleteResult('${r.id}')">&#10005;</button>`;
+
+    // Answer review panel (hidden by default)
+    if (canExpand) {
+      const panel = document.createElement('div');
+      panel.className = 'answer-review';
+      panel.id = 'ar-' + r.id;
+      card.appendChild(panel);
+      // Store answers data on the element
+      card.dataset.answers = JSON.stringify(r.answers);
+    }
+
+    list.appendChild(card);
+  });
+}
+
+function toggleAnswerReview(btn, id) {
+  const panel = document.getElementById('ar-' + id);
+  const card  = panel.closest('.result-card');
+  const isOpen = panel.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.textContent = isOpen ? '▲ Answers' : '▾ Answers';
+
+  if (isOpen && !panel.dataset.built) {
+    panel.dataset.built = '1';
+    buildAnswerReview(panel, JSON.parse(card.dataset.answers));
+  }
+}
+
+function buildAnswerReview(panel, answers) {
+  // answers = [{answer, typed, hinted}, ...] in order of primary cells
+  // We need to map them back onto the lyrics structure
+  // Walk AK_SECTIONS, collect blanks in order (primary only = first chorus occurrence)
+  const blanks = [];
+  const seenSyncIds = new Set();
+
+  AK_SECTIONS.forEach((section, si) => {
+    if (!section.lines) return;
+    section.lines.forEach((tokens, li) => {
+      const syncLineIdx = (section.isChorus && li >= AK_CHORUS_LINES.length)
+        ? AK_CHORUS_LINES.length - 1 : li;
+      let blankIdx = 0;
+      tokens.forEach(tok => {
+        if (typeof tok !== 'string') {
+          tok[0].split('').forEach((ch, ci) => {
+            const sid = section.isChorus ? `c_${syncLineIdx}_${blankIdx}_${ci}` : null;
+            const isPrimary = !sid || !seenSyncIds.has(sid);
+            if (sid) seenSyncIds.add(sid);
+            blanks.push({ isPrimary, answer: ch, sid });
+          });
+          blankIdx++;
+        }
+      });
+    });
+  });
+
+  // Now render sections with the answers mapped in
+  let ansIdx = 0;
+  const primaryAnswers = answers; // already only primary cells
+
+  AK_SECTIONS.forEach(section => {
+    if (!section.lines) return;
+    const secEl = document.createElement('div');
+    secEl.className = 'ar-section';
+    const lbl = document.createElement('div');
+    lbl.className = 'ar-section-label';
+    lbl.textContent = section.label;
+    secEl.appendChild(lbl);
+
+    section.lines.forEach((tokens, li) => {
+      const syncLineIdx = (section.isChorus && li >= AK_CHORUS_LINES.length)
+        ? AK_CHORUS_LINES.length - 1 : li;
+      const lineEl = document.createElement('div');
+      lineEl.className = 'ar-line';
+      let blankIdx = 0;
+      let prevWasBlank = false;
+
+      tokens.forEach(tok => {
+        if (typeof tok === 'string') {
+          if (tok) {
+            const sp = document.createElement('span');
+            sp.className = 'ar-plain';
+            sp.textContent = tok;
+            lineEl.appendChild(sp);
+          }
+          prevWasBlank = false;
+        } else {
+          const grp = document.createElement('div');
+          grp.className = 'ar-group';
+          if (prevWasBlank) grp.classList.add('gap-before');
+
+          tok[0].split('').forEach((ch, ci) => {
+            const sid = section.isChorus ? `c_${syncLineIdx}_${blankIdx}_${ci}` : null;
+            // Is this the primary occurrence?
+            const isPrimaryOcc = !sid || (() => {
+              // primary = first time we see this sid in our walk
+              // We need to track per-render; use a closure map
+              return true; // we'll handle via ansIdx below
+            })();
+
+            const cell = document.createElement('div');
+            cell.className = 'ar-cell';
+
+            // Get answer data
+            let typed = '', hinted = false, isCorrect = false;
+            if (ansIdx < primaryAnswers.length) {
+              const a = primaryAnswers[ansIdx];
+              typed   = a.typed;
+              hinted  = a.hinted;
+              isCorrect = typed === a.answer;
+              ansIdx++;
+            }
+
+            if (hinted) {
+              cell.classList.add('hinted');
+              cell.textContent = ch;
+            } else if (typed === '') {
+              cell.classList.add('wrong');
+              cell.textContent = '–';
+            } else if (isCorrect) {
+              cell.classList.add('correct');
+              cell.textContent = ch;
+            } else {
+              cell.classList.add('wrong');
+              cell.textContent = typed;
+            }
+
+            grp.appendChild(cell);
+          });
+
+          blankIdx++;
+          lineEl.appendChild(grp);
+          prevWasBlank = true;
+        }
+      });
+      secEl.appendChild(lineEl);
+    });
+    panel.appendChild(secEl);
+  });
 }
 
 function formatTime(iso) {
@@ -1102,6 +1915,65 @@ async function deleteAllResults() {
 }
 
 // Open dashboard and load
+
+// ─── Vocab PIN ─────────────────────────────────────────────────────────────────
+const VOCAB_PIN = '2803';
+
+function openVocabLogin() {
+  const vo = document.getElementById('vocab-overlay');
+  vo.style.display = 'flex';
+  vocabPinDigits[0].focus();
+}
+
+function closeVocabLogin() {
+  document.getElementById('vocab-overlay').style.display = 'none';
+  vocabPinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+  document.getElementById('vocab-pin-error').textContent = '';
+  pinDigits[0].focus();
+}
+
+const vocabPinDigits = Array.from(document.querySelectorAll('#vocab-pin-inputs .pin-digit'));
+const vocabPinError  = document.getElementById('vocab-pin-error');
+
+vocabPinDigits.forEach((el, i) => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      el.value = '';
+      if (i > 0) vocabPinDigits[i - 1].focus();
+      vocabPinError.textContent = '';
+      vocabPinDigits.forEach(d => d.classList.remove('pin-error'));
+    } else if (e.key === 'Escape') {
+      closeVocabLogin();
+    }
+  });
+  el.addEventListener('input', e => {
+    const val = el.value.replace(/[^0-9]/g, '').slice(-1);
+    el.value = val;
+    vocabPinError.textContent = '';
+    vocabPinDigits.forEach(d => d.classList.remove('pin-error'));
+    if (val && i < 3) vocabPinDigits[i + 1].focus();
+    if (i === 3 && val) checkVocabPin();
+  });
+  el.addEventListener('keypress', e => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
+});
+
+function checkVocabPin() {
+  const pin = vocabPinDigits.map(d => d.value).join('');
+  if (pin === VOCAB_PIN) {
+    document.getElementById('vocab-overlay').style.display = 'none';
+    openVocabPage('standalone');
+  } else {
+    vocabPinError.textContent = 'Incorrect PIN. Please try again.';
+    vocabPinDigits.forEach(d => d.classList.add('pin-error'));
+    setTimeout(() => {
+      vocabPinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+      vocabPinError.textContent = '';
+      vocabPinDigits[0].focus();
+    }, 900);
+  }
+}
+
 function openStaffDashboard() {
   document.getElementById('staff-dashboard').style.display = 'block';
   loadResults();
@@ -1250,7 +2122,8 @@ let allCells = [];
 let syncMap  = {};
 let lineRows = [];
 
-function initQuiz() {
+
+
 // ─── Chorus template ──────────────────────────────────────────────────────────
 const CHORUS_LINES = [
   [ "So I say thank you for the music, the ", ["songs"], " I'm ", ["singing"] ],
@@ -1262,9 +2135,44 @@ const CHORUS_LINES = [
 ];
 
 const CHORUS_FINAL_LINES = [
-  ...CHORUS_LINES,
+  [ "Thank you for the music, the ", ["songs"], " I'm ", ["singing"] ],
+  ...CHORUS_LINES.slice(1),
   [ "So I say thank you for the music, ", ["for"], " ", ["giving"], " ", ["it"], " ", ["to"], " ", ["me"] ],
 ];
+
+
+// ─── Answer Key data (mirrors lyrics data, must be in global scope) ────────────
+const AK_CHORUS_LINES = CHORUS_LINES;
+const AK_SECTIONS = [
+  { label: "Verse 1", isChorus: false, lines: [
+    [ "I\u2019m nothing ", ["special"], ", in fact I\u2019m a bit of a ", ["bore"] ],
+    [ "If I tell a joke, you\u2019ve ", ["probably"], " ", ["heard"], " it before" ],
+    [ "But I have a talent, a ", ["wonderful"], " ", ["thing"] ],
+    [ "\u2018Cause everyone listens when I ", ["start"], " ", ["to"], " ", ["sing"] ],
+    [ "I\u2019m so ", ["grateful"], " and ", ["proud"] ],
+    [ "All I want is to sing it ", ["out"], " ", ["loud"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Verse 2", isChorus: false, lines: [
+    [ ["Mother"], " says I was a ", ["dancer"], " before I ", ["could"], " ", ["walk"] ],
+    [ "Mhm, she says I ", ["began"], " to sing long before I ", ["could"], " ", ["talk"] ],
+    [ "And I\u2019ve ", ["often"], " ", ["wondered"], ", how ", ["did"], " it ", ["all"], " ", ["start"], "?" ],
+    [ "Who ", ["found"], " ", ["out"], " that nothing can ", ["capture"], " a ", ["heart"] ],
+    [ "Like a ", ["melody"], " can?" ],
+    [ "Well, ", ["whoever"], " it was, I\u2019m a ", ["fan"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Bridge", isChorus: false, lines: [
+    [ "I\u2019ve been so ", ["lucky"] ],
+    [ "I am the ", ["girl"], " with ", ["golden"], " ", ["hair"] ],
+    [ "I ", ["wanna"], " sing it out to ", ["everybody"] ],
+    [ "What a ", ["joy"], ", what a ", ["life"], ", what a ", ["chance"] ],
+  ]},
+  { label: "Chorus (final)", isChorus: true, lines: CHORUS_FINAL_LINES },
+];
+
+function initQuiz() {
+
 
 const lyrics = [
   { label: "Verse 1", isChorus: false, lines: [
@@ -1568,6 +2476,132 @@ function onKeyDown(e) {
 
 } // end initQuiz
 
+// ─── Dashboard tabs ────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'answers' && !akBuilt) buildAnswerKey();
+}
+
+// ─── Answer Key ────────────────────────────────────────────────────────────────
+let akBuilt = false;
+const akSyncMap = {};   // syncId → [cell elements]
+
+function buildAnswerKey() {
+  akBuilt = true;
+  const container = document.getElementById('ak-lyrics');
+  if (!container) { console.error('ak-lyrics element not found'); return; }
+  container.innerHTML = '';
+  console.log('buildAnswerKey: AK_SECTIONS length =', AK_SECTIONS ? AK_SECTIONS.length : 'undefined');
+
+  if (!AK_SECTIONS) { container.textContent = 'Error: song data not loaded.'; return; }
+
+  AK_SECTIONS.forEach(section => {
+    if (!section.lines) return; // skip null placeholders
+    const sec = document.createElement('div');
+    sec.className = 'ak-section' + (section.isChorus ? ' is-chorus' : '');
+
+    const lbl = document.createElement('div');
+    lbl.className = 'ak-section-label';
+    lbl.textContent = section.label;
+    sec.appendChild(lbl);
+
+    section.lines.forEach((tokens, lineIdx) => {
+      const lineEl = document.createElement('div');
+      lineEl.className = 'ak-line';
+
+      const syncLineIdx = (section.isChorus && lineIdx >= AK_CHORUS_LINES.length)
+        ? AK_CHORUS_LINES.length - 1 : lineIdx;
+
+      let blankIdx = 0;
+      let prevWasBlank = false;
+
+      tokens.forEach(token => {
+        if (typeof token === 'string') {
+          if (token) {
+            const span = document.createElement('span');
+            span.className = 'ak-plain';
+            span.textContent = token;
+            lineEl.appendChild(span);
+          }
+          prevWasBlank = false;
+        } else {
+          const word = token[0];
+          const group = document.createElement('div');
+          group.className = 'ak-group';
+          if (prevWasBlank) group.classList.add('gap-before');
+
+          // Build cells for this word
+          const wordCells = [];
+          word.split('').forEach((ch, charIdx) => {
+            const cell = document.createElement('div');
+            cell.className = 'ak-cell';
+            cell.textContent = ch;
+            cell.dataset.letter = ch;
+
+            if (section.isChorus) {
+              const sid = `ak_${syncLineIdx}_${blankIdx}_${charIdx}`;
+              cell.dataset.syncId = sid;
+              if (!akSyncMap[sid]) akSyncMap[sid] = [];
+              akSyncMap[sid].push(cell);
+            }
+
+            wordCells.push(cell);
+            group.appendChild(cell);
+          });
+
+          // Click on any cell reveals the whole word (all cells in group)
+          wordCells.forEach(cell => {
+            cell.addEventListener('click', () => akRevealWord(wordCells, cell.dataset.syncId, blankIdx, syncLineIdx, word));
+          });
+
+          blankIdx++;
+          lineEl.appendChild(group);
+          prevWasBlank = true;
+        }
+      });
+
+      sec.appendChild(lineEl);
+    });
+
+    container.appendChild(sec);
+  });
+}
+
+function akRevealWord(wordCells, syncId, blankIdx, syncLineIdx, word) {
+  // Reveal all cells in this word
+  wordCells.forEach(cell => {
+    cell.classList.add('revealed');
+  });
+
+  // Sync chorus: reveal the same word in all chorus mirrors
+  if (syncId) {
+    // syncId is per-character; find all cells for same word (same blankIdx)
+    // We stored per-char, so gather all chars of this word via blankIdx
+    const wordLen = word.length;
+    for (let ci = 0; ci < wordLen; ci++) {
+      const sid = syncId.replace(/_\d+$/, '_' + ci); // replace last charIdx
+      if (akSyncMap[sid]) {
+        akSyncMap[sid].forEach(peer => {
+          if (!wordCells.includes(peer)) {
+            peer.classList.add('mirror-revealed');
+          }
+        });
+      }
+    }
+  }
+}
+
+function akResetAll() {
+  document.querySelectorAll('.ak-cell').forEach(c => {
+    c.classList.remove('revealed', 'mirror-revealed');
+  });
+}
+
+
+
 // ─── Check & Reset (global scope — called from HTML buttons) ──────────────────
 function checkAnswers() {
   let correct = 0, total = 0;
@@ -1596,7 +2630,16 @@ function checkAnswers() {
   banner.style.display = 'block';
   banner.innerHTML = `Score: <span>${correct}&thinsp;/&thinsp;${total}</span> correct letters &nbsp;(${pct}%)`;
 
-  if (currentUser) saveResult(correct, total, pct);
+  // Collect answers snapshot (primary cells only, for staff review)
+  const answersSnapshot = allCells
+    .filter(c => c.dataset.primary === '1')
+    .map(c => ({
+      answer: c.dataset.answer,
+      typed:  c.value.toLowerCase().trim(),
+      hinted: c.dataset.hinted === '1',
+    }));
+
+  if (currentUser) saveResult(correct, total, pct, answersSnapshot);
 }
 
 function resetAll() {
@@ -1612,6 +2655,405 @@ function resetAll() {
   document.getElementById('score').style.display = 'none';
   allCells[0]?.focus();
 }
+
+// ─── Vocabulary data ───────────────────────────────────────────────────────────
+const VOCAB_DATA = [
+  // ── Section 1: Vocabulary & Collocations ──────────────────────────────────
+  {
+    section: 'vocab',
+    sectionTitle: '📚 Vocabulary & Collocations',
+    levels: [
+      {
+        level: 'b1b2',
+        label: '🟢 B1–B2',
+        badgeClass: 'level-b1b2',
+        items: [
+          {
+            phrase: 'a bit of a bore',
+            translation: 'немного скучный человек',
+            context: '"I\'m nothing special, in fact I\'m a bit of a bore"',
+            note: '<b>bore</b> здесь существительное, не глагол! «A bore» = скучный человек. Конструкция <b>a bit of a + noun</b> — типично разговорная британская смягчённая характеристика: <em>a bit of a mess, a bit of a disaster.</em>',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'tell a joke',
+            translation: 'рассказать шутку',
+            context: '"If I tell a joke, you\'ve probably heard it before"',
+            note: 'Устойчивое сочетание: всегда <b>tell</b> a joke, никогда не <em>say</em> или <em>speak</em>. Аналогично: tell a story, tell the truth, tell a lie.',
+            cefr: 'B1',
+            stars: ''
+          },
+          {
+            phrase: 'you\'ve probably heard it before',
+            translation: 'ты, наверное, уже это слышал',
+            context: '"If I tell a joke, you\'ve probably heard it before"',
+            note: 'Present Perfect для выражения опыта + наречие <b>probably</b> для смягчения. Разговорная естественность: не «you probably heard», а именно с Present Perfect.',
+            cefr: 'B1–B2',
+            stars: ''
+          },
+          {
+            phrase: 'have a talent',
+            translation: 'иметь талант',
+            context: '"But I have a talent, a wonderful thing"',
+            note: 'Коллокация: <b>have a talent</b> (не <em>possess</em>, не <em>own</em>). Также: <em>have a talent for something / for doing something.</em>',
+            cefr: 'B1',
+            stars: ''
+          },
+          {
+            phrase: 'grateful and proud',
+            translation: 'благодарный и гордый',
+            context: '"I\'m so grateful and proud"',
+            note: '<b>grateful</b> ≠ <b>thankful</b>: grateful — более глубокое, тёплое чувство признательности. Классическая коллокация эмоций в английской речи.',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'sing it out loud',
+            translation: 'петь вслух / громко',
+            context: '"All I want is to sing it out loud"',
+            note: '<b>out loud</b> vs <b>aloud</b>: оба верны, но <em>out loud</em> — более разговорное и эмфатическое. Нюанс: <em>think out loud</em> = думать вслух (говорить то, что думаешь).',
+            cefr: 'B2',
+            stars: ''
+          },
+        ]
+      },
+      {
+        level: 'b2c1',
+        label: '🟡 B2 → C1',
+        badgeClass: 'level-b2c1',
+        items: [
+          {
+            phrase: 'bring joy',
+            translation: 'приносить радость',
+            context: '"Thanks for all the joy they\'re bringing"',
+            note: '<b>bring joy / happiness / comfort</b> — частая академическая и литературная коллокация. Обратите внимание: Present Continuous (<em>they\'re bringing</em>) подчёркивает длящееся действие.',
+            cefr: 'B2+',
+            stars: ''
+          },
+          {
+            phrase: 'live without (something)',
+            translation: 'жить без чего-либо',
+            context: '"Who can live without it?"',
+            note: 'Конструкция зависимости: <b>can\'t live without</b> = незаменимо. Часто используется в риторических вопросах и гиперболах.',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'in all honesty',
+            translation: 'честно говоря',
+            context: '"I ask in all honesty"',
+            note: 'Формальный дискурсивный маркер искренности. Сильнее, чем <em>honestly</em> или <em>to be honest</em> — добавляет торжественность и вес высказыванию.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'what would life be?',
+            translation: 'чем была бы жизнь?',
+            context: '"What would life be?"',
+            note: 'Риторический вопрос со Second Conditional без if-clause. Полная форма: <em>What would life be without music?</em> — контекст заменяет условие. Мощный дискурсивный инструмент.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'capture a heart',
+            translation: 'покорить сердце',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: '<b>capture</b> в переносном значении = завоевать, покорить. Метафорические коллокации: <em>capture attention, capture the imagination, capture a heart.</em>',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'like a melody can',
+            translation: '(так,) как это может делать мелодия',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: '<b>Эллипсис</b>: пропущен глагол «capture a heart» во второй части. Полная форма: <em>like a melody can capture a heart.</em> Носители постоянно используют этот приём для избежания повторений. C1–C2.',
+            cefr: 'C1–C2',
+            stars: '⭐⭐'
+          },
+        ]
+      },
+      {
+        level: 'c1c2',
+        label: '🔴 C1–C2',
+        badgeClass: 'level-c1c2',
+        items: [
+          {
+            phrase: "I'm nothing special",
+            translation: 'я ничего особенного',
+            context: '"I\'m nothing special, in fact I\'m a bit of a bore"',
+            note: 'На поверхности — простое B1. Но здесь это <b>understatement</b> (намеренное преуменьшение): говорящий подчёркивает скромность, чтобы усилить контраст с талантом. Это <b>pragmatics</b> — умение читать подтекст.',
+            cefr: 'C1 (pragmatics)',
+            stars: '⭐'
+          },
+          {
+            phrase: 'in fact',
+            translation: 'на самом деле / более того',
+            context: '"I\'m nothing special, in fact I\'m a bit of a bore"',
+            note: '<b>in fact</b> — дискурсивный маркер, который усиливает или уточняет предыдущее высказывание (не просто «на самом деле», а «и более того»). Ключевой маркер для C1-уровневой связности речи.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'everyone listens when I start to sing',
+            translation: 'все слушают, когда я начинаю петь',
+            context: '"\'Cause everyone listens when I start to sing"',
+            note: 'Грамматически простая фраза, но создаёт <b>dramatic contrast</b>: незначительный человек → магический эффект пения. Умение строить такой контраст — навык уровня C1+ в discourse control.',
+            cefr: 'C1 (discourse)',
+            stars: '⭐'
+          },
+          {
+            phrase: 'who can live without it?',
+            translation: 'кто может жить без этого?',
+            context: '"Who can live without it? I ask in all honesty"',
+            note: 'Это не вопрос — это утверждение. <b>Риторический вопрос</b> = «никто не может». Понимать и использовать риторические вопросы — признак C1 discourse awareness.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'without a song or a dance, what are we?',
+            translation: 'без песни и танца — кто мы?',
+            context: '"Without a song or a dance, what are we?"',
+            note: '<b>Философская редукция</b>: «что мы есть» без культуры и искусства? Инверсия + абстрактное обобщение. Уровень C2 — это не про грамматику, это про умение мыслить и формулировать абстрактно.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'whoever it was',
+            translation: 'кто бы это ни был',
+            context: '"Well, whoever it was, I\'m a fan"',
+            note: '<b>whoever</b> = «кто угодно, кто» / «кто бы ни». Сложное неопределённое местоимение, требующее понимания референтной неопределённости. Редко используется учащимися ниже C1.',
+            cefr: 'C1–C2',
+            stars: '⭐'
+          },
+          {
+            phrase: "I've often wondered",
+            translation: 'я часто задумывалась',
+            context: '"And I\'ve often wondered, how did it all start?"',
+            note: '<b>Present Perfect + often</b> = повторяющаяся мысль с актуальностью в настоящем. Учащиеся ниже C1 обычно заменяют это Past Simple: «I often wondered» — что технически ошибочно в данном контексте.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'how did it all start?',
+            translation: 'как всё это началось?',
+            context: '"How did it all start?"',
+            note: 'После <em>I\'ve wondered</em> ожидается косвенный вопрос: <em>how it all started</em>. Но здесь — прямой вопрос, что создаёт <b>разговорный, риторический эффект</b>. Переключение между прямым и косвенным вопросом — C1.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'nothing can capture a heart like X can',
+            translation: 'ничто не может покорить сердце так, как X',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: 'Сравнительная конструкция <b>nothing can X like Y can</b> с эллипсисом во второй части. Повтор модального <em>can</em> создаёт параллелизм. Одна из самых элегантных структур в английской риторике.',
+            cefr: 'C1–C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'what a joy, what a life, what a chance',
+            translation: 'какая радость, какая жизнь, какой шанс',
+            context: '"What a joy, what a life, what a chance"',
+            note: '<b>Восклицательная анафора</b> + <b>триколон</b>: три параллельные структуры <em>What a + noun</em> без прилагательного. Чистая <em>What a + noun</em> (без adj.) — более зрелый вариант, чем <em>What a wonderful life</em>. Стилистический приём уровня C2.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+        ]
+      }
+    ]
+  },
+
+  // ── Section 2: Grammar ─────────────────────────────────────────────────────
+  {
+    section: 'grammar',
+    sectionTitle: '⚙️ Grammar Constructions',
+    levels: [
+      {
+        level: 'b1b2',
+        label: '🟢 B1–B2 (important for fluency)',
+        badgeClass: 'level-b1b2',
+        items: [
+          {
+            phrase: "If I tell a joke, you've probably heard it before",
+            translation: 'если я расскажу шутку, ты, наверно, уже слышал её',
+            context: '"If I tell a joke, you\'ve probably heard it before"',
+            note: '<b>First Conditional + Present Perfect</b> в главной части. Нетипичная комбинация: обычно учебники дают Present Simple в обеих частях, но реальная речь часто использует Perfect для выражения накопленного опыта.',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'before I could walk / talk',
+            translation: 'до того как я научилась ходить / говорить',
+            context: '"She says I was a dancer before I could walk"',
+            note: '<b>before + Past Simple</b> и <b>could</b> для выражения прошлой способности. <em>Could</em> здесь = was able to. Не путать с <em>can</em> в значении разрешения.',
+            cefr: 'B1–B2',
+            stars: ''
+          },
+        ]
+      },
+      {
+        level: 'b2c1',
+        label: '🟡 B2 → C1',
+        badgeClass: 'level-b2c1',
+        items: [
+          {
+            phrase: "I've often wondered…",
+            translation: 'я часто задумывалась…',
+            context: '"And I\'ve often wondered, how did it all start?"',
+            note: '<b>Present Perfect + frequency adverb</b>. Конструкция «размышляющей речи»: <em>I\'ve always wondered, I\'ve often thought, I\'ve sometimes asked myself.</em> Характерна для C1 уровня беглости.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'who found out that nothing can…',
+            translation: 'кто обнаружил, что ничто не может…',
+            context: '"Who found out that nothing can capture a heart like a melody can?"',
+            note: 'Сложноподчинённое предложение: <b>found out + that-clause</b>. <em>Find out</em> = discover (фразовый глагол). Внутри придаточного — ещё одно сравнительное придаточное с эллипсисом.',
+            cefr: 'B2+',
+            stars: ''
+          },
+        ]
+      },
+      {
+        level: 'c1c2',
+        label: '🔴 C1–C2 (most powerful)',
+        badgeClass: 'level-c1c2',
+        items: [
+          {
+            phrase: 'What would life be (without…)?',
+            translation: 'Чем была бы жизнь (без…)?',
+            context: '"What would life be?"',
+            note: '<b>Second Conditional + абстракция + эллипсис if-clause</b>. Контекст полностью заменяет условную часть. Мощный риторический инструмент: короткий вопрос несёт весь смысл.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'Without a song or a dance, what are we?',
+            translation: 'Без песни и танца — кто мы?',
+            context: '"Without a song or a dance, what are we?"',
+            note: '<b>Инверсия</b>: обстоятельство вынесено в начало + риторический вопрос. <b>Философское обобщение</b>: <em>we</em> = all humans. Сочетание инверсии и абстракции — признак C2 уровня.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'like a melody can',
+            translation: 'как мелодия (может)',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: '<b>Ellipsis</b>: глагольная группа <em>capture a heart</em> опущена во второй части сравнения. Полная форма: <em>like a melody can capture a heart.</em> Носители используют этот приём автоматически — учащиеся осваивают его на уровне C2.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'All I want is to sing it out loud',
+            translation: 'Всё, чего я хочу — это петь вслух',
+            context: '"All I want is to sing it out loud"',
+            note: '<b>Pseudo-cleft sentence</b> (расщеплённое предложение): <em>All + subject + verb + is + to-infinitive</em>. Используется для эмфазы — выделения самого важного. Учащиеся C1 часто знают эту структуру пассивно, но редко используют активно.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+        ]
+      }
+    ]
+  }
+];
+
+// ─── Vocab page logic ──────────────────────────────────────────────────────────
+let vocabReturnTo = 'student'; // 'student' or 'staff'
+let activeVocabFilter = 'all';
+
+function openVocabPage(from) {
+  vocabReturnTo = from;
+  document.getElementById('vocab-page').style.display = 'block';
+  document.getElementById('vocab-back-btn').onclick = closeVocabPage;
+  if (!document.getElementById('vocab-content').children.length) renderVocab();
+}
+
+function closeVocabPage() {
+  document.getElementById('vocab-page').style.display = 'none';
+  if (vocabReturnTo === 'standalone') {
+    // login-overlay is still visible underneath — nothing to do
+    pinDigits[0].focus();
+  } else if (vocabReturnTo === 'staff') {
+    document.getElementById('staff-dashboard').style.display = 'block';
+  }
+}
+
+function vocabFilter(filter) {
+  activeVocabFilter = filter;
+  document.querySelectorAll('.vf-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderVocab();
+}
+
+function renderVocab() {
+  const container = document.getElementById('vocab-content');
+  container.innerHTML = '';
+
+  VOCAB_DATA.forEach(section => {
+    // Section filter
+    if (activeVocabFilter === 'vocab' && section.section !== 'vocab') return;
+    if (activeVocabFilter === 'grammar' && section.section !== 'grammar') return;
+
+    const secEl = document.createElement('div');
+    secEl.className = 'vocab-section';
+
+    const secTitle = document.createElement('div');
+    secTitle.className = 'vocab-section-title';
+    secTitle.textContent = section.sectionTitle;
+    secEl.appendChild(secTitle);
+
+    section.levels.forEach(levelGroup => {
+      // Level filter
+      if (activeVocabFilter === 'b1b2' && levelGroup.level !== 'b1b2') return;
+      if (activeVocabFilter === 'b2c1' && levelGroup.level !== 'b2c1') return;
+      if (activeVocabFilter === 'c1c2' && levelGroup.level !== 'c1c2') return;
+
+      const grpEl = document.createElement('div');
+      grpEl.className = 'vocab-level-group';
+
+      const hdr = document.createElement('div');
+      hdr.className = 'vocab-level-header';
+      hdr.innerHTML = `<span class="level-badge ${levelGroup.badgeClass}">${levelGroup.label}</span>
+        <span class="level-toggle">${levelGroup.items.length} items</span>`;
+      grpEl.appendChild(hdr);
+
+      const itemsEl = document.createElement('div');
+      itemsEl.className = 'vocab-items';
+
+      levelGroup.items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'vocab-item';
+        card.innerHTML = `
+          <div class="vocab-item-top">
+            <span class="vocab-phrase">${item.phrase}</span>
+            <span class="vocab-arrow">→</span>
+            <span class="vocab-translation">${item.translation}</span>
+            ${item.stars ? `<span class="vocab-stars">${item.stars}</span>` : ''}
+          </div>
+          <div class="vocab-detail" id="vd-${section.section}-${levelGroup.level}-${idx}">
+            <div class="context-line">${item.context}</div>
+            <div>${item.note}</div>
+            <span class="cefr-tag ${levelGroup.badgeClass}">CEFR: ${item.cefr}</span>
+          </div>`;
+
+        card.addEventListener('click', () => {
+          const detail = card.querySelector('.vocab-detail');
+          detail.classList.toggle('open');
+        });
+
+        itemsEl.appendChild(card);
+      });
+
+      grpEl.appendChild(itemsEl);
+      secEl.appendChild(grpEl);
+    });
+
+    container.appendChild(secEl);
+  });
+}
+
+
+
 </script>
 </body>
 </html>
