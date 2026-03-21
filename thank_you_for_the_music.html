@@ -1778,35 +1778,12 @@ function toggleAnswerReview(btn, id) {
 }
 
 function buildAnswerReview(panel, answers) {
-  // answers = [{answer, typed, hinted}, ...] in order of primary cells
-  // We need to map them back onto the lyrics structure
-  // Walk AK_SECTIONS, collect blanks in order (primary only = first chorus occurrence)
-  const blanks = [];
-  const seenSyncIds = new Set();
+  // answers = [{answer, typed, hinted}] — only primary cells, in DOM order
+  // We render ALL sections/lines visually, but only consume from answers[]
+  // for primary cells (first occurrence of each syncId for chorus).
 
-  AK_SECTIONS.forEach((section, si) => {
-    if (!section.lines) return;
-    section.lines.forEach((tokens, li) => {
-      const syncLineIdx = (section.isChorus && li >= AK_CHORUS_LINES.length)
-        ? AK_CHORUS_LINES.length - 1 : li;
-      let blankIdx = 0;
-      tokens.forEach(tok => {
-        if (typeof tok !== 'string') {
-          tok[0].split('').forEach((ch, ci) => {
-            const sid = section.isChorus ? `c_${syncLineIdx}_${blankIdx}_${ci}` : null;
-            const isPrimary = !sid || !seenSyncIds.has(sid);
-            if (sid) seenSyncIds.add(sid);
-            blanks.push({ isPrimary, answer: ch, sid });
-          });
-          blankIdx++;
-        }
-      });
-    });
-  });
-
-  // Now render sections with the answers mapped in
   let ansIdx = 0;
-  const primaryAnswers = answers; // already only primary cells
+  const seenSids = new Set(); // track which chorus syncIds we've already consumed
 
   AK_SECTIONS.forEach(section => {
     if (!section.lines) return;
@@ -1835,46 +1812,56 @@ function buildAnswerReview(panel, answers) {
           }
           prevWasBlank = false;
         } else {
+          const word = tok[0];
           const grp = document.createElement('div');
           grp.className = 'ar-group';
           if (prevWasBlank) grp.classList.add('gap-before');
 
-          tok[0].split('').forEach((ch, ci) => {
+          word.split('').forEach((ch, ci) => {
+            // Determine if this cell is primary
             const sid = section.isChorus ? `c_${syncLineIdx}_${blankIdx}_${ci}` : null;
-            // Is this the primary occurrence?
-            const isPrimaryOcc = !sid || (() => {
-              // primary = first time we see this sid in our walk
-              // We need to track per-render; use a closure map
-              return true; // we'll handle via ansIdx below
-            })();
+            const isPrimary = !sid || !seenSids.has(sid);
+            if (sid) seenSids.add(sid);
 
             const cell = document.createElement('div');
             cell.className = 'ar-cell';
 
-            // Get answer data
-            let typed = '', hinted = false, isCorrect = false;
-            if (ansIdx < primaryAnswers.length) {
-              const a = primaryAnswers[ansIdx];
-              typed   = a.typed;
-              hinted  = a.hinted;
-              isCorrect = typed === a.answer;
-              ansIdx++;
-            }
-
-            if (hinted) {
-              cell.classList.add('hinted');
-              cell.textContent = ch;
-            } else if (typed === '') {
-              cell.classList.add('wrong');
-              cell.textContent = '–';
-            } else if (isCorrect) {
-              cell.classList.add('correct');
-              cell.textContent = ch;
+            if (isPrimary && ansIdx < answers.length) {
+              // Consume from answers
+              const a = answers[ansIdx++];
+              const isCorrect = a.typed === a.answer;
+              if (a.hinted) {
+                cell.classList.add('hinted');
+                cell.textContent = ch;
+              } else if (a.typed === '') {
+                cell.classList.add('wrong');
+                cell.textContent = '–';
+              } else if (isCorrect) {
+                cell.classList.add('correct');
+                cell.textContent = ch;
+              } else {
+                cell.classList.add('wrong');
+                cell.textContent = a.typed;
+              }
+              // Store for mirror cells below
+              cell.dataset.isPrimary = '1';
+              cell.dataset.displayClass = cell.classList[1]; // correct/wrong/hinted
+              cell.dataset.displayText = cell.textContent;
             } else {
-              cell.classList.add('wrong');
-              cell.textContent = typed;
+              // Mirror cell — copy display from the primary sid
+              // Find the primary cell already rendered for this sid
+              // (it's in the DOM already since primary comes first)
+              const primaryCell = panel.querySelector(`[data-sid="${sid}"]`);
+              if (primaryCell) {
+                cell.classList.add(primaryCell.dataset.displayClass || 'empty');
+                cell.textContent = primaryCell.dataset.displayText || ch;
+              } else {
+                cell.classList.add('empty');
+                cell.textContent = ch;
+              }
             }
 
+            if (sid) cell.dataset.sid = sid;
             grp.appendChild(cell);
           });
 
