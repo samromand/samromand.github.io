@@ -1,0 +1,4726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thank You for the Music – Fill in the Blanks</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf6ee;
+    --surface: #fffdf9;
+    --border: #e2d9cc;
+    --text: #1a1410;
+    --muted: #7a6a58;
+    --accent: #c8873a;
+    --accent-light: #f5e6d3;
+    --correct: #2d8a4e;
+    --correct-bg: #e6f4ec;
+    --wrong: #c0392b;
+    --wrong-bg: #fcecea;
+    --hint-color: #7c4dbd;
+    --hint-bg: #f0eafa;
+    --hint-border: #b89edc;
+    --cell-size: 32px;
+    --cell-border: #b8a898;
+    --cell-focus: #c8873a;
+    --shadow: 0 2px 16px rgba(60,40,10,0.08);
+    /* Extra right margin so hint buttons don't overlap card border */
+    --hint-btn-w: 32px;
+    --hint-gap: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+  }
+
+  .page-wrapper {
+    /* Extra right space for the hint buttons that float outside the card */
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .song-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 5vw, 42px);
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .subtitle { color: var(--muted); font-size: 15px; margin-top: 6px; }
+
+  .author {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 8px;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+  }
+
+  .instructions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 36px;
+    line-height: 1.6;
+    box-shadow: var(--shadow);
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+  .instructions strong { color: var(--text); }
+
+  /* ── Card + hint button layout ─────────────────────────────────────────── */
+  .lyrics-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    /* Right padding leaves room so text doesn't go under the hint buttons */
+    padding: 36px 40px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.7s 0.2s ease both;
+    /* overflow visible so hint buttons can sit just outside the right edge */
+    overflow: visible;
+  }
+
+  .section { margin-bottom: 32px; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section.is-chorus .section-label { color: var(--accent); }
+
+  /* Each lyric line is wrapped in a row that can host the hint button */
+  .line-row {
+    position: relative;
+    margin-bottom: 12px;
+    /* right padding = button width + gap, so text never overlaps button */
+    padding-right: calc(var(--hint-btn-w) + var(--hint-gap) + 4px);
+  }
+
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px 8px;
+    line-height: 1;
+  }
+
+  /* ── Hint button ────────────────────────────────────────────────────────── */
+  .hint-btn {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--hint-btn-w);
+    height: var(--hint-btn-w);
+    border-radius: 50%;
+    border: 1.5px solid var(--hint-border);
+    background: var(--hint-bg);
+    color: var(--hint-color);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s, opacity 0.2s;
+    opacity: 0.55;
+  }
+  .hint-btn:hover  { background: #e4d8f5; opacity: 1; transform: translateY(-50%) scale(1.08); }
+  .hint-btn:active { transform: translateY(-50%) scale(0.94); }
+  /* Dim when no empty cells remain on this line */
+  .hint-btn.exhausted {
+    opacity: 0.2;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  /* ── Cells ──────────────────────────────────────────────────────────────── */
+  .plain-text {
+    font-size: 16px;
+    color: var(--text);
+    line-height: var(--cell-size);
+    white-space: pre;
+  }
+
+  .cell-group {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 3px;
+  }
+  .gap-before { margin-left: 6px; }
+
+  .cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 1.5px solid var(--cell-border);
+    border-radius: 6px;
+    background: #ffffff;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    caret-color: transparent;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    cursor: text;
+    -webkit-appearance: none;
+  }
+  .cell:focus {
+    border-color: var(--cell-focus);
+    box-shadow: 0 0 0 3px rgba(200,135,58,0.18);
+    background: #ffffff;
+  }
+
+  /* Filled by student */
+  .cell.filled {
+    background: #fdefd8;
+    border-color: #c8a06a;
+  }
+
+  /* Mirror (non-primary chorus) — empty */
+  .cell.synced-mirror {
+    background: #ffffff;
+    border-color: #d9b88a;
+    border-style: dashed;
+    color: var(--muted);
+    cursor: default;
+  }
+  /* Mirror — filled via sync */
+  .cell.synced-mirror.filled {
+    background: #fdefd8;
+    border-color: #c8a06a;
+    border-style: solid;
+  }
+
+  /* Hint-revealed cell */
+  .cell.hinted {
+    background: var(--hint-bg) !important;
+    border-color: var(--hint-border) !important;
+    border-style: solid !important;
+    color: var(--hint-color) !important;
+    cursor: default;
+  }
+
+  /* Check results */
+  .cell.correct {
+    background: var(--correct-bg) !important;
+    border-color: var(--correct) !important;
+    color: var(--correct) !important;
+  }
+  .cell.wrong {
+    background: var(--wrong-bg) !important;
+    border-color: var(--wrong) !important;
+    color: var(--wrong) !important;
+  }
+
+  /* ── Controls ───────────────────────────────────────────────────────────── */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.35s ease both;
+  }
+
+  button.main-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 32px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+  }
+  button.main-btn:active { transform: scale(0.97); }
+
+  .btn-check {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(200,135,58,0.35);
+  }
+  .btn-check:hover { opacity: 0.92; box-shadow: 0 6px 18px rgba(200,135,58,0.4); }
+
+  .btn-reset {
+    background: var(--surface);
+    color: var(--muted);
+    border: 1.5px solid var(--border) !important;
+  }
+  .btn-reset:hover { background: var(--bg); }
+
+  .score-banner {
+    display: none;
+    text-align: center;
+    margin-top: 24px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    animation: pop 0.3s ease both;
+  }
+  .score-banner span {
+    color: var(--accent);
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+  }
+
+  @keyframes fadeDown {
+    from { opacity:0; transform:translateY(-14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes pop {
+    0%   { transform:scale(0.85); opacity:0; }
+    70%  { transform:scale(1.04); }
+    100% { transform:scale(1); opacity:1; }
+  }
+
+  @media (max-width: 600px) {
+    .lyrics-card { padding: 24px 18px; }
+    :root { --cell-size: 28px; --hint-btn-w: 26px; --hint-gap: 6px; }
+    .plain-text { font-size: 15px; }
+  }
+
+  /* ── Staff Only button ──────────────────────────────────────────────────── */
+  .staff-link-wrap {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .staff-link {
+    background: none;
+    border: none;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+    opacity: 0.6;
+  }
+  .staff-link:hover { background: var(--bg); color: var(--text); opacity: 1; }
+
+  .staff-back-link {
+    background: none;
+    border: none;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    margin-top: 8px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.15s;
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+  .staff-back-link:hover { color: var(--text); }
+
+  /* ── Staff overlay (reuses #login-overlay layout) ───────────────────────── */
+  #staff-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #vocab-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 110;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── Under construction ─────────────────────────────────────────────────── */
+  #staff-dashboard {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .under-construction {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(60,40,10,0.1);
+    padding: 56px 44px 44px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .uc-icon { font-size: 48px; margin-bottom: 20px; }
+
+  .under-construction h2 {
+    font-family: "DM Serif Display", serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .under-construction p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── Staff login card — wider to fit 8 digits ───────────────────────────── */
+  #staff-overlay .login-card {
+    max-width: 500px;
+  }
+
+  #staff-pin-inputs .pin-digit {
+    width: 42px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+  #staff-pin-inputs {
+    gap: 7px;
+  }
+
+  /* ── Login overlay ──────────────────────────────────────────────────────── */
+  #login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(60,40,10,0.13);
+    padding: 48px 44px 40px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .login-badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+
+  .login-card h2 {
+    font-family: "DM Serif Display", serif;
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .login-card h2 em { font-style: italic; color: var(--accent); }
+
+  .login-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .pin-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .pin-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .pin-digit {
+    width: 54px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    text-align: center;
+    font-family: "DM Serif Display", serif;
+    font-size: 26px;
+    color: var(--text);
+    caret-color: transparent;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+  }
+
+  .pin-digit:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,135,58,0.18);
+    background: #fff;
+  }
+
+  .pin-digit.pin-error {
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+    animation: shake 0.35s ease;
+  }
+
+  .pin-error-msg {
+    font-size: 13px;
+    color: var(--wrong);
+    min-height: 20px;
+    margin-bottom: 4px;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+
+  /* ── Welcome banner ─────────────────────────────────────────────────────── */
+  #welcome-banner {
+    display: none;
+    text-align: center;
+    margin-bottom: 18px;
+    animation: fadeDown 0.5s ease both;
+  }
+
+  .welcome-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-light);
+    border: 1px solid #e0c49a;
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .welcome-pill .wave { font-size: 16px; }
+
+
+  /* ── Staff dashboard ────────────────────────────────────────────────────── */
+  #staff-dashboard {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    overflow-y: auto;
+    padding: 36px 24px 60px;
+  }
+
+  .dash-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .dash-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .dash-title {
+    font-family: "DM Serif Display", serif;
+    font-size: 24px;
+    color: var(--text);
+    margin-top: 8px;
+  }
+  .dash-title em { font-style: italic; color: var(--accent); }
+
+  .dash-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+
+  .dash-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .dash-btn:active { transform: scale(0.96); }
+  .dash-btn-refresh { background: var(--accent-light); color: var(--accent); }
+  .dash-btn-refresh:hover { opacity: 0.8; }
+  .dash-btn-danger  { background: #fcecea; color: var(--wrong); }
+  .dash-btn-danger:hover  { opacity: 0.8; }
+  .dash-btn-back    { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .dash-btn-back:hover    { background: var(--bg); }
+
+  .dash-status {
+    font-size: 13px;
+    color: var(--muted);
+    min-height: 20px;
+    margin-bottom: 8px;
+  }
+
+  .dash-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Bar chart ──────────────────────────────────────────────────────────── */
+  .bar-chart {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 48px;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bar-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar-track {
+    background: var(--bg);
+    border-radius: 6px;
+    height: 26px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--accent) 0%, #e8a84a 100%);
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    min-width: 4px;
+  }
+
+  .bar-score {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  /* ── Results list ───────────────────────────────────────────────────────── */
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .result-card.briefing   { border-left: 3px solid #bbb; }
+  .result-card.active     { border-left: 3px solid #f5c842; }
+  .result-card.finished   { border-left: 3px solid var(--correct); }
+
+  .result-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .result-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .result-score {
+    font-family: "DM Serif Display", serif;
+    font-size: 22px;
+    color: var(--correct);
+    white-space: nowrap;
+  }
+
+  .result-score.status-pill {
+    font-size: 12px;
+    font-family: "DM Sans", sans-serif;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 4px 12px;
+    white-space: nowrap;
+  }
+  .result-score.pill-briefing { background: #f0f0f0; color: #999; }
+  .result-score.pill-active   { background: #fffbe6; color: #b8860b; border: 1px solid #f5c842; }
+  .result-score.manual-score  { color: var(--accent); }
+
+  .result-delete {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+  .result-delete:hover { color: var(--wrong); background: var(--wrong-bg); }
+
+  .dash-empty {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 40px 0;
+  }
+
+
+  /* ── Audio player ───────────────────────────────────────────────────────── */
+  .player-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 24px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    animation: fadeDown 0.6s 0.15s ease both;
+  }
+
+  .player-play-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(200,135,58,0.35);
+    transition: opacity 0.15s, transform 0.1s;
+    line-height: 1;
+  }
+  .player-play-btn:hover  { opacity: 0.88; }
+  .player-play-btn:active { transform: scale(0.94); }
+  .player-play-btn:disabled {
+    background: #ccc;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+
+  .player-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .player-counter {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .player-counter .counter-val {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .player-counter.exhausted .counter-val {
+    color: var(--wrong);
+  }
+
+  .player-now-playing {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 5px;
+  }
+  .player-now-playing.visible { display: flex; }
+
+  .player-pulse {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.5); opacity: 0.5; }
+  }
+
+
+  /* ── Manual entry form ──────────────────────────────────────────────────── */
+  .manual-form {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: none;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+  }
+  .manual-form.open { display: flex; }
+
+  .manual-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .manual-field label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .manual-field select,
+  .manual-field input[type="number"] {
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .manual-field select:focus,
+  .manual-field input[type="number"]:focus {
+    border-color: var(--accent);
+  }
+
+  .manual-field select { min-width: 200px; }
+  .manual-field input[type="number"] { width: 100px; }
+
+  .dash-btn-add { background: #e8f5ee; color: var(--correct); }
+  .dash-btn-add:hover { opacity: 0.8; }
+  .dash-btn-add.active { background: var(--correct); color: #fff; }
+
+  .result-card.manual { border-left: 3px solid var(--accent); }
+  .result-score.manual-score { color: #444; }
+  .manual-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #f0f0f0;
+    color: #888;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+
+  /* ── Dashboard tabs ─────────────────────────────────────────────────────── */
+  .dash-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .dash-tab {
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .dash-tab:hover { color: var(--text); background: var(--bg); }
+  .dash-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .dash-panel { display: none; }
+  .dash-panel.active { display: block; }
+
+  /* ── Answer key lyrics ──────────────────────────────────────────────────── */
+  .ak-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 36px;
+    box-shadow: var(--shadow);
+  }
+
+  .ak-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background: var(--accent-light);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .ak-section { margin-bottom: 24px; }
+
+  .ak-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .is-chorus .ak-section-label { color: var(--accent); }
+
+  .ak-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 4px 6px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+
+  .ak-plain {
+    font-size: 16px;
+    color: var(--text);
+    line-height: 32px;
+    white-space: pre;
+  }
+
+  .ak-group {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .ak-group.gap-before { margin-left: 6px; }
+
+  .ak-cell {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--cell-border);
+    border-radius: 6px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: transparent;   /* hidden until revealed */
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    user-select: none;
+  }
+
+  .ak-cell:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* Revealed word */
+  .ak-cell.revealed {
+    background: #e8f5ee;
+    border-color: #6dbf8a;
+    color: #1e6b3a;
+    cursor: default;
+  }
+  .ak-cell.revealed:hover {
+    background: #e8f5ee;
+    border-color: #6dbf8a;
+  }
+
+  /* Mirror revealed (synced chorus) */
+  .ak-cell.mirror-revealed {
+    background: #e8f5ee;
+    border-color: #6dbf8a;
+    color: #1e6b3a;
+    cursor: default;
+  }
+
+  /* Reset button */
+  .ak-reset-wrap {
+    text-align: right;
+    margin-bottom: 12px;
+  }
+  .ak-reset-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .ak-reset-btn:hover { background: var(--bg); color: var(--text); }
+
+
+  /* ── Vocabulary page (shared: student + staff) ──────────────────────────── */
+  #vocab-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 115;
+    overflow-y: auto;
+    padding: 36px 24px 80px;
+  }
+
+  .vocab-wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .vocab-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .vocab-title {
+    font-family: "DM Serif Display", serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-top: 6px;
+  }
+  .vocab-title em { font-style: italic; color: var(--accent); }
+  .vocab-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  /* Category filter tabs */
+  .vocab-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .vf-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .vf-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .vf-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Section blocks */
+  .vocab-section { margin-bottom: 36px; }
+
+  .vocab-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Level group */
+  .vocab-level-group { margin-bottom: 24px; }
+
+  .vocab-level-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .level-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .level-b1b2  { background: #e8f5ee; color: #2a7a4a; }
+  .level-b2c1  { background: #fff8e0; color: #8a6a00; }
+  .level-c1c2  { background: #fceaea; color: #a02020; }
+
+  .level-toggle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  /* Item cards */
+  .vocab-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .vocab-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .vocab-item:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(200,135,58,0.1); }
+
+  .vocab-item-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .vocab-phrase {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    font-family: "DM Serif Display", serif;
+  }
+
+  .vocab-arrow {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .vocab-translation {
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .vocab-stars {
+    margin-left: auto;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  /* Expandable detail */
+  .vocab-detail {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .vocab-detail.open { display: block; }
+
+  .vocab-detail .note-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .vocab-detail .context-line {
+    font-style: italic;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .vocab-detail .cefr-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
+
+  /* Back button */
+  .vocab-back-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .vocab-back-btn:hover { background: var(--bg); color: var(--text); }
+
+  /* Vocabulary button in student view */
+  .btn-vocab {
+    background: #ede8f5;
+    color: #6a3faa;
+    border: none;
+  }
+  .btn-vocab:hover { opacity: 0.85; }
+
+
+  /* ── Answer review panel ────────────────────────────────────────────────── */
+  .result-card.expandable { cursor: default; }
+
+  .result-expand-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .result-expand-btn:hover { background: var(--bg); color: var(--text); border-color: var(--cell-border); }
+  .result-expand-btn.open  { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+  .answer-review {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .answer-review.open { display: block; }
+
+  /* Мини-версия текста песни */
+  .ar-section { margin-bottom: 20px; }
+
+  .ar-section-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ar-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px 4px;
+    margin-bottom: 6px;
+    line-height: 1;
+  }
+
+  .ar-plain {
+    font-size: 13px;
+    color: var(--text);
+    white-space: pre;
+    line-height: 26px;
+  }
+
+  .ar-group { display: inline-flex; gap: 2px; }
+  .ar-group.gap-before { margin-left: 4px; }
+
+  .ar-cell {
+    width: 22px;
+    height: 26px;
+    border-radius: 4px;
+    border: 1.5px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .ar-cell.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); }
+  .ar-cell.wrong   { background: var(--wrong-bg);   border-color: var(--wrong);   color: var(--wrong); }
+  .ar-cell.hinted  { background: var(--hint-bg);    border-color: var(--hint-border); color: var(--hint-color); }
+  .ar-cell.empty   { background: #f5f5f5; border-color: #ccc; color: #ccc; }
+
+
+  /* ── Podium ─────────────────────────────────────────────────────────────── */
+  .podium-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 12px;
+    margin: 8px 0 32px;
+    padding: 0 20px;
+  }
+
+  .podium-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 180px;
+  }
+
+  .podium-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .podium-score {
+    font-family: "DM Serif Display", serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .podium-medal { font-size: 28px; line-height: 1; }
+
+  .podium-block {
+    width: 100%;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "DM Serif Display", serif;
+    font-size: 22px;
+    color: #fff;
+    animation: podiumRise 0.6s cubic-bezier(.22,1,.36,1) both;
+  }
+
+  .podium-1 { background: linear-gradient(160deg,#f5c842,#e6a800); height: 110px; animation-delay: 0.1s; }
+  .podium-2 { background: linear-gradient(160deg,#c0c8d8,#8a96aa); height: 80px;  animation-delay: 0.25s; }
+  .podium-3 { background: linear-gradient(160deg,#d4956a,#b06a3a); height: 56px;  animation-delay: 0.4s; }
+
+  @keyframes podiumRise {
+    from { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+    to   { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+  }
+
+  /* ── Certificates button ─────────────────────────────────────────────────── */
+  .dash-btn-cert { background: #fff8e0; color: #8a6a00; }
+  .dash-btn-cert:hover { opacity: 0.8; }
+
+
+  /* ── Teacher result ─────────────────────────────────────────────────────── */
+  .teacher-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border);
+  }
+
+  .teacher-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6a3faa;
+    margin-bottom: 10px;
+  }
+
+  .bar-row.teacher-row .bar-fill {
+    background: linear-gradient(90deg, #9b6bd4 0%, #c49ee8 100%);
+  }
+
+  .bar-row.teacher-row .bar-name {
+    color: #6a3faa;
+  }
+
+  .bar-row.teacher-row .bar-score {
+    color: #6a3faa;
+  }
+
+
+  /* ── Welcome / Intro screen — fullscreen card carousel ─────────────────── */
+  #welcome-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 95;
+    overflow: hidden;
+  }
+
+  /* Slides container */
+  .ws-slides {
+    display: flex;
+    height: calc(100% - 65px);
+    transition: transform 0.45s cubic-bezier(.4,0,.2,1);
+  }
+
+  .ws-slide {
+    min-width: 100%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 32px 20px;
+    text-align: center;
+    gap: 0;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  /* Slide: greeting */
+  .ws-slide-greeting .ws-emoji   { font-size: 56px; margin-bottom: 20px; line-height: 1; }
+  .ws-slide-greeting .ws-hi      { font-size: 16px; color: var(--muted); margin-bottom: 6px; }
+  .ws-slide-greeting .ws-name    { font-family: "DM Serif Display", serif; font-size: clamp(30px,7vw,52px); color: var(--text); line-height: 1.15; margin-bottom: 10px; }
+  .ws-slide-greeting .ws-name em { font-style: italic; color: var(--accent); }
+  .ws-slide-greeting .ws-luck    { font-size: 16px; color: var(--muted); margin-bottom: 28px; }
+  .ws-slide-greeting .ws-author  { font-size: 13px; color: var(--muted); opacity: 0.7; margin-top: 4px; }
+
+  /* Slide: ABBA info */
+  .ws-slide-abba .ws-emoji       { font-size: 52px; margin-bottom: 24px; }
+  .ws-slide-abba .ws-slide-title { margin-bottom: 16px; }
+  .ws-slide-abba .ws-abba-text   { font-size: 16px; color: var(--muted); line-height: 1.7; max-width: 520px; }
+  .ws-slide-abba .ws-abba-text b { color: var(--text); }
+  .ws-slide-abba .ws-abba-year   { margin-top: 18px; font-size: 13px; color: var(--muted); opacity: 0.7; }
+
+  /* Slide: instruction card */
+  .ws-slide-instr .ws-instr-icon  { font-size: 64px; margin-bottom: 24px; line-height: 1; }
+  .ws-slide-instr .ws-slide-title { margin-bottom: 14px; }
+  .ws-slide-instr .ws-instr-text  { font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 480px; }
+  .ws-slide-instr .ws-instr-text b { color: var(--text); }
+
+  /* Shared title style */
+  .ws-slide-title {
+    font-family: "DM Serif Display", serif;
+    font-size: clamp(22px, 4vw, 32px);
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  /* Bottom nav bar */
+  .ws-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 65px;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    z-index: 2;
+  }
+
+  /* Dot indicators */
+  .ws-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .ws-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s, width 0.2s;
+  }
+  .ws-dot.active { background: var(--accent); width: 22px; border-radius: 4px; }
+
+  /* Nav buttons */
+  .ws-nav-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .ws-nav-btn:active { transform: scale(0.96); }
+  .ws-btn-next  { background: var(--accent); color: #fff; box-shadow: 0 3px 12px rgba(200,135,58,0.3); }
+  .ws-btn-next:hover  { opacity: 0.9; }
+  .ws-btn-prev  { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .ws-btn-prev:hover  { background: var(--bg); }
+  .ws-btn-start { background: var(--accent); color: #fff; font-size: 15px; padding: 12px 32px; box-shadow: 0 4px 16px rgba(200,135,58,0.35); }
+  .ws-btn-start:hover { opacity: 0.9; }
+  .ws-btn-invisible { visibility: hidden; }
+
+
+  /* ── Inline demo ────────────────────────────────────────────────────────── */
+  .ws-demo {
+    margin-top: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    max-width: 480px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .ws-demo-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  .ws-demo-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 4px 5px;
+    margin-bottom: 14px;
+  }
+
+  .ws-demo-text {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 28px;
+    white-space: pre;
+  }
+
+  .ws-demo-group { display: inline-flex; gap: 2px; }
+
+  .ws-demo-cell {
+    width: 26px;
+    height: 28px;
+    border: 1.5px solid var(--cell-border);
+    border-radius: 5px;
+    background: #fff;
+    text-align: center;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    caret-color: transparent;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+  }
+  .ws-demo-cell:focus { border-color: var(--cell-focus); box-shadow: 0 0 0 2px rgba(200,135,58,0.18); background: #fff; }
+  .ws-demo-cell.filled  { background: #fdefd8; border-color: #c8a06a; }
+  .ws-demo-cell.correct { background: var(--correct-bg) !important; border-color: var(--correct) !important; color: var(--correct) !important; }
+  .ws-demo-cell.wrong   { background: var(--wrong-bg) !important; border-color: var(--wrong) !important; color: var(--wrong) !important; }
+  .ws-demo-cell.hinted  { background: var(--hint-bg) !important; border-color: var(--hint-border) !important; color: var(--hint-color) !important; font-style: normal; cursor: default; }
+
+  .ws-demo-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .ws-demo-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .ws-demo-btn:hover { opacity: 0.85; }
+  .ws-demo-btn-check { background: var(--accent); color: #fff; }
+  .ws-demo-btn-reset { background: var(--bg); color: var(--muted); border: 1px solid var(--border) !important; }
+  .ws-demo-btn-hint  { width: 26px; height: 26px; padding: 0; border-radius: 50%; background: var(--hint-bg); color: var(--hint-color); border: 1.5px solid var(--hint-border) !important; font-size: 13px; }
+
+  .ws-demo-score {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    display: none;
+  }
+  .ws-demo-score.visible { display: inline; }
+  .ws-demo-score .ok  { color: var(--correct); }
+  .ws-demo-score .bad { color: var(--wrong); }
+  .ws-demo-score .hint-note { color: var(--hint-color); font-weight: 400; font-size: 12px; }
+
+
+  /* Mirror demo cells (second line in linked demo) */
+  .ws-demo-cell.demo-mirror {
+    background: #ffffff;
+    border-color: #d9b88a;
+    border-style: dashed;
+    color: var(--muted);
+  }
+  .ws-demo-cell.demo-mirror.filled {
+    background: #fdefd8;
+    border-color: #c8a06a;
+    border-style: solid;
+  }
+
+
+  /* ── Rank banner (student view) ────────────────────────────────────────── */
+  .rank-banner {
+    margin-top: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 22px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.4s ease both;
+    box-shadow: var(--shadow);
+  }
+  .rank-banner.visible { display: flex; }
+  .rank-info { display: flex; align-items: center; gap: 12px; }
+  .rank-medal { font-size: 28px; line-height: 1; }
+  .rank-text { font-size: 15px; color: var(--muted); line-height: 1.4; }
+  .rank-text strong { color: var(--text); font-size: 17px; display: block; }
+  .rank-refresh-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .rank-refresh-btn:hover { background: var(--bg); color: var(--text); }
+  .rank-refresh-btn.spinning { pointer-events: none; opacity: 0.5; }
+
+</style>
+</head>
+<body>
+
+<!-- ── Login overlay ─────────────────────────────────────────────────────── -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-badge">English Listening Quiz</div>
+    <h2>Thank You for the <em>Music</em></h2>
+    <div class="login-subtitle">Enter your 4-digit PIN to begin</div>
+    <div class="pin-label">Your PIN</div>
+    <div class="pin-inputs" id="pin-inputs">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+    </div>
+    <div class="pin-error-msg" id="pin-error"></div>
+    <div class="staff-link-wrap" style="display:flex;gap:12px;justify-content:center;">
+      <button class="staff-link" onclick="openStaffLogin()">🔒 Staff Only</button>
+      <button class="staff-link" onclick="openVocabLogin()" style="color:#6a3faa">📚 Language Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Staff login overlay ───────────────────────────────────────────────── -->
+<div id="staff-overlay" style="display:none">
+  <div class="login-card">
+    <div class="login-badge" style="background:#ede8f5;color:#6a3faa">Staff Access</div>
+    <h2>Results <em>Dashboard</em></h2>
+    <div class="login-subtitle">Enter the 8-digit staff PIN</div>
+    <div class="pin-label">Staff PIN</div>
+    <div class="pin-inputs" id="staff-pin-inputs">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+    </div>
+    <div class="pin-error-msg" id="staff-pin-error"></div>
+    <button class="staff-back-link" onclick="closeStaffLogin()">&#8592; Back</button>
+  </div>
+</div>
+
+<!-- ── Vocab login overlay ───────────────────────────────────────────────── -->
+<div id="vocab-overlay" style="display:none">
+  <div class="login-card">
+    <div class="login-badge" style="background:#ede8f5;color:#6a3faa">Language Notes</div>
+    <h2>Useful <em>Language</em></h2>
+    <div class="login-subtitle">Enter the 4-digit PIN to continue</div>
+    <div class="pin-label">PIN</div>
+    <div class="pin-inputs" id="vocab-pin-inputs">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+      <input class="pin-digit" maxlength="1" type="password" inputmode="numeric" pattern="[0-9]" autocomplete="off">
+    </div>
+    <div class="pin-error-msg" id="vocab-pin-error"></div>
+    <button class="staff-back-link" onclick="closeVocabLogin()">&#8592; Back</button>
+  </div>
+</div>
+
+
+<!-- ── Staff dashboard ───────────────────────────────────────────────────── -->
+<div id="staff-dashboard" style="display:none">
+  <div class="dash-wrap">
+    <div class="dash-header">
+      <div>
+        <div class="login-badge" style="background:#ede8f5;color:#6a3faa">Staff Dashboard</div>
+        <h2 class="dash-title">Results — <em>Thank You for the Music</em></h2>
+      </div>
+      <div class="dash-actions">
+        <button class="dash-btn dash-btn-cert" onclick="generateCertificates()">&#127881; Certificates</button>
+        <button class="dash-btn dash-btn-add" id="btn-add-manual" onclick="toggleManualForm()">&#43; Paper result</button>
+        <button class="dash-btn dash-btn-refresh" onclick="loadResults()">&#8635; Refresh</button>
+        <button class="dash-btn dash-btn-danger" onclick="deleteAllResults()">&#128465; Clear all</button>
+        <button class="dash-btn dash-btn-back" onclick="closeStaffDashboard()">&#8592; Back</button>
+      </div>
+    </div>
+
+    <!-- Manual entry form -->
+    <div class="manual-form" id="manual-form">
+      <div class="manual-field">
+        <label>Participant</label>
+        <select id="manual-name">
+          <option value="">— select name —</option>
+          <option>Roman Samoylov</option>
+          <option>Anastasia Dikareva</option>
+          <option>Aleksandr Zakharov</option>
+          <option>Daniil Koryakov</option>
+          <option>Ekaterina Krylova</option>
+          <option>Taisia Pavlova</option>
+          <option>Nikita Panfilov</option>
+          <option>Ilia Sotirov</option>
+          <option>Natalia Trubitsyna</option>
+          <option>Danil Shamsutdinov</option>
+          <option>Anastasia Sharapova</option>
+          <option>Varvara Akimova</option>
+        </select>
+      </div>
+      <div class="manual-field">
+        <label>Score (0–300)</label>
+        <input type="number" id="manual-score" min="0" max="300" placeholder="e.g. 245">
+      </div>
+      <button class="dash-btn dash-btn-add" onclick="submitManualResult()" style="align-self:flex-end">Save</button>
+      <button class="dash-btn dash-btn-back" onclick="toggleManualForm()" style="align-self:flex-end">Cancel</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dash-tabs">
+      <button class="dash-tab active" id="tab-results" onclick="switchTab('results')">&#128202; Results</button>
+      <button class="dash-tab" id="tab-answers" onclick="switchTab('answers')">&#9670; Answer Key</button>
+    </div>
+
+    <!-- Panel: Results -->
+    <div class="dash-panel active" id="panel-results">
+      <div id="dash-status" class="dash-status"></div>
+      <div id="chart-section" style="display:none">
+        <div class="dash-section-label">Leaderboard</div>
+        <div class="podium-wrap" id="podium"></div>
+        <div id="bar-chart" class="bar-chart"></div>
+        <div id="teacher-section" class="teacher-section" style="display:none">
+          <div class="teacher-label">🎓 Teacher</div>
+          <div class="bar-chart" id="teacher-chart"></div>
+        </div>
+      </div>
+      <div class="dash-section-label" style="margin-top:28px">Attempts</div>
+      <div id="results-list" class="results-list"></div>
+    </div>
+
+    <!-- Panel: Answer Key -->
+    <div class="dash-panel" id="panel-answers">
+      <div class="ak-hint">&#128161; Click any cell in a word to reveal the whole word. Choruses are synchronised.</div>
+      <div class="ak-reset-wrap">
+        <button class="ak-reset-btn" onclick="akResetAll()">&#8635; Hide all answers</button>
+      </div>
+      <div class="ak-card" id="ak-lyrics"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Vocabulary page ───────────────────────────────────────────────────── -->
+<div id="vocab-page" style="display:none">
+  <div class="vocab-wrap">
+    <div class="vocab-top">
+      <div>
+        <div class="login-badge">Language Focus</div>
+        <h2 class="vocab-title">Useful Language from <em>Thank You for the Music</em></h2>
+        <div class="vocab-subtitle">Click any item to expand • CEFR levels B1–C2</div>
+      </div>
+      <button class="vocab-back-btn" id="vocab-back-btn">&#8592; Back</button>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="vocab-filters">
+      <button class="vf-btn active" onclick="vocabFilter('all')">All</button>
+      <button class="vf-btn" onclick="vocabFilter('vocab')">&#128218; Vocabulary &amp; Collocations</button>
+      <button class="vf-btn" onclick="vocabFilter('grammar')">&#9881; Grammar</button>
+      <button class="vf-btn" onclick="vocabFilter('b1b2')">🟢 B1–B2</button>
+      <button class="vf-btn" onclick="vocabFilter('b2c1')">🟡 B2–C1</button>
+      <button class="vf-btn" onclick="vocabFilter('c1c2')">🔴 C1–C2</button>
+    </div>
+
+    <div id="vocab-content"></div>
+  </div>
+</div>
+
+
+<!-- ── Welcome / Intro screen — fullscreen card carousel ─────────────────── -->
+<div id="welcome-screen" style="display:none">
+  <div class="ws-slides" id="ws-slides">
+
+    <!-- Slide 0: Greeting -->
+    <div class="ws-slide ws-slide-greeting">
+      <div class="ws-emoji">🎵</div>
+      <div class="ws-hi">Welcome to the quiz,</div>
+      <div class="ws-name"><em id="ws-name-text"></em></div>
+      <div class="ws-luck">Good luck — you've got this!</div>
+      <div class="ws-author">Quiz by Roman Samoylov</div>
+    </div>
+
+    <!-- Slide 1: About the song -->
+    <div class="ws-slide ws-slide-abba">
+      <div class="ws-emoji">🎼</div>
+      <div class="ws-slide-title">About the Song</div>
+      <div class="ws-abba-text">
+        <b>Thank You for the Music</b> is a song by Swedish pop group <b>ABBA</b>,
+        released in 1977 on the album <b><em>The Album</em></b>.<br><br>
+        Famous for their crystal-clear pronunciation and irresistible melodies,
+        ABBA became one of the best-selling music acts of all time —
+        making their songs perfect for English listening practice.
+      </div>
+      <div class="ws-abba-year">Sweden · 1977 · Pop</div>
+    </div>
+
+    <!-- Slide 2: Listen -->
+    <div class="ws-slide ws-slide-instr">
+      <div class="ws-instr-icon">🎧</div>
+      <div class="ws-slide-title">Listen First</div>
+      <div class="ws-instr-text">
+        Use the <b>audio player</b> at the top of the page.<br>
+        You have <b>two listens</b>. Fill in the blanks <b>as you listen</b> — don't wait until the end.<br><br>
+        ABBA's pronunciation is clear, so you can type while the music plays.
+      </div>
+    </div>
+
+    <!-- Slide 3: Letter boxes + demo -->
+    <div class="ws-slide ws-slide-instr">
+      <div class="ws-instr-icon">⬜</div>
+      <div class="ws-slide-title">Letter Boxes</div>
+      <div class="ws-instr-text">
+        Each box = <b>one letter</b>. The number of boxes hints at the word's length.<br>
+        Cursor moves <b>automatically</b>. Use <b>← →</b> to navigate, <b>Backspace</b> to delete.
+      </div>
+      <div class="ws-demo" id="demo-boxes">
+        <div class="ws-demo-label">Try it — fill in the blanks and check:</div>
+        <div class="ws-demo-line" id="demo-boxes-line"></div>
+        <div class="ws-demo-controls">
+          <button class="ws-demo-btn ws-demo-btn-check" onclick="demoCheck('boxes')">Check</button>
+          <button class="ws-demo-btn ws-demo-btn-reset" onclick="demoReset('boxes')">Reset</button>
+          <span class="ws-demo-score" id="demo-boxes-score"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: Linked choruses + demo -->
+    <div class="ws-slide ws-slide-instr">
+      <div class="ws-instr-icon">🔗</div>
+      <div class="ws-slide-title">Linked Choruses</div>
+      <div class="ws-instr-text">
+        The song has <b>three choruses</b> with the same lyrics.<br>
+        Fill in one — the <b>others update automatically</b>. Type only <b>once</b>.
+      </div>
+      <div class="ws-demo" id="demo-chorus">
+        <div class="ws-demo-label">Fill in either line — both update:</div>
+        <div class="ws-demo-line" id="demo-chorus-line-0"></div>
+        <div class="ws-demo-line" id="demo-chorus-line-1" style="margin-top:4px"></div>
+        <div class="ws-demo-controls" style="margin-top:10px">
+          <button class="ws-demo-btn ws-demo-btn-check" onclick="demoCheck('chorus')">Check</button>
+          <button class="ws-demo-btn ws-demo-btn-reset" onclick="demoReset('chorus')">Reset</button>
+          <span class="ws-demo-score" id="demo-chorus-score"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: Hints + demo (two synced lines, two hint buttons) -->
+    <div class="ws-slide ws-slide-instr">
+      <div class="ws-instr-icon">💡</div>
+      <div class="ws-slide-title">Hints</div>
+      <div class="ws-instr-text">
+        The <b>?</b> button on the right of each line reveals one random letter in <b style="color:var(--hint-color)">purple</b>.<br>
+        Hinted letters are <b>not counted</b> toward your score.<br>
+        <span style="color:var(--muted);font-size:13px">💡 Tip: use hints <b>after both listens</b> — your chances are higher once you've heard the song twice.</span>
+      </div>
+      <div class="ws-demo" id="demo-hints">
+        <div class="ws-demo-label">Try the hint buttons, then check:</div>
+        <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:4px">
+          <div class="ws-demo-line" id="demo-hints-line-0" style="flex:1;margin-bottom:0"></div>
+          <button class="ws-demo-btn ws-demo-btn-hint" onclick="demoHint('hints',0)" title="Hint" style="margin-bottom:2px;flex-shrink:0">?</button>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px">
+          <div class="ws-demo-line" id="demo-hints-line-1" style="flex:1;margin-bottom:0"></div>
+          <button class="ws-demo-btn ws-demo-btn-hint" onclick="demoHint('hints',1)" title="Hint" style="margin-bottom:2px;flex-shrink:0">?</button>
+        </div>
+        <div class="ws-demo-controls" style="margin-top:10px">
+          <button class="ws-demo-btn ws-demo-btn-check" onclick="demoCheck('hints')">Check</button>
+          <button class="ws-demo-btn ws-demo-btn-reset" onclick="demoReset('hints')">Reset</button>
+          <span class="ws-demo-score" id="demo-hints-score"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: Check & Score -->
+    <div class="ws-slide ws-slide-instr">
+      <div class="ws-instr-icon">✅</div>
+      <div class="ws-slide-title">Check & Score</div>
+      <div class="ws-instr-text">
+        Press <b>Check answers</b> when you're done.<br>
+        Green = correct &nbsp;·&nbsp; Red = incorrect &nbsp;·&nbsp; Purple = hinted<br><br>
+        Maximum score: <b>300 points</b>.<br>
+        Your result is saved automatically.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom navigation -->
+  <div class="ws-nav">
+    <button class="ws-nav-btn ws-btn-prev" id="ws-btn-prev" onclick="wsGo(-1)">← Back</button>
+    <div class="ws-dots" id="ws-dots"></div>
+    <button class="ws-nav-btn ws-btn-next" id="ws-btn-next" onclick="wsGo(1)">Next →</button>
+  </div>
+</div>
+
+<!-- ── Welcome banner (shown after login) ───────────────────────────────── -->
+<div id="welcome-banner">
+  <span class="welcome-pill"><span class="wave">&#128075;</span> <span id="welcome-name"></span></span>
+</div>
+
+<div class="page-wrapper">
+
+  <header>
+    <div class="song-badge">Listening Exercise</div>
+    <h1>Thank You for the <em>Music</em></h1>
+    <div class="subtitle">ABBA &nbsp;·&nbsp; Fill in the blanks</div>
+    <div class="author">Interactive exercise by Roman Samoylov</div>
+  </header>
+
+  <div class="instructions">
+    <strong>Instructions:</strong> Listen to the song twice and fill in the missing words.
+    Each box represents <strong>one letter</strong> — use the number of boxes as a hint.
+    After typing a letter the cursor moves automatically.
+    All choruses are <strong>linked</strong> — filling one fills the others automatically.
+    The <span style="color:var(--hint-color);font-weight:600">?</span> button next to each line reveals
+    one random missing letter — but hinted letters <strong>don't count</strong> toward your score.
+    Press <strong>Check</strong> when you're done.
+  </div>
+
+  <div class="player-wrap">
+    <button class="player-play-btn" id="player-btn" onclick="playerPlay()">&#9654;</button>
+    <div class="player-info">
+      <div class="player-title">&#9835; Thank You for the Music — ABBA</div>
+      <div class="player-counter" id="player-counter">
+        <span class="counter-val" id="player-count-val">2</span> listens remaining
+      </div>
+      <div class="player-now-playing" id="player-now-playing">
+        <div class="player-pulse"></div> Now playing…
+      </div>
+    </div>
+    <audio id="player-audio" preload="metadata"
+           src="ABBA_-_Thank_You_for_the_Music_(SkySound.cc).mp3"
+           onended="playerOnEnded()">
+    </audio>
+  </div>
+
+  <div class="lyrics-card" id="lyrics"></div>
+
+  <div class="controls">
+    <button class="main-btn btn-check" onclick="checkAnswers()">Check answers</button>
+    <button class="main-btn btn-reset" onclick="resetAll()">Reset</button>
+    <button class="main-btn btn-reset" onclick="location.reload()">&#8962; Home</button>
+  </div>
+  <div class="score-banner" id="score"></div>
+  <div class="rank-banner" id="rank-banner">
+    <div class="rank-info">
+      <div class="rank-medal" id="rank-medal"></div>
+      <div class="rank-text"><strong id="rank-position"></strong><span id="rank-detail"></span></div>
+    </div>
+    <button class="rank-refresh-btn" id="rank-refresh-btn" onclick="refreshRank()">&#8635; Refresh rank</button>
+  </div>
+
+</div>
+<script>
+
+// ─── PIN auth ─────────────────────────────────────────────────────────────────
+// ─── Staff PIN ────────────────────────────────────────────────────────────────
+const STAFF_PIN = '10951538';
+
+function openStaffLogin() {
+  document.getElementById('login-overlay').style.display = 'none';
+  const so = document.getElementById('staff-overlay');
+  so.style.display = 'flex';
+  so.style.opacity = '1';
+  staffPinDigits[0].focus();
+}
+
+function closeStaffLogin() {
+  document.getElementById('staff-overlay').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+  staffPinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+  document.getElementById('staff-pin-error').textContent = '';
+  pinDigits[0].focus();
+}
+
+function closeStaffDashboard() {
+  document.getElementById('staff-dashboard').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+  pinDigits[0].focus();
+}
+
+// ─── JSONBin config ────────────────────────────────────────────────────────────
+const BIN_ID  = '69b74287b7ec241ddc6ff280';
+const BIN_KEY = '$2a$10$Qy2L0o5GXgfOVRzcKIrXjOVn5epvNXjA4KBTsTMLrc.8vtO5ShnyO';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' };
+
+let currentUser = null;   // set after student login
+let currentAttemptId = null;
+
+// ─── Called right after student PIN login ──────────────────────────────────────
+async function registerAttempt(name) {
+  currentUser = name;
+  const attempt = {
+    id: Date.now().toString(),
+    name,
+    status: 'briefing',
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+    correct: null,
+    total: null,
+    pct: null,
+  };
+  currentAttemptId = attempt.id;
+  try {
+    const data = await readBin();
+    const results = data.results || [];
+    results.push(attempt);
+    await writeBin({ results });
+  } catch(e) { console.error('registerAttempt failed', e); }
+}
+
+async function updateAttemptStatus(newStatus) {
+  try {
+    const data = await readBin();
+    const results = data.results || [];
+    const idx = results.findIndex(r => r.id === currentAttemptId);
+    if (idx >= 0 && results[idx].status !== 'finished') {
+      results[idx].status = newStatus;
+      await writeBin({ results });
+    }
+  } catch(e) { console.error('updateAttemptStatus failed', e); }
+}
+
+// ─── Called after checkAnswers() ──────────────────────────────────────────────
+async function saveResult(correct, total, pct, answers) {
+  console.log('saveResult called:', { currentAttemptId, currentUser, correct, total });
+  if (!currentAttemptId) {
+    console.error('saveResult: no currentAttemptId!');
+    return;
+  }
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const data = await readBin();
+      const results = data.results || [];
+      console.log('saveResult: bin has', results.length, 'results, looking for id:', currentAttemptId);
+      const idx = results.findIndex(r => r.id === currentAttemptId);
+      console.log('saveResult: found at index:', idx);
+      const updated = {
+        id: currentAttemptId,
+        name: currentUser,
+        status: 'finished',
+        startedAt: idx >= 0 ? results[idx].startedAt : new Date().toISOString(),
+        finishedAt: new Date().toISOString(),
+        correct, total, pct,
+        answers: answers || [],
+      };
+      if (idx >= 0) results[idx] = updated; else results.push(updated);
+      await writeBin({ results });
+      console.log('saveResult: write done ✓');
+      return;
+    } catch(e) {
+      console.error('saveResult attempt', attempt + 1, 'failed:', e);
+      if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+}
+
+async function readBin() {
+  const r = await fetch(BIN_URL + '/latest', {
+    method: 'GET',
+    mode: 'cors',
+    headers: { 'X-Master-Key': BIN_KEY }
+  });
+  if (!r.ok) throw new Error('readBin HTTP ' + r.status);
+  const j = await r.json();
+  return j.record !== undefined ? j.record : j;
+}
+
+async function writeBin(data) {
+  await fetch(BIN_URL, {
+    method: 'PUT',
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY },
+    body: JSON.stringify(data),
+  });
+}
+
+// ─── Dashboard rendering ───────────────────────────────────────────────────────
+// ─── Manual entry ─────────────────────────────────────────────────────────────
+function toggleManualForm() {
+  const form = document.getElementById('manual-form');
+  const btn  = document.getElementById('btn-add-manual');
+  const open = form.classList.toggle('open');
+  btn.classList.toggle('active', open);
+  if (open) {
+    document.getElementById('manual-name').focus();
+    document.getElementById('manual-score').value = '';
+  }
+}
+
+async function submitManualResult() {
+  const nameEl  = document.getElementById('manual-name');
+  const scoreEl = document.getElementById('manual-score');
+  const name    = nameEl.value.trim();
+  const score   = parseInt(scoreEl.value, 10);
+
+  if (!name) { nameEl.focus(); return; }
+  if (isNaN(score) || score < 0 || score > 300) { scoreEl.focus(); return; }
+
+  const entry = {
+    id: 'manual_' + Date.now(),
+    name,
+    status: 'finished',
+    source: 'manual',
+    startedAt: new Date().toISOString(),
+    finishedAt: new Date().toISOString(),
+    correct: score,
+    total: 300,
+    pct: Math.round(score / 300 * 100),
+  };
+
+  try {
+    const data = await readBin();
+    const results = data.results || [];
+    results.push(entry);
+    await writeBin({ results });
+    toggleManualForm();
+    await loadResults();
+  } catch(e) {
+    alert('Failed to save. Check connection.');
+    console.error(e);
+  }
+}
+
+let lastResults = [];
+
+async function loadResults() {
+  const status = document.getElementById('dash-status');
+  status.textContent = 'Loading…';
+  try {
+    const data = await readBin();
+    const results = (data.results || []).slice(); // copy
+
+    // Sort: 3 groups by priority, within each group newest first
+    const groupOrder = s =>
+      s === 'finished' || s === 'manual' ? 0 :
+      s === 'active'                     ? 1 : 2; // briefing + anything else
+
+    results.sort((a, b) => {
+      const ga = groupOrder(a.source === 'manual' ? 'manual' : a.status);
+      const gb = groupOrder(b.source === 'manual' ? 'manual' : b.status);
+      if (ga !== gb) return ga - gb;
+      // Within same group: newest first
+      const ta = a.status === 'finished' ? a.finishedAt : a.startedAt;
+      const tb = b.status === 'finished' ? b.finishedAt : b.startedAt;
+      return new Date(tb) - new Date(ta);
+    });
+
+    lastResults = results;
+    renderChart(results.filter(r => r.status === 'finished'));
+    renderList(results);
+    status.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    status.textContent = 'Error loading results. Check connection.';
+    console.error(e);
+  }
+}
+
+function renderChart(finished) {
+  const section = document.getElementById('chart-section');
+  const chart   = document.getElementById('bar-chart');
+  const podium  = document.getElementById('podium');
+  if (finished.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  const TEACHER_NAME = 'Varvara Akimova';
+
+  // Split teacher from students
+  const teacherResults = finished.filter(r => r.name === TEACHER_NAME);
+  const studentResults = finished.filter(r => r.name !== TEACHER_NAME);
+
+  // Sort students: score desc, finishedAt asc on tie
+  const sorted = studentResults.slice().sort((a, b) => {
+    if (b.correct !== a.correct) return b.correct - a.correct;
+    return new Date(a.finishedAt) - new Date(b.finishedAt);
+  });
+  const max = 300;
+  const medals = ['🥇','🥈','🥉'];
+  const classes = ['podium-1','podium-2','podium-3'];
+
+  // ── Podium (students only, top 3) ───────────────────────────────────────────
+  podium.innerHTML = '';
+  if (sorted.length >= 1) {
+    const podiumVisual = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
+    podiumVisual.forEach(r => {
+      const rank = sorted.indexOf(r);
+      const slot = document.createElement('div');
+      slot.className = 'podium-slot';
+      const firstName = r.name.split(' ')[0];
+      slot.innerHTML = `
+        <div class="podium-medal">${medals[rank] || ''}</div>
+        <div class="podium-name">${firstName}</div>
+        <div class="podium-score">${r.correct}<span style="font-size:12px">/300</span></div>
+        <div class="podium-block ${classes[rank] || 'podium-3'}">${rank + 1}</div>`;
+      podium.appendChild(slot);
+    });
+  }
+
+  // ── Bar chart (students) ─────────────────────────────────────────────────────
+  chart.innerHTML = sorted.map((r, i) => {
+    const pct = Math.round(r.correct / max * 100);
+    const medal = i < 3 ? medals[i] + ' ' : '';
+    return `<div class="bar-row">
+      <div class="bar-name" title="${r.name}">${medal}${r.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-score">${r.correct}<span style="font-size:11px;color:var(--muted)">/300</span></div>
+    </div>`;
+  }).join('');
+
+  // ── Teacher section ──────────────────────────────────────────────────────────
+  const teacherSec = document.getElementById('teacher-section');
+  const teacherChart = document.getElementById('teacher-chart');
+  if (teacherResults.length > 0) {
+    teacherSec.style.display = 'block';
+    const best = teacherResults.sort((a,b) => b.correct - a.correct)[0];
+    const pct = Math.round(best.correct / max * 100);
+    teacherChart.innerHTML = `<div class="bar-row teacher-row">
+      <div class="bar-name">🎓 ${best.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-score">${best.correct}<span style="font-size:11px;color:var(--muted)">/300</span></div>
+    </div>`;
+  } else {
+    teacherSec.style.display = 'none';
+  }
+}
+
+function renderList(results) {
+  const list = document.getElementById('results-list');
+  if (results.length === 0) {
+    list.innerHTML = '<div class="dash-empty">No attempts yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  results.forEach(r => {
+    const isFinished = r.status === 'finished';
+    const isManual   = r.source === 'manual';
+    const canExpand  = isFinished && !isManual && r.answers && r.answers.length > 0;
+
+    const statusClass = isManual ? 'manual'
+      : isFinished       ? 'finished'
+      : r.status === 'active'    ? 'active'
+      : 'briefing';
+
+    const statusPills = {
+      briefing: ['pill-briefing', '● In lobby'],
+      active:   ['pill-active',   '● In progress'],
+    };
+
+    const time = isFinished
+      ? `Finished ${formatTime(r.finishedAt)}`
+      : `Joined ${formatTime(r.startedAt)}`;
+    const manualTag  = isManual ? `<span class="manual-tag">paper</span>` : '';
+    const scoreHtml  = isFinished
+      ? `<div class="result-score ${isManual ? 'manual-score' : ''}">${r.correct}<span style="font-size:14px;color:var(--muted)">/300</span></div>`
+      : statusPills[r.status]
+        ? `<div class="result-score status-pill ${statusPills[r.status][0]}">${statusPills[r.status][1]}</div>`
+        : `<div class="result-score status-pill pill-briefing">● Waiting</div>`;
+    const expandBtn  = canExpand
+      ? `<button class="result-expand-btn" onclick="toggleAnswerReview(this, '${r.id}')">&#9660; Answers</button>`
+      : '';
+
+    const card = document.createElement('div');
+    card.className = `result-card ${statusClass}`;
+    card.dataset.rid = r.id;
+    card.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div class="result-name">${r.name}${manualTag}</div>
+        <div class="result-meta">${time}</div>
+      </div>
+      ${scoreHtml}
+      ${expandBtn}
+      <button class="result-delete" title="Delete this result" onclick="deleteResult('${r.id}')">&#10005;</button>`;
+
+    // Answer review panel (hidden by default)
+    if (canExpand) {
+      const panel = document.createElement('div');
+      panel.className = 'answer-review';
+      panel.id = 'ar-' + r.id;
+      card.appendChild(panel);
+      // Store answers data on the element
+      card.dataset.answers = JSON.stringify(r.answers);
+    }
+
+    list.appendChild(card);
+  });
+}
+
+function toggleAnswerReview(btn, id) {
+  const panel = document.getElementById('ar-' + id);
+  const card  = panel.closest('.result-card');
+  const isOpen = panel.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.textContent = isOpen ? '▲ Answers' : '▾ Answers';
+
+  if (isOpen && !panel.dataset.built) {
+    panel.dataset.built = '1';
+    buildAnswerReview(panel, JSON.parse(card.dataset.answers));
+  }
+}
+
+function buildAnswerReview(panel, answers) {
+  // answers = [{answer, typed, hinted}] — only primary cells, in DOM order
+  // We render ALL sections/lines visually, but only consume from answers[]
+  // for primary cells (first occurrence of each syncId for chorus).
+
+  let ansIdx = 0;
+  const seenSids = new Set(); // track which chorus syncIds we've already consumed
+
+  AK_SECTIONS.forEach(section => {
+    if (!section.lines) return;
+    const secEl = document.createElement('div');
+    secEl.className = 'ar-section';
+    const lbl = document.createElement('div');
+    lbl.className = 'ar-section-label';
+    lbl.textContent = section.label;
+    secEl.appendChild(lbl);
+
+    section.lines.forEach((tokens, li) => {
+      const syncLineIdx = (section.isChorus && li >= AK_CHORUS_LINES.length)
+        ? AK_CHORUS_LINES.length - 1 : li;
+      const lineEl = document.createElement('div');
+      lineEl.className = 'ar-line';
+      let blankIdx = 0;
+      let prevWasBlank = false;
+
+      tokens.forEach(tok => {
+        if (typeof tok === 'string') {
+          if (tok) {
+            const sp = document.createElement('span');
+            sp.className = 'ar-plain';
+            sp.textContent = tok;
+            lineEl.appendChild(sp);
+          }
+          prevWasBlank = false;
+        } else {
+          const word = tok[0];
+          const grp = document.createElement('div');
+          grp.className = 'ar-group';
+          if (prevWasBlank) grp.classList.add('gap-before');
+
+          word.split('').forEach((ch, ci) => {
+            // Determine if this cell is primary
+            const sid = section.isChorus ? `c_${syncLineIdx}_${blankIdx}_${ci}` : null;
+            const isPrimary = !sid || !seenSids.has(sid);
+            if (sid) seenSids.add(sid);
+
+            const cell = document.createElement('div');
+            cell.className = 'ar-cell';
+
+            if (isPrimary && ansIdx < answers.length) {
+              // Consume from answers
+              const a = answers[ansIdx++];
+              const isCorrect = a.typed === a.answer;
+              if (a.hinted) {
+                cell.classList.add('hinted');
+                cell.textContent = ch;
+              } else if (a.typed === '') {
+                cell.classList.add('wrong');
+                cell.textContent = '–';
+              } else if (isCorrect) {
+                cell.classList.add('correct');
+                cell.textContent = ch;
+              } else {
+                cell.classList.add('wrong');
+                cell.textContent = a.typed;
+              }
+              // Store for mirror cells below
+              cell.dataset.isPrimary = '1';
+              cell.dataset.displayClass = cell.classList[1]; // correct/wrong/hinted
+              cell.dataset.displayText = cell.textContent;
+            } else {
+              // Mirror cell — copy display from the primary sid
+              // Find the primary cell already rendered for this sid
+              // (it's in the DOM already since primary comes first)
+              const primaryCell = panel.querySelector(`[data-sid="${sid}"]`);
+              if (primaryCell) {
+                cell.classList.add(primaryCell.dataset.displayClass || 'empty');
+                cell.textContent = primaryCell.dataset.displayText || ch;
+              } else {
+                cell.classList.add('empty');
+                cell.textContent = ch;
+              }
+            }
+
+            if (sid) cell.dataset.sid = sid;
+            grp.appendChild(cell);
+          });
+
+          blankIdx++;
+          lineEl.appendChild(grp);
+          prevWasBlank = true;
+        }
+      });
+      secEl.appendChild(lineEl);
+    });
+    panel.appendChild(secEl);
+  });
+}
+
+function formatTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' })
+    + ' ' + d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+async function deleteResult(id) {
+  if (!confirm('Delete this result?')) return;
+  try {
+    const data = await readBin();
+    data.results = (data.results || []).filter(r => r.id !== id);
+    await writeBin(data);
+    await loadResults();
+  } catch(e) { alert('Failed to delete.'); }
+}
+
+async function deleteAllResults() {
+  if (!confirm('Delete ALL results? This cannot be undone.')) return;
+  try {
+    await writeBin({ results: [] });
+    await loadResults();
+  } catch(e) { alert('Failed to clear results.'); }
+}
+
+// Open dashboard and load
+
+// ─── Vocab PIN ─────────────────────────────────────────────────────────────────
+const VOCAB_PIN = '2803';
+
+function openVocabLogin() {
+  const vo = document.getElementById('vocab-overlay');
+  vo.style.display = 'flex';
+  vocabPinDigits[0].focus();
+}
+
+function closeVocabLogin() {
+  document.getElementById('vocab-overlay').style.display = 'none';
+  vocabPinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+  document.getElementById('vocab-pin-error').textContent = '';
+  pinDigits[0].focus();
+}
+
+const vocabPinDigits = Array.from(document.querySelectorAll('#vocab-pin-inputs .pin-digit'));
+const vocabPinError  = document.getElementById('vocab-pin-error');
+
+vocabPinDigits.forEach((el, i) => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      el.value = '';
+      if (i > 0) vocabPinDigits[i - 1].focus();
+      vocabPinError.textContent = '';
+      vocabPinDigits.forEach(d => d.classList.remove('pin-error'));
+    } else if (e.key === 'Escape') {
+      closeVocabLogin();
+    }
+  });
+  el.addEventListener('input', e => {
+    const val = el.value.replace(/[^0-9]/g, '').slice(-1);
+    el.value = val;
+    vocabPinError.textContent = '';
+    vocabPinDigits.forEach(d => d.classList.remove('pin-error'));
+    if (val && i < 3) vocabPinDigits[i + 1].focus();
+    if (i === 3 && val) checkVocabPin();
+  });
+  el.addEventListener('keypress', e => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
+});
+
+function checkVocabPin() {
+  const pin = vocabPinDigits.map(d => d.value).join('');
+  if (pin === VOCAB_PIN) {
+    document.getElementById('vocab-overlay').style.display = 'none';
+    openVocabPage('standalone');
+  } else {
+    vocabPinError.textContent = 'Incorrect PIN. Please try again.';
+    vocabPinDigits.forEach(d => d.classList.add('pin-error'));
+    setTimeout(() => {
+      vocabPinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+      vocabPinError.textContent = '';
+      vocabPinDigits[0].focus();
+    }, 900);
+  }
+}
+
+function openStaffDashboard() {
+  document.getElementById('staff-dashboard').style.display = 'block';
+  loadResults();
+}
+
+
+const staffPinDigits = Array.from(document.querySelectorAll('#staff-pin-inputs .pin-digit'));
+const staffPinError  = document.getElementById('staff-pin-error');
+
+staffPinDigits.forEach((el, i) => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      el.value = '';
+      if (i > 0) staffPinDigits[i - 1].focus();
+      staffPinError.textContent = '';
+      staffPinDigits.forEach(d => d.classList.remove('pin-error'));
+    } else if (e.key === 'Escape') {
+      closeStaffLogin();
+    }
+  });
+  el.addEventListener('input', e => {
+    const val = el.value.replace(/[^0-9]/g, '').slice(-1);
+    el.value = val;
+    staffPinError.textContent = '';
+    staffPinDigits.forEach(d => d.classList.remove('pin-error'));
+    if (val && i < 7) staffPinDigits[i + 1].focus();
+    if (i === 7 && val) checkStaffPin();
+  });
+  el.addEventListener('keypress', e => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
+});
+
+function checkStaffPin() {
+  const pin = staffPinDigits.map(d => d.value).join('');
+  if (pin === STAFF_PIN) {
+    document.getElementById('staff-overlay').style.display = 'none';
+    openStaffDashboard();
+  } else {
+    staffPinError.textContent = 'Incorrect PIN. Please try again.';
+    staffPinDigits.forEach(d => d.classList.add('pin-error'));
+    setTimeout(() => {
+      staffPinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+      staffPinError.textContent = '';
+      staffPinDigits[0].focus();
+    }, 900);
+  }
+}
+
+
+const USERS = {
+  '1095': 'Roman Samoylov',
+  '7914': 'Anastasia Dikareva',
+  '3108': 'Aleksandr Zakharov',
+  '9572': 'Daniil Koryakov',
+  '6664': 'Ekaterina Krylova',
+  '4469': 'Taisia Pavlova',
+  '8617': 'Nikita Panfilov',
+  '5874': 'Ilia Sotirov',
+  '5336': 'Natalia Trubitsyna',
+  '7721': 'Danil Shamsutdinov',
+  '8369': 'Anastasia Sharapova',
+  '4580': 'Varvara Akimova',
+};
+
+const pinDigits = Array.from(document.querySelectorAll('.pin-digit'));
+const pinError  = document.getElementById('pin-error');
+
+pinDigits.forEach((el, i) => {
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      el.value = '';
+      if (i > 0) pinDigits[i - 1].focus();
+      clearPinError();
+    } else if (e.key === 'ArrowLeft' && i > 0) {
+      e.preventDefault(); pinDigits[i - 1].focus();
+    } else if (e.key === 'ArrowRight' && i < 3) {
+      e.preventDefault(); pinDigits[i + 1].focus();
+    }
+  });
+
+  el.addEventListener('input', e => {
+    const val = el.value.replace(/[^0-9]/g, '').slice(-1);
+    el.value = val;
+    clearPinError();
+    if (val && i < 3) pinDigits[i + 1].focus();
+    // Check when last digit entered
+    if (i === 3 && val) checkPin();
+  });
+
+  // Prevent non-numeric
+  el.addEventListener('keypress', e => {
+    if (!/[0-9]/.test(e.key)) e.preventDefault();
+  });
+});
+
+// Auto-focus first digit on load
+window.addEventListener('load', () => pinDigits[0].focus());
+
+function getPin() {
+  return pinDigits.map(d => d.value).join('');
+}
+
+function clearPinError() {
+  pinError.textContent = '';
+  pinDigits.forEach(d => d.classList.remove('pin-error'));
+}
+
+function showPinError(msg) {
+  pinError.textContent = msg;
+  pinDigits.forEach(d => d.classList.add('pin-error'));
+  setTimeout(() => {
+    pinDigits.forEach(d => { d.value = ''; d.classList.remove('pin-error'); });
+    pinError.textContent = '';
+    pinDigits[0].focus();
+  }, 900);
+}
+
+function checkPin() {
+  const pin = getPin();
+  const name = USERS[pin];
+  if (name) {
+    // Correct PIN — hide overlay, show welcome/intro screen
+    const overlay = document.getElementById('login-overlay');
+    overlay.style.transition = 'opacity 0.4s';
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 400);
+
+    // Show welcome screen with player's name
+    document.getElementById('ws-name-text').textContent = name;
+    document.getElementById('welcome-screen').style.display = 'block';
+    wsInit();
+
+    // Register attempt in JSONBin
+    registerAttempt(name);
+
+    // Init quiz DOM (hidden until startQuiz is called)
+    initQuiz();
+  } else {
+    showPinError('Incorrect PIN. Please try again.');
+  }
+}
+
+
+// ─── Globals (must be accessible by checkAnswers/resetAll outside initQuiz)
+let allCells = [];
+let syncMap  = {};
+let lineRows = [];
+
+
+
+// ─── Chorus template ──────────────────────────────────────────────────────────
+const CHORUS_LINES = [
+  [ "So I say thank you for the music, the ", ["songs"], " I'm ", ["singing"] ],
+  [ "Thanks for ", ["all"], " ", ["the"], " ", ["joy"], " they're ", ["bringing"] ],
+  [ "Who can ", ["live"], " ", ["without"], " ", ["it"], "? I ask ", ["in"], " ", ["all"], " ", ["honesty"] ],
+  [ "What ", ["would"], " ", ["life"], " ", ["be"], "?" ],
+  [ "Without a song or a ", ["dance"], ", what ", ["are"], " ", ["we"], "?" ],
+  [ "So I say thank you for the music, ", ["for"], " ", ["giving"], " ", ["it"], " ", ["to"], " ", ["me"] ],
+];
+
+const CHORUS_FINAL_LINES = [
+  [ "Thank you for the music, the ", ["songs"], " I'm ", ["singing"] ],
+  ...CHORUS_LINES.slice(1),
+  [ "So I say thank you for the music, ", ["for"], " ", ["giving"], " ", ["it"], " ", ["to"], " ", ["me"] ],
+];
+
+
+// ─── Answer Key data (mirrors lyrics data, must be in global scope) ────────────
+const AK_CHORUS_LINES = CHORUS_LINES;
+const AK_SECTIONS = [
+  { label: "Verse 1", isChorus: false, lines: [
+    [ "I\u2019m nothing ", ["special"], ", in fact I\u2019m a bit of a ", ["bore"] ],
+    [ "If I tell a joke, you\u2019ve ", ["probably"], " ", ["heard"], " it before" ],
+    [ "But I have a talent, a ", ["wonderful"], " ", ["thing"] ],
+    [ "\u2018Cause everyone listens when I ", ["start"], " ", ["to"], " ", ["sing"] ],
+    [ "I\u2019m so ", ["grateful"], " and ", ["proud"] ],
+    [ "All I want is to sing it ", ["out"], " ", ["loud"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Verse 2", isChorus: false, lines: [
+    [ ["Mother"], " says I was a ", ["dancer"], " before I ", ["could"], " ", ["walk"] ],
+    [ "Mhm, she says I ", ["began"], " to sing long before I ", ["could"], " ", ["talk"] ],
+    [ "And I\u2019ve ", ["often"], " ", ["wondered"], ", how ", ["did"], " it ", ["all"], " ", ["start"], "?" ],
+    [ "Who ", ["found"], " ", ["out"], " that nothing can ", ["capture"], " a ", ["heart"] ],
+    [ "Like a ", ["melody"], " can?" ],
+    [ "Well, ", ["whoever"], " it was, I\u2019m a ", ["fan"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Bridge", isChorus: false, lines: [
+    [ "I\u2019ve been so ", ["lucky"] ],
+    [ "I am the ", ["girl"], " with ", ["golden"], " ", ["hair"] ],
+    [ "I ", ["wanna"], " sing it out to ", ["everybody"] ],
+    [ "What a ", ["joy"], ", what a ", ["life"], ", what a ", ["chance"] ],
+  ]},
+  { label: "Chorus (final)", isChorus: true, lines: CHORUS_FINAL_LINES },
+];
+
+function initQuiz() {
+
+
+const lyrics = [
+  { label: "Verse 1", isChorus: false, lines: [
+    [ "I'm nothing ", ["special"], ", in fact I'm a bit of a ", ["bore"] ],
+    [ "If I tell a joke, you've ", ["probably"], " ", ["heard"], " it before" ],
+    [ "But I have a talent, a ", ["wonderful"], " ", ["thing"] ],
+    [ "'Cause everyone listens when I ", ["start"], " ", ["to"], " ", ["sing"] ],
+    [ "I'm so ", ["grateful"], " and ", ["proud"] ],
+    [ "All I want is to sing it ", ["out"], " ", ["loud"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Verse 2", isChorus: false, lines: [
+    [ ["Mother"], " says I was a ", ["dancer"], " before I ", ["could"], " ", ["walk"] ],
+    [ "Mhm, she says I ", ["began"], " to sing long before I ", ["could"], " ", ["talk"] ],
+    [ "And I've ", ["often"], " ", ["wondered"], ", how ", ["did"], " it ", ["all"], " ", ["start"], "?" ],
+    [ "Who ", ["found"], " ", ["out"], " that nothing can ", ["capture"], " a ", ["heart"] ],
+    [ "Like a ", ["melody"], " can?" ],
+    [ "Well, ", ["whoever"], " it was, I'm a ", ["fan"] ],
+  ]},
+  { label: "Chorus", isChorus: true, lines: CHORUS_LINES },
+  { label: "Bridge", isChorus: false, lines: [
+    [ "I've been so ", ["lucky"] ],
+    [ "I am the ", ["girl"], " with ", ["golden"], " ", ["hair"] ],
+    [ "I ", ["wanna"], " sing it out to ", ["everybody"] ],
+    [ "What a ", ["joy"], ", what a ", ["life"], ", what a ", ["chance"] ],
+  ]},
+  { label: "Chorus (final)", isChorus: true, lines: CHORUS_FINAL_LINES },
+];
+
+// ─── State (using globals declared above initQuiz)
+allCells.length = 0;
+Object.keys(syncMap).forEach(k => delete syncMap[k]);
+lineRows.length = 0;
+
+// ─── Build DOM ────────────────────────────────────────────────────────────────
+const container = document.getElementById('lyrics');
+
+lyrics.forEach(section => {
+  const sec = document.createElement('div');
+  sec.className = 'section' + (section.isChorus ? ' is-chorus' : '');
+
+  const lbl = document.createElement('div');
+  lbl.className = 'section-label';
+  lbl.textContent = section.label;
+  sec.appendChild(lbl);
+
+  section.lines.forEach((tokens, lineIdx) => {
+    // Wrapper row (holds the line + floating hint button)
+    const row = document.createElement('div');
+    row.className = 'line-row';
+
+    const lineEl = document.createElement('div');
+    lineEl.className = 'line';
+
+    const syncLineIdx = (section.isChorus && lineIdx >= CHORUS_LINES.length)
+      ? CHORUS_LINES.length - 1 : lineIdx;
+
+    let blankIdx = 0;
+    let prevWasBlank = false;
+    const rowCells = [];   // cells belonging to this row
+
+    tokens.forEach(token => {
+      if (typeof token === 'string') {
+        if (token !== '') {
+          const span = document.createElement('span');
+          span.className = 'plain-text';
+          span.textContent = token;
+          lineEl.appendChild(span);
+        }
+        prevWasBlank = false;
+      } else {
+        const word = token[0];
+        const group = document.createElement('div');
+        group.className = 'cell-group';
+        if (prevWasBlank) group.classList.add('gap-before');
+
+        word.split('').forEach((ch, charIdx) => {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.maxLength = 1;
+          input.className = 'cell';
+          input.autocomplete = 'off';
+          input.autocorrect = 'off';
+          input.autocapitalize = 'off';
+          input.spellcheck = false;
+          input.dataset.answer = ch.toLowerCase();
+          input.dataset.hinted = '0';
+
+          if (section.isChorus) {
+            const sid = `c_${syncLineIdx}_${blankIdx}_${charIdx}`;
+            input.dataset.syncId = sid;
+            if (!syncMap[sid]) syncMap[sid] = [];
+            input.dataset.primary = syncMap[sid].length === 0 ? '1' : '0';
+            if (input.dataset.primary === '0') input.classList.add('synced-mirror');
+            syncMap[sid].push(input);
+          } else {
+            input.dataset.syncId = '';
+            input.dataset.primary = '1';
+          }
+
+          input.addEventListener('keydown', onKeyDown);
+          input.addEventListener('input', onInput);
+
+          group.appendChild(input);
+          allCells.push(input);
+          rowCells.push(input);
+        });
+
+        blankIdx++;
+        lineEl.appendChild(group);
+        prevWasBlank = true;
+      }
+    });
+
+    // Only add hint button if this row has any blanks
+    let hintBtn = null;
+    if (rowCells.length > 0) {
+      hintBtn = document.createElement('button');
+      hintBtn.className = 'hint-btn';
+      hintBtn.textContent = '?';
+      hintBtn.title = 'Reveal one random missing letter (won\'t count toward score)';
+      const rowIdx = lineRows.length;
+      hintBtn.addEventListener('click', () => giveHint(rowIdx));
+      row.appendChild(hintBtn);
+    }
+
+    row.appendChild(lineEl);
+    sec.appendChild(row);
+
+    lineRows.push({ cells: rowCells, hintBtn });
+  });
+
+  container.appendChild(sec);
+});
+
+// ─── Hint logic ───────────────────────────────────────────────────────────────
+function giveHint(rowIdx) {
+  const { cells } = lineRows[rowIdx];
+
+  // Collect primary empty non-hinted cells in this row
+  // (For chorus rows, we work on primary cells; mirrors follow via sync)
+  const eligible = cells.filter(c =>
+    c.dataset.primary === '1' &&
+    c.value === '' &&
+    c.dataset.hinted === '0'
+  );
+
+  // Also consider non-primary cells if there are no primary empty ones
+  // (e.g. row is entirely mirrors — shouldn't happen normally but be safe)
+  const fallback = cells.filter(c =>
+    c.value === '' && c.dataset.hinted === '0'
+  );
+
+  const pool = eligible.length > 0 ? eligible : fallback;
+  if (pool.length === 0) return;  // all filled
+
+  // Pick one at random
+  const target = pool[Math.floor(Math.random() * pool.length)];
+  revealHint(target);
+  updateHintBtn(rowIdx);
+}
+
+function revealHint(cell) {
+  const answer = cell.dataset.answer;
+  cell.value = answer;
+  cell.dataset.hinted = '1';
+  cell.classList.remove('correct', 'wrong', 'synced-mirror', 'filled');
+  cell.classList.add('hinted');
+  cell.readOnly = true;
+  cell.tabIndex = -1;
+
+  // Propagate to chorus mirrors — mark them hinted too
+  const sid = cell.dataset.syncId;
+  if (sid && syncMap[sid]) {
+    syncMap[sid].forEach(peer => {
+      if (peer === cell) return;
+      peer.value = answer;
+      peer.dataset.hinted = '1';
+      peer.classList.remove('correct', 'wrong', 'synced-mirror', 'filled');
+      peer.classList.add('hinted');
+      peer.readOnly = true;
+      peer.tabIndex = -1;
+      // Update the hint button of the peer's row
+      updateHintBtnForCell(peer);
+    });
+  }
+}
+
+function updateHintBtn(rowIdx) {
+  const { cells, hintBtn } = lineRows[rowIdx];
+  if (!hintBtn) return;
+  const anyEmpty = cells.some(c => c.value === '' && c.dataset.hinted === '0');
+  hintBtn.classList.toggle('exhausted', !anyEmpty);
+}
+
+function updateHintBtnForCell(cell) {
+  // Find which row this cell belongs to and refresh its button
+  for (let i = 0; i < lineRows.length; i++) {
+    if (lineRows[i].cells.includes(cell)) {
+      updateHintBtn(i);
+      break;
+    }
+  }
+}
+
+// ─── Sync helpers ─────────────────────────────────────────────────────────────
+function setFilled(cell, filled) {
+  cell.classList.toggle('filled', filled);
+}
+
+function propagateSync(sourceCell) {
+  const sid = sourceCell.dataset.syncId;
+  if (!sid) return;
+  const peers = syncMap[sid];
+  if (!peers) return;
+  const hasVal = sourceCell.value !== '';
+  peers.forEach(peer => {
+    if (peer === sourceCell) return;
+    peer.value = sourceCell.value;
+    peer.classList.remove('correct', 'wrong', 'hinted');
+    peer.dataset.hinted = '0';
+    setFilled(peer, hasVal);
+    if (peer.dataset.primary === '0') {
+      peer.classList.toggle('synced-mirror', !hasVal);
+    }
+    updateHintBtnForCell(peer);
+  });
+}
+
+// ─── Input handling ───────────────────────────────────────────────────────────
+function getCellIndex(el) { return allCells.indexOf(el); }
+
+function focusCell(idx) {
+  if (idx >= 0 && idx < allCells.length) {
+    allCells[idx].focus();
+    allCells[idx].select();
+  }
+}
+
+// Move focus to nearest non-hinted cell from idx, stepping by dir (+1 or -1)
+function focusSkipHinted(idx, dir) {
+  let i = idx;
+  while (i >= 0 && i < allCells.length) {
+    if (allCells[i].dataset.hinted !== '1') {
+      focusCell(i);
+      return;
+    }
+    i += dir;
+  }
+}
+
+function onInput(e) {
+  const el = e.target;
+  if (el.value.length === 0) return;
+  const val = el.value.slice(-1);
+  if (val === ' ') { el.value = ''; return; } // block spaces
+  el.value = val;
+  el.dataset.hinted = '0';
+  el.classList.remove('correct', 'wrong', 'synced-mirror', 'hinted');
+  setFilled(el, true);
+  propagateSync(el);
+  updateHintBtnForCell(el);
+  focusSkipHinted(getCellIndex(el) + 1, +1);
+}
+
+function onKeyDown(e) {
+  const el = e.target;
+  const idx = getCellIndex(el);
+
+  if (e.key === 'Backspace') {
+    if (el.value === '') {
+      e.preventDefault();
+      // Find previous non-hinted cell, clear it, and focus it
+      let i = idx - 1;
+      while (i >= 0 && allCells[i].dataset.hinted === '1') i--;
+      if (i >= 0) {
+        const prev = allCells[i];
+        prev.value = '';
+        prev.dataset.hinted = '0';
+        prev.classList.remove('correct', 'wrong', 'hinted');
+        setFilled(prev, false);
+        if (prev.dataset.primary === '0') prev.classList.add('synced-mirror');
+        propagateSync(prev);
+        updateHintBtnForCell(prev);
+        prev.focus();
+      }
+    } else {
+      el.value = '';
+      el.dataset.hinted = '0';
+      el.classList.remove('correct', 'wrong', 'hinted');
+      setFilled(el, false);
+      if (el.dataset.primary === '0') el.classList.add('synced-mirror');
+      propagateSync(el);
+      updateHintBtnForCell(el);
+    }
+    e.stopPropagation();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault(); focusSkipHinted(idx - 1, -1);
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault(); focusSkipHinted(idx + 1, +1);
+  }
+}
+
+} // end initQuiz
+
+// ─── Welcome screen carousel ──────────────────────────────────────────────────
+const WS_TOTAL = 7; // total slides (0–6)
+let wsCurrentSlide = 0;
+
+function wsInit() {
+  wsCurrentSlide = 0;
+  // Build dots
+  const dotsEl = document.getElementById('ws-dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < WS_TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'ws-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => wsGoTo(i);
+    d.style.cursor = 'pointer';
+    dotsEl.appendChild(d);
+  }
+  wsUpdate();
+}
+
+function wsGoTo(idx) {
+  wsCurrentSlide = Math.max(0, Math.min(WS_TOTAL - 1, idx));
+  wsUpdate();
+}
+
+function wsGo(dir) {
+  if (dir === 1 && wsCurrentSlide === WS_TOTAL - 1) {
+    startQuiz(); return;
+  }
+  wsGoTo(wsCurrentSlide + dir);
+}
+
+function wsUpdate() {
+  // Move slides
+  document.getElementById('ws-slides').style.transform =
+    `translateX(-${wsCurrentSlide * 100}%)`;
+  // Trigger demo init when relevant slide shown
+  wsUpdateDemoHook();
+  // Update dots
+  document.querySelectorAll('.ws-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === wsCurrentSlide);
+  });
+  // Update buttons
+  const prev = document.getElementById('ws-btn-prev');
+  const next = document.getElementById('ws-btn-next');
+  prev.className = 'ws-nav-btn ws-btn-prev' + (wsCurrentSlide === 0 ? ' ws-btn-invisible' : '');
+  if (wsCurrentSlide === WS_TOTAL - 1) {
+    next.textContent = "Let's go! →";
+    next.className = 'ws-nav-btn ws-btn-start';
+  } else {
+    next.textContent = 'Next →';
+    next.className = 'ws-nav-btn ws-btn-next';
+  }
+}
+
+// Keyboard navigation on welcome screen — only Enter, no arrows (arrows used in demo cells)
+document.addEventListener('keydown', e => {
+  if (document.getElementById('welcome-screen').style.display !== 'block') return;
+  // Don't intercept if a demo cell is focused
+  if (document.activeElement && document.activeElement.classList.contains('ws-demo-cell')) return;
+  if (e.key === 'Enter') wsGo(1);
+});
+
+function startQuiz() {
+  const ws = document.getElementById('welcome-screen');
+  ws.style.transition = 'opacity 0.4s';
+  ws.style.opacity = '0';
+  setTimeout(() => {
+    ws.style.display = 'none';
+    ws.style.opacity = '1';
+    const banner = document.getElementById('welcome-banner');
+    document.getElementById('welcome-name').textContent = 'Welcome, ' + currentUser + '!';
+    banner.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    allCells[0]?.focus();
+  }, 400);
+  updateAttemptStatus('active');
+}
+
+
+
+// ─── Dashboard tabs ────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'answers' && !akBuilt) buildAnswerKey();
+}
+
+// ─── Answer Key ────────────────────────────────────────────────────────────────
+let akBuilt = false;
+const akSyncMap = {};   // syncId → [cell elements]
+
+function buildAnswerKey() {
+  akBuilt = true;
+  const container = document.getElementById('ak-lyrics');
+  if (!container) { console.error('ak-lyrics element not found'); return; }
+  container.innerHTML = '';
+  console.log('buildAnswerKey: AK_SECTIONS length =', AK_SECTIONS ? AK_SECTIONS.length : 'undefined');
+
+  if (!AK_SECTIONS) { container.textContent = 'Error: song data not loaded.'; return; }
+
+  AK_SECTIONS.forEach(section => {
+    if (!section.lines) return; // skip null placeholders
+    const sec = document.createElement('div');
+    sec.className = 'ak-section' + (section.isChorus ? ' is-chorus' : '');
+
+    const lbl = document.createElement('div');
+    lbl.className = 'ak-section-label';
+    lbl.textContent = section.label;
+    sec.appendChild(lbl);
+
+    section.lines.forEach((tokens, lineIdx) => {
+      const lineEl = document.createElement('div');
+      lineEl.className = 'ak-line';
+
+      const syncLineIdx = (section.isChorus && lineIdx >= AK_CHORUS_LINES.length)
+        ? AK_CHORUS_LINES.length - 1 : lineIdx;
+
+      let blankIdx = 0;
+      let prevWasBlank = false;
+
+      tokens.forEach(token => {
+        if (typeof token === 'string') {
+          if (token) {
+            const span = document.createElement('span');
+            span.className = 'ak-plain';
+            span.textContent = token;
+            lineEl.appendChild(span);
+          }
+          prevWasBlank = false;
+        } else {
+          const word = token[0];
+          const group = document.createElement('div');
+          group.className = 'ak-group';
+          if (prevWasBlank) group.classList.add('gap-before');
+
+          // Build cells for this word
+          const wordCells = [];
+          word.split('').forEach((ch, charIdx) => {
+            const cell = document.createElement('div');
+            cell.className = 'ak-cell';
+            cell.textContent = ch;
+            cell.dataset.letter = ch;
+
+            if (section.isChorus) {
+              const sid = `ak_${syncLineIdx}_${blankIdx}_${charIdx}`;
+              cell.dataset.syncId = sid;
+              if (!akSyncMap[sid]) akSyncMap[sid] = [];
+              akSyncMap[sid].push(cell);
+            }
+
+            wordCells.push(cell);
+            group.appendChild(cell);
+          });
+
+          // Click on any cell reveals the whole word (all cells in group)
+          wordCells.forEach(cell => {
+            cell.addEventListener('click', () => akRevealWord(wordCells, cell.dataset.syncId, blankIdx, syncLineIdx, word));
+          });
+
+          blankIdx++;
+          lineEl.appendChild(group);
+          prevWasBlank = true;
+        }
+      });
+
+      sec.appendChild(lineEl);
+    });
+
+    container.appendChild(sec);
+  });
+}
+
+function akRevealWord(wordCells, syncId, blankIdx, syncLineIdx, word) {
+  // Reveal all cells in this word
+  wordCells.forEach(cell => {
+    cell.classList.add('revealed');
+  });
+
+  // Sync chorus: reveal the same word in all chorus mirrors
+  if (syncId) {
+    // syncId is per-character; find all cells for same word (same blankIdx)
+    // We stored per-char, so gather all chars of this word via blankIdx
+    const wordLen = word.length;
+    for (let ci = 0; ci < wordLen; ci++) {
+      const sid = syncId.replace(/_\d+$/, '_' + ci); // replace last charIdx
+      if (akSyncMap[sid]) {
+        akSyncMap[sid].forEach(peer => {
+          if (!wordCells.includes(peer)) {
+            peer.classList.add('mirror-revealed');
+          }
+        });
+      }
+    }
+  }
+}
+
+function akResetAll() {
+  document.querySelectorAll('.ak-cell').forEach(c => {
+    c.classList.remove('revealed', 'mirror-revealed');
+  });
+}
+
+
+
+// ─── Check & Reset (global scope — called from HTML buttons) ──────────────────
+async function checkAnswers() {
+  let correct = 0, total = 0;
+
+  allCells.forEach(cell => {
+    if (cell.dataset.hinted === '1') {
+      cell.classList.remove('correct', 'wrong', 'filled');
+      cell.classList.add('hinted');
+      if (cell.dataset.primary === '1') total++;
+      return;
+    }
+
+    cell.classList.remove('correct', 'wrong', 'synced-mirror', 'hinted', 'filled');
+    const typed  = cell.value.toLowerCase().trim();
+    const answer = cell.dataset.answer;
+    cell.classList.add(typed === answer ? 'correct' : 'wrong');
+
+    if (cell.dataset.primary === '1') {
+      total++;
+      if (typed === answer) correct++;
+    }
+  });
+
+  const pct = total > 0 ? Math.round(correct / total * 100) : 100;
+  const banner = document.getElementById('score');
+  banner.style.display = 'block';
+  banner.innerHTML = `Score: <span>${correct}&thinsp;/&thinsp;${total}</span> correct letters &nbsp;(${pct}%)`;
+
+  // Collect answers snapshot (primary cells only, for staff review)
+  const answersSnapshot = allCells
+    .filter(c => c.dataset.primary === '1')
+    .map(c => ({
+      answer: c.dataset.answer,
+      typed:  c.value.toLowerCase().trim(),
+      hinted: c.dataset.hinted === '1',
+    }));
+
+  // Score animation
+  launchScoreAnimation(pct);
+
+  if (currentUser) {
+    saveResult(correct, total, pct, answersSnapshot).then(() => {
+      fetchAndShowRank();
+    }).catch(() => {
+      // Even if save fails, try to show rank
+      fetchAndShowRank();
+    });
+  }
+}
+
+function resetAll() {
+  allCells.forEach(cell => {
+    cell.value = '';
+    cell.dataset.hinted = '0';
+    cell.readOnly = false;
+    cell.tabIndex = 0;
+    cell.classList.remove('correct', 'wrong', 'filled', 'hinted');
+    if (cell.dataset.primary === '0') cell.classList.add('synced-mirror');
+  });
+  lineRows.forEach((_, i) => updateHintBtn(i));
+  document.getElementById('score').style.display = 'none';
+  allCells[0]?.focus();
+}
+
+// ─── Vocabulary data ───────────────────────────────────────────────────────────
+const VOCAB_DATA = [
+  // ── Section 1: Vocabulary & Collocations ──────────────────────────────────
+  {
+    section: 'vocab',
+    sectionTitle: '📚 Vocabulary & Collocations',
+    levels: [
+      {
+        level: 'b1b2',
+        label: '🟢 B1–B2',
+        badgeClass: 'level-b1b2',
+        items: [
+          {
+            phrase: 'a bit of a bore',
+            translation: 'немного скучный человек',
+            context: '"I\'m nothing special, in fact I\'m a bit of a bore"',
+            note: '<b>bore</b> здесь существительное, не глагол! «A bore» = скучный человек. Конструкция <b>a bit of a + noun</b> — типично разговорная британская смягчённая характеристика: <em>a bit of a mess, a bit of a disaster.</em>',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'tell a joke',
+            translation: 'рассказать шутку',
+            context: '"If I tell a joke, you\'ve probably heard it before"',
+            note: 'Устойчивое сочетание: всегда <b>tell</b> a joke, никогда не <em>say</em> или <em>speak</em>. Аналогично: tell a story, tell the truth, tell a lie.',
+            cefr: 'B1',
+            stars: ''
+          },
+          {
+            phrase: 'you\'ve probably heard it before',
+            translation: 'ты, наверное, уже это слышал',
+            context: '"If I tell a joke, you\'ve probably heard it before"',
+            note: 'Present Perfect для выражения опыта + наречие <b>probably</b> для смягчения. Разговорная естественность: не «you probably heard», а именно с Present Perfect.',
+            cefr: 'B1–B2',
+            stars: ''
+          },
+          {
+            phrase: 'have a talent',
+            translation: 'иметь талант',
+            context: '"But I have a talent, a wonderful thing"',
+            note: 'Коллокация: <b>have a talent</b> (не <em>possess</em>, не <em>own</em>). Также: <em>have a talent for something / for doing something.</em>',
+            cefr: 'B1',
+            stars: ''
+          },
+          {
+            phrase: 'grateful and proud',
+            translation: 'благодарный и гордый',
+            context: '"I\'m so grateful and proud"',
+            note: '<b>grateful</b> ≠ <b>thankful</b>: grateful — более глубокое, тёплое чувство признательности. Классическая коллокация эмоций в английской речи.',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'sing it out loud',
+            translation: 'петь вслух / громко',
+            context: '"All I want is to sing it out loud"',
+            note: '<b>out loud</b> vs <b>aloud</b>: оба верны, но <em>out loud</em> — более разговорное и эмфатическое. Нюанс: <em>think out loud</em> = думать вслух (говорить то, что думаешь).',
+            cefr: 'B2',
+            stars: ''
+          },
+        ]
+      },
+      {
+        level: 'b2c1',
+        label: '🟡 B2 → C1',
+        badgeClass: 'level-b2c1',
+        items: [
+          {
+            phrase: 'bring joy',
+            translation: 'приносить радость',
+            context: '"Thanks for all the joy they\'re bringing"',
+            note: '<b>bring joy / happiness / comfort</b> — частая академическая и литературная коллокация. Обратите внимание: Present Continuous (<em>they\'re bringing</em>) подчёркивает длящееся действие.',
+            cefr: 'B2+',
+            stars: ''
+          },
+          {
+            phrase: 'live without (something)',
+            translation: 'жить без чего-либо',
+            context: '"Who can live without it?"',
+            note: 'Конструкция зависимости: <b>can\'t live without</b> = незаменимо. Часто используется в риторических вопросах и гиперболах.',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'in all honesty',
+            translation: 'честно говоря',
+            context: '"I ask in all honesty"',
+            note: 'Формальный дискурсивный маркер искренности. Сильнее, чем <em>honestly</em> или <em>to be honest</em> — добавляет торжественность и вес высказыванию.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'what would life be?',
+            translation: 'чем была бы жизнь?',
+            context: '"What would life be?"',
+            note: 'Риторический вопрос со Second Conditional без if-clause. Полная форма: <em>What would life be without music?</em> — контекст заменяет условие. Мощный дискурсивный инструмент.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'capture a heart',
+            translation: 'покорить сердце',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: '<b>capture</b> в переносном значении = завоевать, покорить. Метафорические коллокации: <em>capture attention, capture the imagination, capture a heart.</em>',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'like a melody can',
+            translation: '(так,) как это может делать мелодия',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: '<b>Эллипсис</b>: пропущен глагол «capture a heart» во второй части. Полная форма: <em>like a melody can capture a heart.</em> Носители постоянно используют этот приём для избежания повторений. C1–C2.',
+            cefr: 'C1–C2',
+            stars: '⭐⭐'
+          },
+        ]
+      },
+      {
+        level: 'c1c2',
+        label: '🔴 C1–C2',
+        badgeClass: 'level-c1c2',
+        items: [
+          {
+            phrase: "I'm nothing special",
+            translation: 'я ничего особенного',
+            context: '"I\'m nothing special, in fact I\'m a bit of a bore"',
+            note: 'На поверхности — простое B1. Но здесь это <b>understatement</b> (намеренное преуменьшение): говорящий подчёркивает скромность, чтобы усилить контраст с талантом. Это <b>pragmatics</b> — умение читать подтекст.',
+            cefr: 'C1 (pragmatics)',
+            stars: '⭐'
+          },
+          {
+            phrase: 'in fact',
+            translation: 'на самом деле / более того',
+            context: '"I\'m nothing special, in fact I\'m a bit of a bore"',
+            note: '<b>in fact</b> — дискурсивный маркер, который усиливает или уточняет предыдущее высказывание (не просто «на самом деле», а «и более того»). Ключевой маркер для C1-уровневой связности речи.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'everyone listens when I start to sing',
+            translation: 'все слушают, когда я начинаю петь',
+            context: '"\'Cause everyone listens when I start to sing"',
+            note: 'Грамматически простая фраза, но создаёт <b>dramatic contrast</b>: незначительный человек → магический эффект пения. Умение строить такой контраст — навык уровня C1+ в discourse control.',
+            cefr: 'C1 (discourse)',
+            stars: '⭐'
+          },
+          {
+            phrase: 'who can live without it?',
+            translation: 'кто может жить без этого?',
+            context: '"Who can live without it? I ask in all honesty"',
+            note: 'Это не вопрос — это утверждение. <b>Риторический вопрос</b> = «никто не может». Понимать и использовать риторические вопросы — признак C1 discourse awareness.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'without a song or a dance, what are we?',
+            translation: 'без песни и танца — кто мы?',
+            context: '"Without a song or a dance, what are we?"',
+            note: '<b>Философская редукция</b>: «что мы есть» без культуры и искусства? Инверсия + абстрактное обобщение. Уровень C2 — это не про грамматику, это про умение мыслить и формулировать абстрактно.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'whoever it was',
+            translation: 'кто бы это ни был',
+            context: '"Well, whoever it was, I\'m a fan"',
+            note: '<b>whoever</b> = «кто угодно, кто» / «кто бы ни». Сложное неопределённое местоимение, требующее понимания референтной неопределённости. Редко используется учащимися ниже C1.',
+            cefr: 'C1–C2',
+            stars: '⭐'
+          },
+          {
+            phrase: "I've often wondered",
+            translation: 'я часто задумывалась',
+            context: '"And I\'ve often wondered, how did it all start?"',
+            note: '<b>Present Perfect + often</b> = повторяющаяся мысль с актуальностью в настоящем. Учащиеся ниже C1 обычно заменяют это Past Simple: «I often wondered» — что технически ошибочно в данном контексте.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'how did it all start?',
+            translation: 'как всё это началось?',
+            context: '"How did it all start?"',
+            note: 'После <em>I\'ve wondered</em> ожидается косвенный вопрос: <em>how it all started</em>. Но здесь — прямой вопрос, что создаёт <b>разговорный, риторический эффект</b>. Переключение между прямым и косвенным вопросом — C1.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'nothing can capture a heart like X can',
+            translation: 'ничто не может покорить сердце так, как X',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: 'Сравнительная конструкция <b>nothing can X like Y can</b> с эллипсисом во второй части. Повтор модального <em>can</em> создаёт параллелизм. Одна из самых элегантных структур в английской риторике.',
+            cefr: 'C1–C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'what a joy, what a life, what a chance',
+            translation: 'какая радость, какая жизнь, какой шанс',
+            context: '"What a joy, what a life, what a chance"',
+            note: '<b>Восклицательная анафора</b> + <b>триколон</b>: три параллельные структуры <em>What a + noun</em> без прилагательного. Чистая <em>What a + noun</em> (без adj.) — более зрелый вариант, чем <em>What a wonderful life</em>. Стилистический приём уровня C2.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+        ]
+      }
+    ]
+  },
+
+  // ── Section 2: Grammar ─────────────────────────────────────────────────────
+  {
+    section: 'grammar',
+    sectionTitle: '⚙️ Grammar Constructions',
+    levels: [
+      {
+        level: 'b1b2',
+        label: '🟢 B1–B2 (important for fluency)',
+        badgeClass: 'level-b1b2',
+        items: [
+          {
+            phrase: "If I tell a joke, you've probably heard it before",
+            translation: 'если я расскажу шутку, ты, наверно, уже слышал её',
+            context: '"If I tell a joke, you\'ve probably heard it before"',
+            note: '<b>First Conditional + Present Perfect</b> в главной части. Нетипичная комбинация: обычно учебники дают Present Simple в обеих частях, но реальная речь часто использует Perfect для выражения накопленного опыта.',
+            cefr: 'B2',
+            stars: ''
+          },
+          {
+            phrase: 'before I could walk / talk',
+            translation: 'до того как я научилась ходить / говорить',
+            context: '"She says I was a dancer before I could walk"',
+            note: '<b>before + Past Simple</b> и <b>could</b> для выражения прошлой способности. <em>Could</em> здесь = was able to. Не путать с <em>can</em> в значении разрешения.',
+            cefr: 'B1–B2',
+            stars: ''
+          },
+        ]
+      },
+      {
+        level: 'b2c1',
+        label: '🟡 B2 → C1',
+        badgeClass: 'level-b2c1',
+        items: [
+          {
+            phrase: "I've often wondered…",
+            translation: 'я часто задумывалась…',
+            context: '"And I\'ve often wondered, how did it all start?"',
+            note: '<b>Present Perfect + frequency adverb</b>. Конструкция «размышляющей речи»: <em>I\'ve always wondered, I\'ve often thought, I\'ve sometimes asked myself.</em> Характерна для C1 уровня беглости.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'who found out that nothing can…',
+            translation: 'кто обнаружил, что ничто не может…',
+            context: '"Who found out that nothing can capture a heart like a melody can?"',
+            note: 'Сложноподчинённое предложение: <b>found out + that-clause</b>. <em>Find out</em> = discover (фразовый глагол). Внутри придаточного — ещё одно сравнительное придаточное с эллипсисом.',
+            cefr: 'B2+',
+            stars: ''
+          },
+        ]
+      },
+      {
+        level: 'c1c2',
+        label: '🔴 C1–C2 (most powerful)',
+        badgeClass: 'level-c1c2',
+        items: [
+          {
+            phrase: 'What would life be (without…)?',
+            translation: 'Чем была бы жизнь (без…)?',
+            context: '"What would life be?"',
+            note: '<b>Second Conditional + абстракция + эллипсис if-clause</b>. Контекст полностью заменяет условную часть. Мощный риторический инструмент: короткий вопрос несёт весь смысл.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+          {
+            phrase: 'Without a song or a dance, what are we?',
+            translation: 'Без песни и танца — кто мы?',
+            context: '"Without a song or a dance, what are we?"',
+            note: '<b>Инверсия</b>: обстоятельство вынесено в начало + риторический вопрос. <b>Философское обобщение</b>: <em>we</em> = all humans. Сочетание инверсии и абстракции — признак C2 уровня.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'like a melody can',
+            translation: 'как мелодия (может)',
+            context: '"Nothing can capture a heart like a melody can"',
+            note: '<b>Ellipsis</b>: глагольная группа <em>capture a heart</em> опущена во второй части сравнения. Полная форма: <em>like a melody can capture a heart.</em> Носители используют этот приём автоматически — учащиеся осваивают его на уровне C2.',
+            cefr: 'C2',
+            stars: '⭐⭐'
+          },
+          {
+            phrase: 'All I want is to sing it out loud',
+            translation: 'Всё, чего я хочу — это петь вслух',
+            context: '"All I want is to sing it out loud"',
+            note: '<b>Pseudo-cleft sentence</b> (расщеплённое предложение): <em>All + subject + verb + is + to-infinitive</em>. Используется для эмфазы — выделения самого важного. Учащиеся C1 часто знают эту структуру пассивно, но редко используют активно.',
+            cefr: 'C1',
+            stars: '⭐'
+          },
+        ]
+      }
+    ]
+  }
+];
+
+// ─── Vocab page logic ──────────────────────────────────────────────────────────
+let vocabReturnTo = 'student'; // 'student' or 'staff'
+let activeVocabFilter = 'all';
+
+function openVocabPage(from) {
+  vocabReturnTo = from;
+  document.getElementById('vocab-page').style.display = 'block';
+  document.getElementById('vocab-back-btn').onclick = closeVocabPage;
+  if (!document.getElementById('vocab-content').children.length) renderVocab();
+}
+
+function closeVocabPage() {
+  document.getElementById('vocab-page').style.display = 'none';
+  if (vocabReturnTo === 'standalone') {
+    // login-overlay is still visible underneath — nothing to do
+    pinDigits[0].focus();
+  } else if (vocabReturnTo === 'staff') {
+    document.getElementById('staff-dashboard').style.display = 'block';
+  }
+}
+
+function vocabFilter(filter) {
+  activeVocabFilter = filter;
+  document.querySelectorAll('.vf-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderVocab();
+}
+
+function renderVocab() {
+  const container = document.getElementById('vocab-content');
+  container.innerHTML = '';
+
+  VOCAB_DATA.forEach(section => {
+    // Section filter
+    if (activeVocabFilter === 'vocab' && section.section !== 'vocab') return;
+    if (activeVocabFilter === 'grammar' && section.section !== 'grammar') return;
+
+    const secEl = document.createElement('div');
+    secEl.className = 'vocab-section';
+
+    const secTitle = document.createElement('div');
+    secTitle.className = 'vocab-section-title';
+    secTitle.textContent = section.sectionTitle;
+    secEl.appendChild(secTitle);
+
+    section.levels.forEach(levelGroup => {
+      // Level filter
+      if (activeVocabFilter === 'b1b2' && levelGroup.level !== 'b1b2') return;
+      if (activeVocabFilter === 'b2c1' && levelGroup.level !== 'b2c1') return;
+      if (activeVocabFilter === 'c1c2' && levelGroup.level !== 'c1c2') return;
+
+      const grpEl = document.createElement('div');
+      grpEl.className = 'vocab-level-group';
+
+      const hdr = document.createElement('div');
+      hdr.className = 'vocab-level-header';
+      hdr.innerHTML = `<span class="level-badge ${levelGroup.badgeClass}">${levelGroup.label}</span>
+        <span class="level-toggle">${levelGroup.items.length} items</span>`;
+      grpEl.appendChild(hdr);
+
+      const itemsEl = document.createElement('div');
+      itemsEl.className = 'vocab-items';
+
+      levelGroup.items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'vocab-item';
+        card.innerHTML = `
+          <div class="vocab-item-top">
+            <span class="vocab-phrase">${item.phrase}</span>
+            <span class="vocab-arrow">→</span>
+            <span class="vocab-translation">${item.translation}</span>
+            ${item.stars ? `<span class="vocab-stars">${item.stars}</span>` : ''}
+          </div>
+          <div class="vocab-detail" id="vd-${section.section}-${levelGroup.level}-${idx}">
+            <div class="context-line">${item.context}</div>
+            <div>${item.note}</div>
+            <span class="cefr-tag ${levelGroup.badgeClass}">CEFR: ${item.cefr}</span>
+          </div>`;
+
+        card.addEventListener('click', () => {
+          const detail = card.querySelector('.vocab-detail');
+          detail.classList.toggle('open');
+        });
+
+        itemsEl.appendChild(card);
+      });
+
+      grpEl.appendChild(itemsEl);
+      secEl.appendChild(grpEl);
+    });
+
+    container.appendChild(secEl);
+  });
+}
+
+
+
+
+// ─── Certificate generation ────────────────────────────────────────────────────
+function generateCertificates() {
+  if (lastResults.filter(r => r.status === 'finished').length === 0) { alert('No finished results yet.'); return; }
+
+  // Use cached results data (includes finishedAt for tie-breaking)
+  const data = lastResults
+    .filter(r => r.status === 'finished' && r.name !== 'Varvara Akimova')
+    .map(r => ({ name: r.name, score: r.correct, finishedAt: r.finishedAt }));
+
+  // Sort by score desc for ranking
+  // Sort by score desc, then finishedAt asc — no ties possible
+  data.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return new Date(a.finishedAt || 0) - new Date(b.finishedAt || 0);
+  });
+  // Assign sequential ranks — no ties
+  data.forEach((d, i) => { d.rank = i + 1; });
+
+  const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+  const today  = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Certificates — Thank You for the Music</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f5f0e8; font-family: "DM Sans", sans-serif; }
+
+    .cert-page {
+      width: 210mm;
+      min-height: 148mm;
+      margin: 0 auto 20px;
+      background: #fffdf9;
+      border: 2px solid #c8873a;
+      border-radius: 4px;
+      padding: 16mm 18mm 14mm;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      page-break-after: always;
+      text-align: center;
+    }
+
+    .cert-corner {
+      position: absolute;
+      font-size: 28px;
+      opacity: 0.35;
+    }
+    .cert-corner.tl { top: 10px; left: 14px; }
+    .cert-corner.tr { top: 10px; right: 14px; }
+    .cert-corner.bl { bottom: 10px; left: 14px; }
+    .cert-corner.br { bottom: 10px; right: 14px; }
+
+    .cert-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #c8873a;
+      margin-bottom: 2px;
+    }
+
+    .cert-title {
+      font-family: "DM Serif Display", serif;
+      font-size: 28px;
+      color: #1a1410;
+      line-height: 1.2;
+    }
+    .cert-title em { font-style: italic; color: #c8873a; }
+
+    .cert-subtitle {
+      font-size: 13px;
+      color: #7a6a58;
+      margin-bottom: 6px;
+    }
+
+    .cert-awarded { font-size: 13px; color: #7a6a58; }
+
+    .cert-name {
+      font-family: "DM Serif Display", serif;
+      font-size: 36px;
+      color: #1a1410;
+      border-bottom: 1.5px solid #c8873a;
+      padding-bottom: 6px;
+      min-width: 120mm;
+    }
+
+    .cert-desc {
+      font-size: 13px;
+      color: #5a4a38;
+      max-width: 140mm;
+      line-height: 1.5;
+    }
+
+    .cert-score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 4px 0;
+    }
+
+    .cert-medal { font-size: 36px; }
+
+    .cert-score {
+      font-family: "DM Serif Display", serif;
+      font-size: 40px;
+      color: #c8873a;
+      line-height: 1;
+    }
+    .cert-score span { font-size: 18px; color: #7a6a58; }
+
+    .cert-rank {
+      font-size: 13px;
+      font-weight: 600;
+      color: #7a6a58;
+      letter-spacing: 0.06em;
+    }
+
+    .cert-footer {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 4px;
+    }
+
+    .cert-divider {
+      width: 40mm;
+      height: 1px;
+      background: #e2d9cc;
+    }
+
+    @media print {
+      body { background: white; }
+      .cert-page { margin: 0; border-radius: 0; page-break-after: always; }
+      .no-print { display: none !important; }
+    }
+  </style></head><body>`);
+
+  data.forEach(d => {
+    const medal = medals[d.rank] || '';
+    const rankText = d.rank === 1 ? '1st Place' : d.rank === 2 ? '2nd Place' : d.rank === 3 ? '3rd Place' : null;
+    win.document.write(`
+    <div class="cert-page">
+      <div class="cert-corner tl">♪</div>
+      <div class="cert-corner tr">♪</div>
+      <div class="cert-corner bl">♩</div>
+      <div class="cert-corner br">♩</div>
+
+      <div class="cert-badge">Certificate of Achievement</div>
+      <div class="cert-title">Thank You for the <em>Music</em></div>
+      <div class="cert-subtitle">ABBA · English Listening Quiz</div>
+
+      <div class="cert-divider"></div>
+
+      <div class="cert-awarded">This certificate is awarded to</div>
+      <div class="cert-name">${d.name}</div>
+
+      <div class="cert-desc">for successfully completing the listening comprehension quiz<br>and demonstrating outstanding knowledge of English</div>
+
+      <div class="cert-score-wrap">
+        ${medal ? `<div class="cert-medal">${medal}</div>` : ''}
+        <div>
+          <div class="cert-score">${d.score}<span> / 300</span></div>
+          ${rankText ? `<div class="cert-rank">${rankText}</div>` : `<div class="cert-rank" style="color:#aaa;font-weight:400">Participant</div>`}
+        </div>
+      </div>
+
+      <div class="cert-divider"></div>
+      <div class="cert-footer">${today} &nbsp;·&nbsp; Roman Samoylov</div>
+    </div>`);
+  });
+
+  // ── Teacher certificate ────────────────────────────────────────────────────
+  const teacherResult = lastResults.find(r => r.name === 'Varvara Akimova' && r.status === 'finished');
+  if (teacherResult) {
+    win.document.write(`
+    <div class="cert-page" style="border-color:#7c4dbd">
+      <div class="cert-corner tl" style="color:#7c4dbd">✦</div>
+      <div class="cert-corner tr" style="color:#7c4dbd">✦</div>
+      <div class="cert-corner bl" style="color:#7c4dbd">✦</div>
+      <div class="cert-corner br" style="color:#7c4dbd">✦</div>
+
+      <div class="cert-badge" style="color:#7c4dbd">Certificate of Appreciation</div>
+      <div class="cert-title">Thank You for the <em style="color:#7c4dbd">Music</em></div>
+      <div class="cert-subtitle">ABBA · English Listening Quiz</div>
+
+      <div class="cert-divider" style="background:#c8b4f0"></div>
+
+      <div class="cert-awarded">With gratitude and appreciation to</div>
+      <div class="cert-name" style="border-bottom-color:#7c4dbd">${teacherResult.name}</div>
+
+      <div class="cert-desc">for inspiring a love of the English language<br>
+      and for encouraging creative, interactive learning experiences</div>
+
+      <div class="cert-score-wrap">
+        <div class="cert-medal">🎓</div>
+        <div>
+          <div class="cert-score" style="color:#7c4dbd">${teacherResult.correct}<span style="color:#9b6bd4"> / 300</span></div>
+          <div class="cert-rank" style="color:#9b6bd4;font-weight:600">English Teacher</div>
+        </div>
+      </div>
+
+      <div class="cert-divider" style="background:#c8b4f0"></div>
+      <div class="cert-footer">${today} &nbsp;·&nbsp; Roman Samoylov</div>
+    </div>`);
+  }
+
+  win.document.write(`
+    <div style="text-align:center;padding:20px" class="no-print">
+      <button onclick="window.print()" style="font-family:sans-serif;font-size:15px;padding:12px 32px;
+        background:#c8873a;color:#fff;border:none;border-radius:8px;cursor:pointer">
+        🖨️ Print / Save as PDF
+      </button>
+    </div>
+  </body></html>`);
+  win.document.close();
+}
+
+
+
+// ─── Score animations ──────────────────────────────────────────────────────────
+function launchScoreAnimation(pct) {
+  if      (pct >= 90) launchFireworks('grand');   // 🎆 Большой салют
+  else if (pct >= 80) launchFireworks('light');   // 🎇 Лёгкий салют
+  else if (pct >= 60) launchConfetti();            // 🎊 Конфетти
+  else if (pct >= 40) launchSparkles();            // ✨ Искорки
+  else                launchStardust();            // 🌟 Звёздная пыль
+}
+
+function makeCanvas() {
+  const c = document.createElement('canvas');
+  c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+  document.body.appendChild(c);
+  c.width  = window.innerWidth;
+  c.height = window.innerHeight;
+  return c;
+}
+
+// ── 🎆 Салют (grand / light) ──────────────────────────────────────────────────
+function launchFireworks(intensity) {
+  // Dark overlay behind fireworks
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0);pointer-events:none;z-index:9998;transition:background 0.6s ease';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => { overlay.style.background = 'rgba(0,0,0,0.55)'; });
+
+  const canvas = makeCanvas();
+  canvas.style.zIndex = '9999';
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const burstCount  = intensity === 'grand' ? 7 : 4;
+  const sparkPerBurst = intensity === 'grand' ? 60 : 36;
+  const palettes = {
+    grand: ['#f5c842','#e05252','#4a90d9','#7c4dbd','#2d8a4e','#f0a500','#ff6eb4','#fff'],
+    light: ['#c8873a','#f5c842','#ffd9a0','#fff','#e8c87a'],
+  };
+  const palette = palettes[intensity];
+
+  const rockets  = [];
+  const bursts   = [];
+  let   tick     = 0;
+  const maxTicks = intensity === 'grand' ? 420 : 280;
+
+  // Schedule rocket launches
+  const launchTimes = Array.from({ length: burstCount }, (_, i) =>
+    Math.floor(i * (intensity === 'grand' ? 48 : 44) + Math.random() * 20)
+  );
+
+  function addBurst(x, y) {
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    const color2 = palette[Math.floor(Math.random() * palette.length)];
+    for (let i = 0; i < sparkPerBurst; i++) {
+      const angle = (i / sparkPerBurst) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+      const speed = 2 + Math.random() * (intensity === 'grand' ? 5 : 3.5);
+      bursts.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color: Math.random() < 0.3 ? color2 : color,
+        alpha: 1,
+        trail: [],
+        size: 1.5 + Math.random() * 2,
+      });
+    }
+    // Glitter ring
+    if (intensity === 'grand') {
+      for (let i = 0; i < 20; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.5 + Math.random() * 1.5;
+        bursts.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: '#fff',
+          alpha: 0.8,
+          trail: [],
+          size: 1,
+        });
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Launch rockets on schedule
+    launchTimes.forEach((lt, i) => {
+      if (tick === lt) {
+        const targetX = W * (0.15 + Math.random() * 0.7);
+        const targetY = H * (0.1 + Math.random() * 0.35);
+        rockets.push({ x: targetX, y: H + 10, tx: targetX, ty: targetY, speed: 14 + Math.random() * 6, done: false, trail: [] });
+      }
+    });
+
+    // Draw rockets
+    rockets.forEach(r => {
+      if (r.done) return;
+      r.trail.push({ x: r.x, y: r.y });
+      if (r.trail.length > 8) r.trail.shift();
+      const dy = r.ty - r.y, dx = r.tx - r.x;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < r.speed) {
+        r.done = true;
+        addBurst(r.x, r.y);
+      } else {
+        r.x += dx / dist * r.speed;
+        r.y += dy / dist * r.speed;
+      }
+      r.trail.forEach((p, i) => {
+        ctx.globalAlpha = (i / r.trail.length) * 0.6;
+        ctx.fillStyle = '#ffd';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    // Draw burst sparks
+    bursts.forEach(p => {
+      p.trail.push({ x: p.x, y: p.y });
+      if (p.trail.length > 5) p.trail.shift();
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.vy += 0.08;
+      p.vx *= 0.98;
+      p.alpha -= 0.013;
+
+      if (p.alpha <= 0) return;
+      p.trail.forEach((pt, i) => {
+        ctx.globalAlpha = (i / p.trail.length) * p.alpha * 0.5;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, p.size * 0.6, 0, Math.PI*2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+    tick++;
+
+    const anyAlive = bursts.some(p => p.alpha > 0) || rockets.some(r => !r.done);
+    if (tick < maxTicks || anyAlive) {
+      requestAnimationFrame(draw);
+    } else {
+      // Fade out canvas and overlay together
+      overlay.style.transition = 'background 0.8s ease';
+      overlay.style.background = 'rgba(0,0,0,0)';
+      let fadeAlpha = 1;
+      const fade = () => {
+        fadeAlpha -= 0.05;
+        if (fadeAlpha <= 0) { canvas.remove(); overlay.remove(); return; }
+        canvas.style.opacity = fadeAlpha;
+        requestAnimationFrame(fade);
+      };
+      fade();
+    }
+  }
+  requestAnimationFrame(draw);
+}
+
+// ── 🎊 Конфетти ───────────────────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = makeCanvas();
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const palette = ['#c8873a','#f5c842','#2d8a4e','#7c4dbd','#e05252','#4a90d9'];
+
+  const pieces = Array.from({ length: 120 }, () => ({
+    x:     Math.random() * W,
+    y:     -20 - Math.random() * H * 0.4,
+    w:     6 + Math.random() * 8,
+    h:     10 + Math.random() * 8,
+    color: palette[Math.floor(Math.random() * palette.length)],
+    angle: Math.random() * Math.PI * 2,
+    spin:  (Math.random() - 0.5) * 0.15,
+    vx:    (Math.random() - 0.5) * 2.5,
+    vy:    2 + Math.random() * 3,
+    alpha: 1,
+  }));
+
+  let tick = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    let alive = false;
+    pieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.angle += p.spin; p.vy += 0.05;
+      if (tick > 160) p.alpha -= 0.015;
+      if (p.alpha > 0 && p.y < H + 20) {
+        alive = true;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      }
+    });
+    tick++;
+    if (alive && tick < 280) requestAnimationFrame(draw);
+    else canvas.remove();
+  }
+  requestAnimationFrame(draw);
+}
+
+// ── ✨ Искорки ─────────────────────────────────────────────────────────────────
+function launchSparkles() {
+  const canvas = makeCanvas();
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const palette = ['#f5c842','#ffd9a0','#ffe066','#fff4c2','#c8873a'];
+
+  const stars = Array.from({ length: 60 }, () => ({
+    x:     Math.random() * W,
+    y:     -20 - Math.random() * H * 0.3,
+    size:  3 + Math.random() * 5,
+    color: palette[Math.floor(Math.random() * palette.length)],
+    vx:    (Math.random() - 0.5) * 1.2,
+    vy:    0.8 + Math.random() * 1.8,
+    alpha: 0.9 + Math.random() * 0.1,
+    twinkle: Math.random() * Math.PI * 2,
+    twinkleSpeed: 0.08 + Math.random() * 0.12,
+  }));
+
+  let tick = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    let alive = false;
+    stars.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.twinkle += p.twinkleSpeed;
+      const flicker = 0.5 + 0.5 * Math.sin(p.twinkle);
+      if (tick > 140) p.alpha -= 0.012;
+      if (p.alpha > 0 && p.y < H + 20) {
+        alive = true;
+        drawStar(ctx, p.x, p.y, p.size, p.color, p.alpha * flicker);
+      }
+    });
+    tick++;
+    if (alive && tick < 240) requestAnimationFrame(draw);
+    else canvas.remove();
+  }
+  requestAnimationFrame(draw);
+}
+
+// ── 🌟 Звёздная пыль ──────────────────────────────────────────────────────────
+function launchStardust() {
+  const canvas = makeCanvas();
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const palette = ['#f5c842','#e8dcc8','#ffd97a','#ffe8a0','#d4aa50','#fff4c2'];
+
+  const dust = Array.from({ length: 70 }, () => ({
+    x:     Math.random() * W,
+    y:     -10 - Math.random() * H * 0.4,
+    size:  3 + Math.random() * 5,
+    color: palette[Math.floor(Math.random() * palette.length)],
+    vx:    (Math.random() - 0.5) * 1.2,
+    vy:    0.8 + Math.random() * 1.6,
+    alpha: 0.75 + Math.random() * 0.25,
+    twinkle: Math.random() * Math.PI * 2,
+    twinkleSpeed: 0.07 + Math.random() * 0.1,
+  }));
+
+  let tick = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    let alive = false;
+    dust.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      p.twinkle += p.twinkleSpeed;
+      const flicker = 0.55 + 0.45 * Math.sin(p.twinkle);
+      if (tick > 180) p.alpha -= 0.010;
+      if (p.alpha > 0 && p.y < H + 10) {
+        alive = true;
+        drawStar(ctx, p.x, p.y, p.size, p.color, p.alpha * flicker);
+      }
+    });
+    tick++;
+    if (alive && tick < 300) requestAnimationFrame(draw);
+    else canvas.remove();
+  }
+  requestAnimationFrame(draw);
+}
+
+// ── Вспомогательная: рисует звёздочку ────────────────────────────────────────
+function drawStar(ctx, x, y, r, color, alpha) {
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, alpha);
+  ctx.fillStyle   = color;
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const outerAngle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+    const innerAngle = outerAngle + (2 * Math.PI) / 10;
+    if (i === 0) ctx.moveTo(x + r * Math.cos(outerAngle), y + r * Math.sin(outerAngle));
+    else          ctx.lineTo(x + r * Math.cos(outerAngle), y + r * Math.sin(outerAngle));
+    ctx.lineTo(x + (r*0.45) * Math.cos(innerAngle), y + (r*0.45) * Math.sin(innerAngle));
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+
+// ─── Inline demo (welcome screen) ─────────────────────────────────────────────
+const DEMO_WORDS = [
+  { text: 'Thank ', blank: false },
+  { text: 'you',    blank: true  },
+  { text: ' for ', blank: false },
+  { text: 'the',    blank: true  },
+  { text: ' ',      blank: false },
+  { text: 'music',  blank: true  },
+];
+
+// demoState: cells[], inited, syncMap, lines (per-line cell arrays)
+const demoState = {
+  boxes:  { cells: [], inited: false, syncMap: null,  lines: null },
+  hints:  { cells: [], inited: false, syncMap: {},    lines: [[], []] },
+  chorus: { cells: [], inited: false, syncMap: {},    lines: [[], []] },
+};
+
+// Build one demo line; syncMap optional for chorus sync
+function demoBuildLine(lineEl, allCells, syncMap, lineKey, lineCells) {
+  lineEl.innerHTML = '';
+  DEMO_WORDS.forEach((w, wi) => {
+    if (!w.blank) {
+      const sp = document.createElement('span');
+      sp.className = 'ws-demo-text';
+      sp.textContent = w.text;
+      lineEl.appendChild(sp);
+    } else {
+      const grp = document.createElement('div');
+      grp.className = 'ws-demo-group';
+      w.text.split('').forEach((ch, ci) => {
+        const inp = document.createElement('input');
+        inp.type = 'text'; inp.maxLength = 1;
+        inp.className = 'ws-demo-cell';
+        inp.autocomplete = 'off'; inp.autocorrect = 'off';
+        inp.autocapitalize = 'off'; inp.spellcheck = false;
+        inp.dataset.answer = ch.toLowerCase();
+        inp.dataset.hinted = '0';
+
+        // Sync id for chorus demo
+        if (syncMap !== null) {
+          const sid = `dc_${wi}_${ci}`;
+          inp.dataset.syncId = sid;
+          if (!syncMap[sid]) syncMap[sid] = [];
+          inp.dataset.primary = syncMap[sid].length === 0 ? '1' : '0';
+          syncMap[sid].push(inp);
+        }
+
+        inp.addEventListener('input', e => {
+          const v = inp.value.replace(' ','').slice(-1);
+          inp.value = v;
+          if (!v) return;
+          inp.dataset.hinted = '0';
+          inp.classList.remove('correct','wrong','hinted');
+          inp.classList.toggle('filled', true);
+          // Sync mirrors
+          if (syncMap && inp.dataset.syncId) {
+            syncMap[inp.dataset.syncId].forEach(peer => {
+              if (peer === inp) return;
+              peer.value = v; peer.dataset.hinted = '0';
+              peer.classList.remove('correct','wrong','hinted');
+              peer.classList.toggle('filled', true);
+            });
+          }
+          // Advance — skip hinted
+          let idx = allCells.indexOf(inp) + 1;
+          while (idx < allCells.length && allCells[idx].dataset.hinted === '1') idx++;
+          if (idx < allCells.length) { allCells[idx].focus(); allCells[idx].select(); }
+          // Dim hint buttons if no primary unfilled cells remain
+          demoUpdateHintBtns(id);
+        });
+
+        inp.addEventListener('keydown', e => {
+          const idx = allCells.indexOf(inp);
+          if (e.key === 'Backspace') {
+            e.preventDefault();
+            if (inp.value) {
+              inp.value = ''; inp.readOnly = false; inp.tabIndex = 0;
+              inp.classList.remove('filled','correct','wrong','hinted');
+              inp.dataset.hinted = '0';
+              // Sync mirrors on clear
+              if (syncMap && inp.dataset.syncId) {
+                syncMap[inp.dataset.syncId].forEach(p => {
+                  if (p === inp) return;
+                  p.value = ''; p.readOnly = false; p.tabIndex = 0;
+                  p.classList.remove('filled','correct','wrong','hinted','demo-mirror');
+                  if (p.dataset.primary === '0') p.classList.add('demo-mirror');
+                  p.dataset.hinted = '0';
+                });
+              }
+              demoUpdateHintBtns(id);
+            } else {
+              let pi = idx - 1;
+              while (pi >= 0 && allCells[pi].dataset.hinted === '1') pi--;
+              if (pi >= 0) {
+                const prev = allCells[pi];
+                prev.value = ''; prev.dataset.hinted = '0';
+                prev.classList.remove('filled','correct','wrong','hinted');
+                // Sync mirrors of prev cell
+                if (syncMap && prev.dataset.syncId) {
+                  syncMap[prev.dataset.syncId].forEach(p => {
+                    if (p === prev) return;
+                    p.value = ''; p.readOnly = false; p.tabIndex = 0;
+                    p.classList.remove('filled','correct','wrong','hinted','demo-mirror');
+                    if (p.dataset.primary === '0') p.classList.add('demo-mirror');
+                    p.dataset.hinted = '0';
+                  });
+                }
+                prev.focus();
+                demoUpdateHintBtns(id);
+              }
+            }
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            let pi = idx - 1;
+            while (pi >= 0 && allCells[pi].dataset.hinted === '1') pi--;
+            if (pi >= 0) allCells[pi].focus();
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            let ni = idx + 1;
+            while (ni < allCells.length && allCells[ni].dataset.hinted === '1') ni++;
+            if (ni < allCells.length) allCells[ni].focus();
+          }
+        });
+
+        grp.appendChild(inp);
+        allCells.push(inp);
+        if (lineCells) lineCells.push(inp);
+      });
+      lineEl.appendChild(grp);
+    }
+  });
+}
+
+function demoUpdateHintBtns(id) {
+  const state = demoState[id];
+  if (!state.inited) return;
+  const pool = state.primaryLines
+    ? state.primaryLines[0]
+    : state.cells.filter(c => !c.dataset.syncId || c.dataset.primary === '1');
+  const anyEmpty = pool.some(c => c.dataset.hinted !== '1' && !c.value);
+  document.querySelectorAll(`#demo-${id} .ws-demo-btn-hint`).forEach(btn => {
+    btn.style.opacity = anyEmpty ? '' : '0.25';
+    btn.style.cursor  = anyEmpty ? '' : 'default';
+  });
+}
+
+function demoInit(id) {
+  if (demoState[id].inited) return;
+  demoState[id].inited = true;
+  const cells = demoState[id].cells;
+  const state = demoState[id];
+
+  if (id === 'chorus' || id === 'hints') {
+    const sm = state.syncMap;
+    demoBuildLine(document.getElementById(`demo-${id}-line-0`), cells, sm, 0, state.lines[0]);
+    demoBuildLine(document.getElementById(`demo-${id}-line-1`), cells, sm, 1, state.lines[1]);
+    // Mark second-line mirror cells with dashed border
+    state.lines[1].forEach(c => {
+      if (c.dataset.primary === '0') c.classList.add('demo-mirror');
+    });
+    // Store primary-only cells per line for hint/dim logic
+    state.primaryLines = [
+      state.lines[0].filter(c => c.dataset.primary === '1'),
+      state.lines[1].filter(c => c.dataset.primary === '1'),
+    ];
+  } else {
+    demoBuildLine(document.getElementById(`demo-${id}-line`), cells, null, 0, null);
+    state.primaryLines = null;
+  }
+}
+
+function demoCheck(id) {
+  demoInit(id);
+  const cells = demoState[id].cells;
+  let correct = 0, total = 0, hintedCount = 0;
+  cells.forEach(c => {
+    const isPrimary = !c.dataset.syncId || c.dataset.primary === '1';
+    c.classList.remove('filled', 'demo-mirror');
+    if (c.dataset.hinted === '1') {
+      c.classList.add('hinted');
+      if (isPrimary) { hintedCount++; total++; }
+      return;
+    }
+    const ok = c.value.toLowerCase() === c.dataset.answer;
+    c.classList.add(ok ? 'correct' : 'wrong');
+    if (isPrimary) { total++; if (ok) correct++; }
+  });
+  const scoreEl = document.getElementById(`demo-${id}-score`);
+  scoreEl.classList.add('visible');
+  let html = `<span class="${correct === total - hintedCount && total > 0 ? 'ok':'bad'}">${correct}/${total} correct</span>`;
+  if (hintedCount > 0) html += ` <span class="hint-note">(${hintedCount} hinted — not counted)</span>`;
+  scoreEl.innerHTML = html;
+}
+
+function demoReset(id) {
+  demoInit(id);
+  const state = demoState[id];
+  state.cells.forEach(c => {
+    c.value = ''; c.dataset.hinted = '0'; c.readOnly = false; c.tabIndex = 0;
+    c.classList.remove('correct', 'wrong', 'filled', 'hinted');
+    if (c.dataset.syncId && c.dataset.primary === '0') c.classList.add('demo-mirror');
+  });
+  document.getElementById(`demo-${id}-score`).classList.remove('visible');
+  // Restore hint buttons
+  demoUpdateHintBtns(id);
+  const first = state.cells.find(c => !c.readOnly);
+  first?.focus();
+}
+
+function demoHint(id, lineIdx) {
+  demoInit(id);
+  const state = demoState[id];
+
+  // Use primaryLines if available, otherwise all primary cells
+  let primaryPool;
+  if (state.primaryLines && lineIdx !== undefined) {
+    // Both buttons trigger on the SAME primary cells (line 0 is always primary)
+    // Mirror line has no primary cells — both buttons use primaryLines[0]
+    primaryPool = state.primaryLines[0];
+  } else if (state.primaryLines) {
+    primaryPool = state.primaryLines[0];
+  } else {
+    primaryPool = state.cells.filter(c => !c.dataset.syncId || c.dataset.primary === '1');
+  }
+
+  const eligible = primaryPool.filter(c => !c.value && c.dataset.hinted === '0');
+
+  if (!eligible.length) {
+    // Dim both hint buttons — nothing left to hint
+    document.querySelectorAll(`#demo-${id} .ws-demo-btn-hint`).forEach(btn => {
+      btn.style.opacity = '0.25'; btn.style.cursor = 'default';
+    });
+    return;
+  }
+
+  const target = eligible[Math.floor(Math.random() * eligible.length)];
+  target.value = target.dataset.answer;
+  target.dataset.hinted = '1';
+  target.classList.remove('correct', 'wrong', 'filled', 'demo-mirror');
+  target.classList.add('hinted');
+  target.readOnly = true; target.tabIndex = -1;
+
+  // Sync mirrors
+  if (target.dataset.syncId && state.syncMap) {
+    state.syncMap[target.dataset.syncId]?.forEach(p => {
+      if (p === target) return;
+      p.value = target.dataset.answer; p.dataset.hinted = '1';
+      p.classList.remove('correct', 'wrong', 'filled', 'demo-mirror');
+      p.classList.add('hinted');
+      p.readOnly = true; p.tabIndex = -1;
+    });
+  }
+
+  // Dim both hint buttons if no unhinted+unfilled primary cells remain
+  const remaining = primaryPool.filter(c => c.dataset.hinted !== '1' && !c.value);
+  if (remaining.length === 0) {
+    document.querySelectorAll(`#demo-${id} .ws-demo-btn-hint`).forEach(btn => {
+      btn.style.opacity = '0.25'; btn.style.cursor = 'default';
+    });
+  }
+}
+
+function wsUpdateDemoHook() {
+  if (wsCurrentSlide === 3) demoInit('boxes');
+  if (wsCurrentSlide === 4) demoInit('chorus');
+  if (wsCurrentSlide === 5) demoInit('hints');
+}
+
+
+// ─── Custom audio player ───────────────────────────────────────────────────────
+let playerListensLeft = 2;
+let playerPlaying = false;
+
+function playerPlay() {
+  if (playerListensLeft <= 0) return;
+  if (playerPlaying) return; // no pause — button does nothing while playing
+
+  const audio = document.getElementById('player-audio');
+  const btn   = document.getElementById('player-btn');
+
+  // Reset to start for each new listen
+  audio.currentTime = 0;
+
+  // Block seeking
+  audio.addEventListener('seeking', playerBlockSeek);
+
+  audio.play();
+  playerPlaying = true;
+
+  btn.innerHTML = '&#9654;';
+  btn.style.opacity = '0.4';
+  btn.style.cursor  = 'not-allowed';
+
+  document.getElementById('player-now-playing').classList.add('visible');
+  updatePlayerCounter();
+}
+
+function playerBlockSeek() {
+  const audio = document.getElementById('player-audio');
+  // Reset to current playback position (block any seeking)
+  if (!playerPlaying) return;
+  audio.currentTime = audio._lastTime || 0;
+}
+
+// Track current time to block seeking
+document.addEventListener('DOMContentLoaded', () => {
+  const audio = document.getElementById('player-audio');
+  if (!audio) return;
+  audio.addEventListener('timeupdate', () => {
+    if (playerPlaying) audio._lastTime = audio.currentTime;
+  });
+});
+
+function playerOnEnded() {
+  playerListensLeft = Math.max(0, playerListensLeft - 1);
+  playerPlaying = false;
+
+  const audio = document.getElementById('player-audio');
+  audio.removeEventListener('seeking', playerBlockSeek);
+  audio._lastTime = 0;
+
+  document.getElementById('player-now-playing').classList.remove('visible');
+  updatePlayerCounter();
+
+  const btn = document.getElementById('player-btn');
+  if (playerListensLeft > 0) {
+    btn.innerHTML = '&#9654;';
+    btn.style.opacity = '';
+    btn.style.cursor  = '';
+    btn.disabled = false;
+  } else {
+    btn.innerHTML = '&#9632;'; // stop square
+    btn.disabled = true;
+    document.getElementById('player-counter').classList.add('exhausted');
+  }
+}
+
+function updatePlayerCounter() {
+  const el = document.getElementById('player-count-val');
+  const counter = document.getElementById('player-counter');
+  if (playerListensLeft === 0) {
+    counter.innerHTML = '<span class="counter-val" style="color:var(--wrong)">No listens remaining</span>';
+  } else if (playerListensLeft === 1 && playerPlaying) {
+    el.textContent = '1';
+    counter.firstChild.textContent = '';
+    counter.innerHTML = 'Last listen — <span class="counter-val">1</span> remaining';
+  } else {
+    counter.innerHTML = '<span class="counter-val">' + playerListensLeft + '</span> listen' + (playerListensLeft !== 1 ? 's' : '') + ' remaining';
+  }
+}
+
+
+
+// ─── Live rank (shown after Check) ────────────────────────────────────────────
+async function fetchAndShowRank() {
+  try {
+    const data = await readBin();
+    const finished = (data.results || []).filter(r =>
+      r.status === 'finished' && r.name !== 'Varvara Akimova'
+    );
+    finished.sort((a, b) => {
+      if (b.correct !== a.correct) return b.correct - a.correct;
+      return new Date(a.finishedAt) - new Date(b.finishedAt);
+    });
+    const total = finished.length;
+    const myIdx = finished.findIndex(r => r.id === currentAttemptId);
+    const rank  = myIdx + 1;
+    const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+    const banner   = document.getElementById('rank-banner');
+    const medalEl  = document.getElementById('rank-medal');
+    const posEl    = document.getElementById('rank-position');
+    const detailEl = document.getElementById('rank-detail');
+
+    banner.classList.add('visible');
+    medalEl.textContent = medals[rank] || '🎵';
+
+    if (myIdx === -1) {
+      posEl.textContent = 'Result saved';
+      detailEl.textContent = ' — waiting for others to finish';
+    } else if (total === 1) {
+      posEl.textContent = '1st place so far!';
+      detailEl.textContent = ' — you\'re the first one done!';
+    } else {
+      const ordinals = ['','1st','2nd','3rd'];
+      const ord = ordinals[rank] || rank + 'th';
+      posEl.textContent = ord + ' place out of ' + total;
+      detailEl.textContent = rank === 1
+        ? ' — you\'re leading! 🎉'
+        : rank === total ? ' — keep going!' : ' — results still coming in';
+    }
+  } catch(e) {
+    console.error('fetchAndShowRank failed', e);
+  }
+}
+
+async function refreshRank() {
+  const btn = document.getElementById('rank-refresh-btn');
+  btn.classList.add('spinning');
+  btn.innerHTML = '&#8635; Updating…';
+  await fetchAndShowRank();
+  btn.classList.remove('spinning');
+  btn.innerHTML = '&#8635; Refresh rank';
+}
+
+</script>
+</body>
+</html>
