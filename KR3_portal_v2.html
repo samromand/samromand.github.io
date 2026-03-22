@@ -1,0 +1,2575 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КР3 · Тектоника, рельеф и полезные ископаемые</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2EDE4;--paper:#FDFAF5;--ink:#1E1508;
+  --accent:#3D2200;--mid:#7A4F1A;--light:#E8D8B8;--muted:#7A6A52;
+  --ok:#2D5A1B;--ok-bg:#DFF0D0;--err:#8B2010;--err-bg:#F5D8D0;
+  --warn:#7A4000;--warn-bg:#F5E8CC;
+  --vpr:#5A2800;--vpr-light:#F0DEC8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Geologica',sans-serif;background:var(--bg);color:var(--ink);}
+
+/* ── Screens ── */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+#exam-screen{padding:0;}#exam-screen.has-progress{padding-top:68px;}
+
+/* ── Strata bar ── */
+.strata{display:flex;height:6px;flex-shrink:0;}
+.strata div{flex:1;}
+.s1{background:#8B6A40;}.s2{background:#6A4A20;}.s3{background:#4A3010;}
+.s4{background:#C4902A;}.s5{background:#8B6030;}.s6{background:#5A3818;}
+.s7{background:#3D2200;}.s8{background:#8B5A20;}
+
+/* ── Home ── */
+#home-screen{align-items:center;justify-content:center;padding:28px 16px;}
+.home-card{background:var(--paper);border-radius:8px;max-width:440px;width:100%;
+  box-shadow:0 4px 28px rgba(61,34,0,.13);overflow:hidden;}
+.home-inner{padding:28px 26px 24px;}
+.home-title{font-size:1.35rem;font-weight:900;color:var(--accent);margin-bottom:3px;}
+.home-sub{font-size:.78rem;color:var(--muted);line-height:1.4;margin-bottom:24px;}
+
+.section-label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.section-label::before{content:'';flex:1;height:1px;background:var(--light);}
+.section-label::after{content:'';flex:1;height:1px;background:var(--light);}
+
+.inp-wrap{margin-bottom:10px;}
+.inp-label{font-size:.64rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:4px;}
+.inp{border:2px solid var(--light);border-radius:4px;padding:9px 12px;font-family:inherit;
+  font-size:.9rem;color:var(--ink);background:#fff;outline:none;transition:border-color .15s;width:100%;}
+.inp:focus{border-color:var(--mid);}
+.inp-row{display:flex;gap:10px;}
+.inp-row .inp-wrap{flex:1;margin-bottom:0;}
+
+.home-btn{display:block;width:100%;padding:12px 16px;border-radius:4px;border:none;
+  font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;text-align:center;
+  margin-top:10px;transition:all .15s;letter-spacing:.01em;}
+.btn-earth{background:linear-gradient(135deg,#3D2200,#7A4F1A);color:#F5E8CC;}
+.btn-earth:hover{background:linear-gradient(135deg,#2A1600,#5C3818);}
+.btn-earth:disabled{opacity:.45;cursor:not-allowed;}
+.btn-clay{background:var(--light);color:var(--accent);}
+.btn-clay:hover{background:#DCCBA0;}
+.btn-ghost{background:transparent;border:1.5px solid var(--light);color:var(--muted);
+  font-size:.82rem;}
+.btn-ghost:hover{border-color:var(--mid);color:var(--mid);}
+
+.err-msg{font-size:.74rem;color:var(--err);margin-top:6px;display:none;}
+
+.pending-banner{background:var(--warn-bg);border-left:3px solid var(--warn);
+  border-radius:0 4px 4px 0;padding:10px 12px;font-size:.82rem;line-height:1.5;
+  margin-bottom:16px;display:none;}
+
+/* ── Loader ── */
+.loader{display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:32px;font-size:.85rem;color:var(--muted);}
+.spinner{width:20px;height:20px;border:2.5px solid var(--light);border-top-color:var(--mid);
+  border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Teacher screen ── */
+#teacher-screen{background:var(--accent);color:#F5E8CC;}
+.t-topbar{padding:18px 20px 14px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(245,232,204,.12);}
+.t-topbar h2{font-size:1rem;font-weight:900;flex:1;}
+.t-topbar-btn{background:rgba(245,232,204,.1);border:1.5px solid rgba(245,232,204,.2);
+  color:#F5E8CC;border-radius:3px;padding:6px 12px;font-family:inherit;
+  font-size:.75rem;cursor:pointer;}
+.t-topbar-btn:hover{background:rgba(245,232,204,.18);}
+.t-list{flex:1;padding:14px 18px;overflow-y:auto;}
+.t-empty{text-align:center;opacity:.35;padding:48px 0;font-size:.85rem;}
+
+.sub-card{background:rgba(255,255,255,.06);border-radius:5px;margin-bottom:8px;}
+.sub-head{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;
+  border-radius:5px;transition:background .12s;}
+.sub-head:hover{background:rgba(255,255,255,.04);}
+.sub-name{font-weight:700;font-size:.88rem;flex:1;}
+.sub-time{font-size:.67rem;opacity:.45;white-space:nowrap;}
+.badge{font-size:.63rem;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.badge-wait{background:rgba(245,200,100,.15);color:#F5D060;}
+.badge-ready{background:rgba(94,180,68,.2);color:#8EE870;}
+.badge-pub{background:rgba(94,180,68,.35);color:#7EDF60;}
+
+.sub-body{display:none;padding:0 14px 14px;border-top:1px solid rgba(245,232,204,.08);}
+.sub-body.open{display:block;}
+.chips-row{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0;}
+.chip{font-size:.7rem;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.08);}
+.chip.ok{background:rgba(94,180,68,.2);color:#8EE870;}
+.chip.bad{background:rgba(200,60,40,.18);color:#FF9090;}
+.sub-total{font-size:.78rem;opacity:.65;margin-bottom:10px;}
+.manual-box{background:rgba(0,0,0,.25);border-radius:4px;padding:10px 12px;
+  font-size:.82rem;line-height:1.6;white-space:pre-wrap;margin-bottom:10px;}
+.manual-label{font-size:.65rem;opacity:.5;text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:6px;}
+.score-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.score-label{font-size:.78rem;opacity:.65;}
+.score-btn{padding:5px 13px;border:1.5px solid rgba(245,232,204,.25);border-radius:3px;
+  background:transparent;color:#F5E8CC;font-family:inherit;font-size:.75rem;
+  font-weight:700;cursor:pointer;transition:all .12s;}
+.score-btn:hover{border-color:#F5E8CC;}
+.score-btn.sel-ok{background:rgba(94,180,68,.3);border-color:#8EE870;color:#8EE870;}
+.score-btn.sel-bad{background:rgba(200,60,40,.25);border-color:#FF9090;color:#FF9090;}
+.pub-btn{padding:7px 16px;background:#2D5A1B;color:#fff;border:none;border-radius:3px;
+  font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer;}
+.pub-btn:disabled{opacity:.35;cursor:not-allowed;}
+.pub-btn.repub{background:#4A7A1B;}
+
+/* ── Result screen ── */
+#result-screen{align-items:center;justify-content:center;padding:28px 16px;}
+.result-card{background:var(--paper);border-radius:8px;max-width:480px;width:100%;
+  box-shadow:0 4px 28px rgba(61,34,0,.13);overflow:hidden;}
+.result-inner{padding:26px 22px;}
+.r-name{font-size:1.05rem;font-weight:700;margin-bottom:2px;}
+.r-date{font-size:.75rem;color:var(--muted);margin-bottom:18px;}
+/* removed */
+/* removed */
+/* removed */
+/* removed */
+/* removed */
+/* removed */
+/* removed */
+.r-manual{background:var(--light);border-radius:4px;padding:10px 12px;
+  font-size:.8rem;line-height:1.6;margin-bottom:14px;white-space:pre-wrap;}
+.r-manual-lbl{font-size:.63rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.r-back{width:100%;padding:10px;background:var(--accent);color:#F5E8CC;border:none;
+  border-radius:4px;font-family:inherit;font-size:.88rem;font-weight:700;cursor:pointer;}
+.pending-view{text-align:center;padding:24px 0;}
+.pv-icon{font-size:2.8rem;margin-bottom:10px;}
+.pv-title{font-size:1rem;font-weight:700;margin-bottom:6px;color:var(--accent);}
+.pv-sub{font-size:.82rem;color:var(--muted);line-height:1.5;}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--accent);color:#F5E8CC;border-radius:4px;padding:9px 18px;
+  font-size:.8rem;opacity:0;transition:all .25s;z-index:9999;pointer-events:none;
+  white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── Exam styles ── */
+#exam-screen .page-wrap{max-width:860px;margin:0 auto;padding:20px 14px 60px;}
+#exam-screen .kr-header{background:var(--accent);color:#fff;border-radius:6px;padding:18px 22px;margin-bottom:16px;}
+#exam-screen .kr-header h1{font-size:1.2rem;font-weight:900;margin-bottom:3px;}
+#exam-screen .kr-header .sub{font-size:.78rem;opacity:.7;font-style:italic;}
+#exam-screen .kr-header .meta{font-size:.75rem;opacity:.6;margin-top:8px;}
+#exam-screen .task{background:var(--paper);border-radius:4px;margin-bottom:12px;box-shadow:0 1px 5px rgba(0,0,0,.06);}
+#exam-screen .task.vpr{box-shadow:0 1px 5px rgba(74,24,120,.15);}
+#exam-screen .task-head{display:flex;align-items:center;gap:10px;padding:12px 14px 9px;border-bottom:1px solid var(--light);flex-wrap:wrap;}
+#exam-screen .task.vpr .task-head{border-bottom-color:var(--vpr-light);}
+#exam-screen .task-num{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);}
+#exam-screen .task.vpr .task-num{color:var(--vpr);}
+#exam-screen .task-pts{font-size:.63rem;background:var(--light);color:var(--accent);border-radius:10px;padding:2px 8px;font-weight:700;}
+#exam-screen .task.vpr .task-pts{background:var(--vpr-light);color:var(--vpr);}
+#exam-screen .task-badge{font-size:.6rem;background:var(--vpr-light);color:var(--vpr);border-radius:10px;padding:2px 8px;font-weight:700;}
+#exam-screen .task-q{font-size:.86rem;font-weight:500;line-height:1.4;flex:1;}
+#exam-screen .task-body{padding:12px 14px;}
+#exam-screen .task-foot{padding:9px 14px 12px;border-top:1px solid var(--light);background:rgba(0,0,0,.01);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+#exam-screen .task.vpr .task-foot{border-top-color:var(--vpr-light);}
+#exam-screen .cells-row{display:flex;flex-wrap:wrap;gap:4px;}
+#exam-screen .cell{width:32px;height:32px;border:2px solid #CBD5E1;border-radius:3px;text-align:center;font-family:inherit;font-size:.9rem;font-weight:700;color:var(--ink);background:#fff;outline:none;text-transform:uppercase;}
+#exam-screen .cell:focus{border-color:var(--mid);box-shadow:0 0 0 2px rgba(122,79,26,.22);}
+#exam-screen .cell.filled{border-color:var(--mid);background:var(--light);}
+#exam-screen .cell.readonly{cursor:default;}
+#exam-screen .match-answer-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+#exam-screen .match-cell-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
+#exam-screen .match-cell-lbl{font-size:.62rem;font-weight:700;color:var(--muted);}
+#exam-screen .choices-list{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+#exam-screen .choice-item{display:flex;align-items:baseline;gap:7px;font-size:.83rem;padding:5px 9px;border-radius:3px;background:var(--bg);border:1px solid #E2E8F0;line-height:1.4;}
+#exam-screen .choice-num{font-weight:700;color:var(--mid);min-width:18px;flex-shrink:0;}
+#exam-screen .match-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;}
+#exam-screen .match-col-label{font-size:.63rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+#exam-screen .match-items{display:flex;flex-direction:column;gap:4px;}
+#exam-screen .match-item{font-size:.81rem;padding:6px 9px;border-radius:3px;background:var(--bg);border:1px solid #E2E8F0;line-height:1.3;}
+#exam-screen .match-item .ltr{font-weight:700;color:var(--accent);margin-right:5px;}
+#exam-screen .match-item .num{font-weight:700;color:var(--mid);margin-right:5px;}
+#exam-screen .refs-box{background:#F5EDD8;border:1px solid var(--light);border-radius:4px;padding:9px 12px;margin-bottom:12px;}
+#exam-screen .refs-label{font-size:.65rem;font-weight:700;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+#exam-screen .refs-grid{display:flex;flex-wrap:wrap;gap:5px;}
+#exam-screen .ref-chip{font-size:.76rem;background:#fff;border:1px solid var(--light);border-radius:3px;padding:3px 9px;}
+#exam-screen .ref-chip .ref-n{font-weight:700;color:var(--mid);}
+#exam-screen .vpr-text{background:#FBF6EE;border:1px solid var(--vpr-light);border-radius:4px;padding:14px 16px;margin-bottom:14px;font-size:.84rem;line-height:1.75;}
+#exam-screen .vpr-text-title{font-size:.8rem;font-weight:700;color:var(--vpr);margin-bottom:10px;}
+#exam-screen .manual-area{width:100%;min-height:100px;border:2px solid #E2E8F0;border-radius:4px;font-family:inherit;font-size:.86rem;padding:10px 12px;resize:vertical;outline:none;line-height:1.6;}
+#exam-screen .manual-area:focus{border-color:var(--mid);}
+#exam-screen .manual-note{font-size:.73rem;color:var(--vpr);font-style:italic;margin-top:6px;}
+#exam-screen .vpr-divider{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--vpr);padding:8px 0 4px;border-top:2px solid var(--vpr-light);margin:16px 0 12px;}
+#exam-screen .submit-wrap{background:var(--paper);border-radius:4px;padding:18px 14px;text-align:center;box-shadow:0 1px 5px rgba(0,0,0,.06);margin-top:6px;}
+#exam-screen #submit-btn{padding:11px 30px;background:#15803D;color:#fff;border:none;border-radius:4px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;}
+#exam-screen #submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+@media(max-width:580px){#exam-screen .match-layout{grid-template-columns:1fr;}#exam-screen .cell{width:28px;height:28px;}}
+
+/* ── Teacher extras ── */
+.t-section-lbl{font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  opacity:.5;margin:10px 0 5px;}
+.t-pending-hint{font-size:.78rem;background:rgba(245,200,100,.1);border:1px solid rgba(245,200,100,.2);
+  border-radius:3px;padding:8px 11px;color:#F5D060;margin:8px 0;}
+
+/* ── Answer review overlay ── */
+#review-overlay{position:fixed;inset:0;background:rgba(20,10,0,.82);z-index:1000;
+  display:none;overflow-y:auto;padding:24px 16px 48px;}
+#review-overlay.open{display:block;}
+.review-wrap{max-width:780px;margin:0 auto;}
+.review-header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.review-title{font-size:1rem;font-weight:900;color:#F5E8CC;flex:1;}
+.review-close{background:rgba(245,232,204,.12);border:1.5px solid rgba(245,232,204,.2);
+  color:#F5E8CC;border-radius:3px;padding:7px 16px;font-family:inherit;font-size:.8rem;cursor:pointer;}
+.review-task{background:#FDFAF5;border-radius:5px;margin-bottom:10px;overflow:hidden;}
+.review-task-head{display:flex;align-items:center;gap:8px;padding:10px 13px 8px;
+  border-bottom:1px solid #E8D8B8;flex-wrap:wrap;}
+.review-task-num{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7A4F1A;}
+.review-task-q{font-size:.82rem;font-weight:500;flex:1;color:#1E1508;line-height:1.4;}
+.review-pts-badge{font-size:.65rem;font-weight:700;border-radius:10px;padding:2px 9px;}
+.pts-ok{background:#DFF0D0;color:#2D5A1B;}
+.pts-part{background:#FFF3CD;color:#7A4000;}
+.pts-bad{background:#F5D8D0;color:#8B2010;}
+.review-task-body{padding:11px 13px;font-size:.82rem;color:#1E1508;}
+.review-choices{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.review-choice{display:flex;align-items:baseline;gap:6px;padding:4px 8px;border-radius:3px;
+  background:#F2EDE4;border:1px solid #E2E8F0;font-size:.8rem;line-height:1.4;}
+.review-choice.chosen-ok{background:#DFF0D0;border-color:#2D5A1B;}
+.review-choice.chosen-bad{background:#F5D8D0;border-color:#8B2010;}
+.review-choice.missed{background:#FFF3CD;border-color:#C4902A;}
+.review-choice-num{font-weight:700;color:#7A4F1A;min-width:16px;}
+.review-cells{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;}
+.review-cell{width:30px;height:30px;border:2px solid #CBD5E1;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;font-weight:700;background:#fff;}
+.review-cell.ok{border-color:#2D5A1B;background:#DFF0D0;color:#2D5A1B;}
+.review-cell.bad{border-color:#8B2010;background:#F5D8D0;color:#8B2010;}
+.review-cell.empty{border-color:#E2E8F0;color:#aaa;}
+.review-answer-line{font-size:.78rem;margin-top:5px;color:#7A6A52;}
+.review-answer-line b{color:#1E1508;}
+.review-match-row{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px;}
+.review-match-lbl-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.review-match-lbl{font-size:.6rem;font-weight:700;color:#7A6A52;}
+.review-match-cell{width:30px;height:30px;border:2px solid #CBD5E1;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;background:#fff;}
+.review-match-cell.ok{border-color:#2D5A1B;background:#DFF0D0;color:#2D5A1B;}
+.review-match-cell.bad{border-color:#8B2010;background:#F5D8D0;color:#8B2010;}
+.review-manual-box{background:#F5EDD8;border:1px solid #E8D8B8;border-radius:4px;
+  padding:10px 13px;font-size:.82rem;line-height:1.6;white-space:pre-wrap;margin-bottom:6px;}
+.review-score-line{font-size:.75rem;margin-top:4px;}
+.review-score-ok{color:#2D5A1B;font-weight:700;}
+.review-score-bad{color:#8B2010;font-weight:700;}
+.review-score-part{color:#7A4000;font-weight:700;}
+
+/* ── Review extras ── */
+.review-task-vpr{border-left:3px solid var(--vpr-light,#F0DEC8);}
+.review-sub{font-size:.82rem;color:#555;margin-bottom:8px;line-height:1.5;}
+.review-cells-wrap{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;}
+.review-cell-lbl{font-size:.72rem;color:#7A6A52;white-space:nowrap;}
+.review-refs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;
+  background:#F5EDD8;border:1px solid #E8D8B8;border-radius:4px;padding:8px 10px;}
+.review-ref-chip{font-size:.76rem;background:#fff;border:1px solid #E8D8B8;
+  border-radius:3px;padding:2px 8px;}
+.review-match-table{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.review-match-tr{display:grid;grid-template-columns:1fr 36px auto;align-items:center;
+  gap:8px;font-size:.82rem;}
+.review-match-left{padding:5px 8px;background:#F2EDE4;border-radius:3px;line-height:1.3;}
+.review-match-correct{font-size:.75rem;color:#2D5A1B;font-weight:700;white-space:nowrap;}
+
+/* ── VPR text in review ── */
+.review-vpr-text-wrap{background:#FBF6EE;border:1px solid #F0DEC8;border-radius:4px;
+  padding:12px 14px;margin-bottom:12px;}
+.review-vpr-title{font-size:.78rem;font-weight:700;color:#5A2800;margin-bottom:8px;}
+.review-vpr-text{font-size:.8rem;line-height:1.7;color:#1E1508;}
+
+/* ── Criteria in review overlay ── */
+.review-criteria{background:#F0F7EC;border:1px solid #C8E0B8;border-radius:4px;
+  padding:12px 14px;margin-top:10px;}
+.review-criteria-title{font-size:.72rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:#2D5A1B;margin-bottom:8px;}
+.review-criteria-body{font-size:.8rem;line-height:1.6;color:#1E1508;}
+.review-criteria-body ul{margin:4px 0 4px 18px;}
+.review-criteria-body p{margin-bottom:4px;}
+
+/* ── Criteria in teacher card ── */
+.t-criteria-details{margin-top:8px;border-radius:3px;overflow:hidden;}
+.t-criteria-summary{font-size:.72rem;font-weight:700;color:rgba(245,232,204,.65);
+  cursor:pointer;padding:5px 8px;background:rgba(255,255,255,.06);
+  border-radius:3px;list-style:none;user-select:none;}
+.t-criteria-summary::-webkit-details-marker{display:none;}
+.t-criteria-summary::before{content:'▶ ';font-size:.6rem;}
+details[open] .t-criteria-summary::before{content:'▼ ';}
+.t-criteria-body{font-size:.76rem;line-height:1.6;padding:8px 10px;
+  background:rgba(255,255,255,.04);border-radius:0 0 3px 3px;
+  color:rgba(245,232,204,.8);}
+.t-criteria-body ul{margin:3px 0 3px 16px;}
+.t-criteria-body p{margin-bottom:3px;}
+.t-criteria-example{font-size:.72rem;margin-top:6px;opacity:.7;font-style:italic;}
+
+/* ── Score number buttons ── */
+.score-btn-num{width:36px;height:36px;font-size:1.1rem;font-weight:900;
+  padding:0;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:4px;}
+
+/* ── Sub-card score/grade chips ── */
+.sub-score-chip{font-size:.68rem;font-weight:700;background:rgba(255,255,255,.12);
+  color:#F5E8CC;border-radius:3px;padding:2px 7px;white-space:nowrap;}
+.sub-grade-chip{font-size:.72rem;font-weight:900;border-radius:3px;
+  padding:2px 8px;white-space:nowrap;min-width:28px;text-align:center;}
+.grade-5{background:#1a4d0e;color:#8EE870;}
+.grade-5minus{background:#1a4d0e;color:#7EDF60;}
+.grade-4plus{background:#1a3a52;color:#7EC8F0;}
+.grade-4{background:#1a3a52;color:#6BB8E8;}
+.grade-4minus{background:#1a3a52;color:#5AA8D8;}
+.grade-3plus{background:#4a3a00;color:#F5D060;}
+.grade-3{background:#4a3a00;color:#E8C050;}
+.grade-3minus{background:#4a3a00;color:#D8B040;}
+.grade-2{background:#4a1208;color:#FF9090;}
+
+/* ── Teacher danger button ── */
+.t-danger-btn{background:rgba(200,60,40,.2) !important;
+  border-color:rgba(200,60,40,.4) !important;color:#FF9090 !important;}
+.t-danger-btn:hover{background:rgba(200,60,40,.35) !important;}
+
+/* ── Student result score detail ── */
+.r-score-detail{font-size:.8rem;color:var(--muted);margin:0 0 8px;}
+
+/* ══ Student result card — grade-first redesign ══ */
+/* old */ .r-grade-big-unused{
+  font-size:4.5rem;font-weight:900;line-height:1;
+  margin:6px 0 4px;letter-spacing:-.02em;
+}
+/* grade colour variants (light bg version for result card) */
+/* old */ .r-grade-big-unused.grade-5{color:#1a7a0a;}
+/* old */ .r-grade-big-unused.grade-5minus{color:#2a8a18;}
+/* old */ .r-grade-big-unused.grade-4plus{color:#0a5a9a;}
+/* old */ .r-grade-big-unused.grade-4{color:#1060a0;}
+/* old */ .r-grade-big-unused.grade-4minus{color:#1668a8;}
+/* old */ .r-grade-big-unused.grade-3plus{color:#8a6000;}
+/* old */ .r-grade-big-unused.grade-3{color:#7a5500;}
+/* old */ .r-grade-big-unused.grade-3minus{color:#6a4a00;}
+/* old */ .r-grade-big-unused.grade-2{color:#8b2010;}
+
+.r-score-row{display:flex;align-items:baseline;gap:4px;margin-bottom:14px;flex-wrap:wrap;}
+.r-score-num{font-size:1.6rem;font-weight:700;color:var(--accent);}
+.r-score-sep{font-size:1.1rem;color:var(--muted);}
+.r-score-max{font-size:.9rem;color:var(--muted);}
+.r-score-five{font-size:.82rem;color:var(--muted);
+  background:var(--light);border-radius:10px;padding:2px 9px;margin-left:6px;}
+
+/* Task cells grid — student */
+.r-tcells-label{font-size:.62rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.r-tcells-grid{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:16px;}
+.r-tcell{width:26px;height:26px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;font-weight:700;cursor:default;}
+
+/* Task cells grid — teacher */
+.t-tcells-grid{display:flex;flex-wrap:wrap;gap:3px;}
+.t-tcell{width:24px;height:24px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-weight:700;cursor:default;}
+
+/* Shared cell colour states */
+.tcell-ok  {background:#DFF0D0;color:#2D5A1B;}
+.tcell-part{background:#FFF3CD;color:#7A4000;}
+.tcell-bad {background:#F5D8D0;color:#8B2010;}
+
+/* ── Task cell wrappers with number label ── */
+.tcell-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.tcell-num{font-size:.55rem;font-weight:700;color:var(--muted,#7A6A52);
+  line-height:1;letter-spacing:-.01em;}
+/* teacher dark bg — lighter number */
+#teacher-screen .tcell-num{color:rgba(245,232,204,.4);}
+
+/* ── Grade cell (compact square) ── */
+.r-grade-row{display:flex;align-items:center;gap:14px;margin:10px 0 12px;}
+.r-grade-cell{
+  width:72px;height:72px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;font-weight:900;letter-spacing:-.03em;flex-shrink:0;
+}
+/* grade colours — light card context */
+.r-grade-cell.grade-5     {background:#d4f0c8;color:#1a7a0a;}
+.r-grade-cell.grade-5minus{background:#d4f0c8;color:#2a8a18;}
+.r-grade-cell.grade-4plus {background:#cce4f6;color:#0a5a9a;}
+.r-grade-cell.grade-4     {background:#cce4f6;color:#1060a0;}
+.r-grade-cell.grade-4minus{background:#cce4f6;color:#1668a8;}
+.r-grade-cell.grade-3plus {background:#fff3cd;color:#8a6000;}
+.r-grade-cell.grade-3     {background:#fff3cd;color:#7a5500;}
+.r-grade-cell.grade-3minus{background:#fff3cd;color:#6a4a00;}
+.r-grade-cell.grade-2     {background:#f5d8d0;color:#8b2010;}
+
+.r-score-stack{display:flex;flex-direction:column;gap:4px;}
+.r-score-main{font-size:1.8rem;font-weight:700;color:var(--accent);line-height:1;}
+.r-score-of{font-size:1rem;color:var(--muted);font-weight:400;}
+.r-score-five{font-size:.8rem;color:var(--muted);
+  background:var(--light);border-radius:10px;padding:2px 9px;
+  display:inline-block;width:fit-content;}
+
+/* ── tcells grid gap ── */
+.r-tcells-grid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px;}
+.t-tcells-grid{display:flex;flex-wrap:wrap;gap:3px;}
+
+/* ══ Exam progress bar ══ */
+#exam-progress-bar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  width:100%;background:var(--accent);
+  padding:8px 12px 10px;
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+#exam-progress-inner{
+  max-width:860px;margin:0 auto;
+}
+.prog-label{
+  font-size:.58rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(245,232,204,.5);
+}
+.prog-cells{
+  display:flex;flex-wrap:wrap;gap:3px;
+}
+.prog-top-row{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  margin-bottom:5px;
+  gap:8px;
+}
+.prog-top-row .prog-label{ justify-self:start; }
+.prog-top-row #exam-timer { justify-self:center; }
+.prog-top-row .prog-count { justify-self:end; }
+.prog-cell{
+  cursor:pointer;
+  transition:transform .12s;
+}
+.prog-cell:hover{transform:translateY(-2px);}
+.prog-cell-box{
+  width:24px;height:24px;border-radius:3px;
+  /* Unfilled = bright, demands attention */
+  border:1.5px solid rgba(245,232,204,.75);
+  background:rgba(245,232,204,.18);
+  transition:background .18s, border-color .18s, color .18s, opacity .18s;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.58rem;font-weight:800;
+  color:rgba(245,232,204,.95);
+  line-height:1;
+}
+.prog-cell-box.prog-filled{
+  /* Filled = dim, already handled */
+  background:rgba(245,232,204,.06);
+  border-color:rgba(245,232,204,.18);
+  color:rgba(245,232,204,.3);
+}
+.prog-cell-box.prog-vpr{
+  /* VPR unfilled = warm amber, attention */
+  border-color:rgba(196,144,42,.85);
+  background:rgba(196,144,42,.18);
+  color:rgba(245,210,120,.95);
+}
+.prog-cell-box.prog-vpr.prog-filled{
+  /* VPR filled = dim */
+  background:rgba(90,40,0,.25);
+  border-color:rgba(196,144,42,.25);
+  color:rgba(196,144,42,.3);
+}
+/* progress count */
+.prog-count{
+  font-size:.65rem;font-weight:700;
+  color:rgba(245,232,204,.7);
+  white-space:nowrap;
+}
+
+/* ══ Task flag button ══ */
+.task-flag-btn{
+  background:none;border:none;cursor:pointer;
+  font-size:.85rem;line-height:1;padding:2px 4px;
+  color:rgba(122,79,26,.3);
+  border-radius:3px;
+  transition:color .15s, background .15s, transform .1s;
+  flex-shrink:0;margin-left:auto;
+  /* put it to the far right of the task-head */
+  order:99;
+}
+.task-flag-btn:hover{
+  color:var(--warn,#7A4000);
+  background:var(--warn-bg,#F5E8CC);
+  transform:scale(1.15);
+}
+.task-flag-btn.flagged{
+  color:#c0392b;
+  background:rgba(192,57,43,.1);
+}
+/* make task-head a flex container so the flag btn can push to the right */
+#exam-screen .task-head{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px 9px;
+  border-bottom:1px solid var(--light);
+  flex-wrap:wrap;
+}
+/* task-num and task-pts stay together, task-q grows */
+#exam-screen .task-q{ flex:1; }
+
+/* ══ Progress bar flag indicator ══ */
+.prog-cell{
+  position:relative; /* needed for absolute dot */
+}
+.prog-flag-dot{
+  position:absolute;top:-3px;right:-3px;
+  width:7px;height:7px;border-radius:50%;
+  background:#e74c3c;
+  border:1.5px solid var(--accent,#3D2200);
+  pointer-events:none;
+}
+/* flagged cell in bar gets warm tint */
+.prog-cell-box.prog-flagged{
+  border-color:#e74c3c !important;
+  box-shadow:0 0 0 1px rgba(231,76,60,.4);
+}
+
+/* ══ Instruction screen ══ */
+.instr-card{
+  background:var(--paper);border-radius:8px;max-width:560px;width:100%;
+  box-shadow:0 4px 28px rgba(61,34,0,.13);overflow:hidden;
+}
+.instr-inner{padding:26px 26px 22px;}
+.instr-greeting{
+  font-size:.82rem;color:var(--mid);font-weight:600;margin-bottom:6px;
+}
+.instr-title{
+  font-size:1.3rem;font-weight:900;color:var(--accent);margin-bottom:2px;
+}
+.instr-sub{
+  font-size:.76rem;color:var(--muted);margin-bottom:20px;
+}
+
+.instr-block{
+  background:var(--bg);border-radius:5px;
+  padding:12px 14px;margin-bottom:10px;
+}
+.instr-warn-block{
+  background:#FEF9EC;border-left:3px solid var(--warn,#7A4000);
+  border-radius:0 5px 5px 0;
+}
+.instr-block-title{
+  font-size:.68rem;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--mid);margin-bottom:8px;
+}
+
+.instr-row{
+  display:flex;align-items:baseline;gap:8px;
+  font-size:.82rem;color:var(--ink);margin-bottom:5px;
+  line-height:1.45;
+}
+.instr-row:last-child{margin-bottom:0;}
+
+.instr-badge{
+  flex-shrink:0;font-size:.62rem;font-weight:700;
+  background:var(--light);color:var(--accent);
+  border-radius:3px;padding:2px 7px;white-space:nowrap;
+  min-width:100px;text-align:center;
+  display:inline-block;
+}
+.instr-badge-vpr{
+  background:var(--vpr-light,#F0DEC8);color:var(--vpr,#5A2800);
+}
+.instr-badge-pts{
+  background:#DFF0D0;color:#2D5A1B;
+}
+.instr-badge-ok{
+  background:#DFF0D0;color:#2D5A1B;
+}
+
+.instr-list{
+  margin:0;padding-left:18px;
+  font-size:.82rem;color:var(--ink);
+  display:flex;flex-direction:column;gap:5px;
+  line-height:1.5;
+}
+
+/* ── Instruction timer block ── */
+.instr-timer-block{
+  text-align:center;
+  background:linear-gradient(135deg,#3D2200,#7A4F1A);
+  border-radius:6px;
+  padding:18px 20px 16px;
+  margin-bottom:10px;
+  color:#F5E8CC;
+}
+.instr-timer-label{
+  font-size:.62rem;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;opacity:.6;margin-bottom:4px;
+}
+.instr-timer-display{
+  font-size:3.2rem;font-weight:900;letter-spacing:.04em;
+  line-height:1;margin-bottom:8px;
+  font-variant-numeric:tabular-nums;
+}
+.instr-timer-note{
+  font-size:.78rem;line-height:1.55;opacity:.75;
+}
+.instr-timer-note b{opacity:1;color:#F5E8CC;}
+
+/* ══ Exam timer in progress bar ══ */
+.exam-timer{
+  font-size:.85rem;font-weight:900;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:.04em;
+  color:rgba(245,232,204,.8);
+  background:rgba(245,232,204,.1);
+  border:1.5px solid rgba(245,232,204,.2);
+  border-radius:4px;
+  padding:2px 9px;
+  white-space:nowrap;
+  transition:background .3s, border-color .3s, color .3s;
+  margin-left:auto;
+}
+.exam-timer.timer-yellow{
+  color:#FFE066;
+  background:rgba(255,200,0,.15);
+  border-color:rgba(255,200,0,.45);
+}
+.exam-timer.timer-red{
+  color:#FF6B6B;
+  background:rgba(220,50,50,.2);
+  border-color:rgba(220,50,50,.5);
+}
+@keyframes timer-blink{
+  0%,100%{ opacity:1; }
+  50%     { opacity:.15; }
+}
+.exam-timer.timer-flash{
+  animation:timer-blink 1s step-start infinite;
+}
+
+/* ══ Timer warn banner ══ */
+.timer-warn-banner{
+  position:fixed;
+  top:calc(var(--bar-h, 62px) + 8px);
+  left:50%;transform:translateX(-50%);
+  z-index:199;
+  font-family:'Geologica',sans-serif;
+  font-size:.88rem;font-weight:700;
+  padding:9px 24px;
+  border-radius:20px;
+  box-shadow:0 3px 18px rgba(0,0,0,.3);
+  pointer-events:none;
+  white-space:nowrap;
+  text-align:center;
+  max-width:90vw;
+  opacity:0;
+  transition:opacity .4s ease;
+}
+.timer-warn-banner.timer-warn-show{ opacity:1; }
+.timer-warn-banner.timer-warn-hide{ opacity:0; }
+
+/* Colour themes */
+.timer-warn-banner.timer-warn-green{
+  background:#1e7e34;color:#d4f0c8;
+  box-shadow:0 3px 18px rgba(30,126,52,.45);
+}
+.timer-warn-banner.timer-warn-yellow{
+  background:#856404;color:#fff3cd;
+  box-shadow:0 3px 18px rgba(133,100,4,.45);
+}
+.timer-warn-banner.timer-warn-red{
+  background:#c0392b;color:#ffe0de;
+  box-shadow:0 3px 18px rgba(192,57,43,.5);
+}
+
+/* ── Task sub-question (above choices) ── */
+#exam-screen .task-sub-q{
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--ink);
+  line-height:1.5;
+  margin-bottom:10px;
+}
+
+/* ── Grade caption ── */
+.r-grade-caption{
+  font-size:.82rem;
+  color:var(--muted);
+  line-height:1.5;
+  margin-bottom:14px;
+  padding:8px 12px;
+  background:var(--bg);
+  border-radius:5px;
+  border-left:3px solid var(--light);
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div id="home-screen" class="screen active">
+  <div class="home-card">
+    <div class="strata">
+      <div class="s1"></div><div class="s2"></div><div class="s3"></div><div class="s4"></div>
+      <div class="s5"></div><div class="s6"></div><div class="s7"></div><div class="s8"></div>
+    </div>
+    <div class="home-inner">
+      <div class="home-title">Контрольная работа № 3</div>
+      <div class="home-sub">8 класс · Тектоника, рельеф и полезные ископаемые · §§ 21–23, 25–26</div>
+
+      <div id="pending-banner" class="pending-banner"></div>
+
+      <!-- START EXAM -->
+      <div class="section-label">Пройти контрольную</div>
+      <div class="inp-row">
+        <div class="inp-wrap">
+          <div class="inp-label">Фамилия</div>
+          <input class="inp" id="s-surname" placeholder="Иванов" autocomplete="off">
+        </div>
+        <div class="inp-wrap">
+          <div class="inp-label">Имя</div>
+          <input class="inp" id="s-name" placeholder="Иван" autocomplete="off">
+        </div>
+      </div>
+      <div id="start-err" class="err-msg">Введите фамилию и имя</div>
+      <button class="home-btn btn-earth" id="start-btn" onclick="startExam()">▶&nbsp; Начать работу</button>
+
+      <!-- GET RESULT -->
+      <div class="section-label" style="margin-top:22px;">Узнать результат</div>
+      <div class="inp-row">
+        <div class="inp-wrap">
+          <div class="inp-label">Фамилия</div>
+          <input class="inp" id="r-surname" placeholder="Иванов" autocomplete="off">
+        </div>
+        <div class="inp-wrap">
+          <div class="inp-label">Имя</div>
+          <input class="inp" id="r-name" placeholder="Иван" autocomplete="off">
+        </div>
+      </div>
+      <div id="res-err" class="err-msg">Введите фамилию и имя</div>
+      <button class="home-btn btn-clay" onclick="getResult()">🔍&nbsp; Узнать результат</button>
+
+      <!-- TEACHER -->
+      <div class="section-label" style="margin-top:22px;">Режим учителя</div>
+      <div style="display:flex;gap:10px;align-items:flex-end;">
+        <div class="inp-wrap" style="flex:1;margin:0;">
+          <div class="inp-label">PIN</div>
+          <input class="inp" id="t-pin" type="password" placeholder="••••••••"
+            maxlength="12" autocomplete="off" onkeydown="if(event.key==='Enter')teacherLogin()">
+        </div>
+        <button class="home-btn btn-ghost" style="width:auto;padding:9px 16px;margin:0;"
+          onclick="teacherLogin()">Войти</button>
+      </div>
+      <div id="pin-err" class="err-msg">Неверный PIN</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ EXAM ═══════════ -->
+<!-- ═══════════ INSTRUCTION ═══════════ -->
+<div id="instr-screen" class="screen">
+  <div style="display:flex;align-items:flex-start;justify-content:center;padding:28px 16px;min-height:100vh;">
+    <div class="instr-card">
+      <div class="strata">
+        <div class="s1"></div><div class="s2"></div><div class="s3"></div><div class="s4"></div>
+        <div class="s5"></div><div class="s6"></div><div class="s7"></div><div class="s8"></div>
+      </div>
+      <div class="instr-inner">
+        <div class="instr-greeting" id="instr-greeting"></div>
+        <div class="instr-title">Контрольная работа № 3</div>
+        <div class="instr-sub">8 класс · Тектоника, рельеф и полезные ископаемые · §§ 21–23, 25–26</div>
+
+        <div class="instr-timer-block">
+          <div class="instr-timer-label">Время на выполнение</div>
+          <div class="instr-timer-display">60:00</div>
+          <div class="instr-timer-note">Таймер начнётся автоматически при старте работы.<br>Рекомендуется оставить <b>20 минут</b> на задания ВПР (20–22).</div>
+        </div>
+
+        <div class="instr-block">
+          <div class="instr-block-title">📋 Структура работы</div>
+          <div class="instr-row">
+            <span class="instr-badge">Часть 1</span>
+            <span>Задания 1–19 — выбор ответа, краткие ответы, соответствия</span>
+          </div>
+          <div class="instr-row">
+            <span class="instr-badge instr-badge-vpr">Часть 2 · ВПР</span>
+            <span>Задания 20–22 — работа с текстом и рисунком, развёрнутый ответ</span>
+          </div>
+
+        </div>
+
+        <div class="instr-block">
+          <div class="instr-block-title">✏️ Как заполнять</div>
+          <ul class="instr-list">
+            <li>В заданиях с <b>выбором ответа</b> — впишите <b>номер</b> варианта в клетку.</li>
+            <li>В заданиях с <b>кратким ответом</b> — по одной <b>букве</b> в каждую клетку, без пробелов.</li>
+            <li>В заданиях на <b>соответствие</b> — впишите <b>номер</b> из правого столбца под каждой буквой.</li>
+            <li>В заданиях на <b>последовательность</b> — впишите цифры в правильном порядке по одной в клетку.</li>
+            <li>В задании 22 — напишите <b>развёрнутое объяснение</b> в текстовое поле.</li>
+          </ul>
+        </div>
+
+        <div class="instr-block">
+          <div class="instr-block-title">🗺️ Разрешённые материалы</div>
+          <div class="instr-row">
+            <span class="instr-badge instr-badge-ok">Разрешено</span>
+            <span>Атлас 8 класса</span>
+          </div>
+          <div style="font-size:.8rem;color:var(--muted);margin-top:6px;line-height:1.55;">
+            Для выполнения заданий контрольной работы в первую очередь понадобятся:
+            <ul style="margin:5px 0 0 18px;display:flex;flex-direction:column;gap:3px;">
+              <li>Физическая карта России</li>
+              <li>Геологическая карта</li>
+              <li>Тектоническая карта</li>
+              <li>Карта полезных ископаемых</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="instr-block">
+          <div class="instr-block-title">⚙️ Навигация</div>
+          <ul class="instr-list">
+            <li>Шкала прогресса вверху экрана показывает все задания. Нажми на ячейку — перейдёшь к заданию.</li>
+            <li>Кнопка <b>⚑</b> в шапке задания помечает его флажком для возврата.</li>
+            <li>После выполнения заданий 1–19 нажми <b>«Подтвердить»</b> — они заблокируются и откроется Часть 2.</li>
+            <li>Для сдачи работы нажми <b>«Сдать контрольную работу»</b> в конце. Изменить ответы после этого будет невозможно.</li>
+          </ul>
+        </div>
+
+        <div class="instr-block instr-warn-block">
+          <div class="instr-block-title">⚠️ Важно</div>
+          <ul class="instr-list">
+            <li>Пройти работу можно только один раз — повторное прохождение заблокировано.</li>
+            <li>После нажатия «Сдать» результат нельзя изменить.</li>
+            <li>Результат появится после проверки задания 22 учителем.</li>
+          </ul>
+        </div>
+
+        <button class="home-btn btn-earth" onclick="beginExam()" style="margin-top:8px;font-size:1rem;padding:14px;">
+          Начать контрольную →
+        </button>
+        <button class="home-btn btn-ghost" onclick="show('home-screen')" style="margin-top:6px;">
+          ← Вернуться
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Timer warn banner -->
+<div id="timer-warn-banner" class="timer-warn-banner"></div>
+
+<!-- Fixed exam progress bar — outside scroll containers -->
+<div id="exam-progress-bar" style="display:none;">
+  <div id="exam-progress-inner"></div>
+</div>
+<div id="exam-screen" class="screen">
+  <div style="max-width:860px;margin:0 auto;padding:0 0 40px;width:100%;">
+  <div class="page-wrap" style="padding-top:0;">
+
+  <div class="kr-header" style="background:linear-gradient(135deg,#3D2200 0%,#5C3410 40%,#7A4F1A 70%,#5C3410 100%);">
+    <div style="display:flex;height:5px;margin:-18px -22px 14px;border-radius:6px 6px 0 0;overflow:hidden;">
+      <div style="flex:1;background:#8B6A40;"></div><div style="flex:1;background:#6A4A20;"></div>
+      <div style="flex:1;background:#4A3010;"></div><div style="flex:1;background:#C4902A;"></div>
+      <div style="flex:1;background:#8B6030;"></div><div style="flex:1;background:#5A3818;"></div>
+      <div style="flex:1;background:#3D2200;"></div><div style="flex:1;background:#8B5A20;"></div>
+    </div>
+    <h1>Контрольная работа № 3</h1>
+    <div class="sub">8 класс · Тектоника, рельеф и полезные ископаемые · §§ 21–23, 25–26</div>
+    <div class="meta" id="exam-meta">Фамилия: _________________________ &nbsp;&nbsp; Имя: _________________________ &nbsp;&nbsp; Класс: _______</div>
+  </div>
+
+  <!-- T1 -->
+  <div class="task" id="task1">
+    <div class="task-head"><span class="task-num">Задание 1</span><button class="task-flag-btn" id="flag1" onclick="toggleFlag(1)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Отметьте ВСЕ верные утверждения:</div>
+      <div id="ch1" class="choices-list"></div>
+      <div id="cells1" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T2 -->
+  <div class="task" id="task2">
+    <div class="task-head"><span class="task-num">Задание 2</span><button class="task-flag-btn" id="flag2" onclick="toggleFlag(2)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">К какой эпохе складчатости относится формирование Уральских гор?</div>
+      <div id="ch2" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t2" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- T3 -->
+  <div class="task" id="task3">
+    <div class="task-head"><span class="task-num">Задание 3</span><button class="task-flag-btn" id="flag3" onclick="toggleFlag(3)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Краткий ответ. По одной букве в каждую клетку, без пробелов.</span></div>
+    <div class="task-body">
+      <div style="font-size:.86rem;margin-bottom:10px;">Нижний ярус платформы, сложенный древними деформированными породами, называется кристаллическим _______.</div>
+      <div id="cells3" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T4 -->
+  <div class="task" id="task4">
+    <div class="task-head"><span class="task-num">Задание 4</span><button class="task-flag-btn" id="flag4" onclick="toggleFlag(4)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Установите правильную последовательность. Запишите цифры подряд — по одной в каждую клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Стадии развития складчатой области — от первой к последней:</div>
+      <div id="ch4" class="choices-list" style="margin-bottom:10px;"></div>
+      <div id="cells4" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T5 -->
+  <div class="task" id="task5">
+    <div class="task-head"><span class="task-num">Задание 5</span><button class="task-flag-btn" id="flag5" onclick="toggleFlag(5)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Что такое «плиты» в строении платформ?</div>
+      <div id="ch5" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t5" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- T6 -->
+  <div class="task" id="task6">
+    <div class="task-head"><span class="task-num">Задание 6</span><button class="task-flag-btn" id="flag6" onclick="toggleFlag(6)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">В результате какого процесса образуются возрождённые горы?</div>
+      <div id="ch6" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t6" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- T7 -->
+  <div class="task" id="task7">
+    <div class="task-head"><span class="task-num">Задание 7</span><button class="task-flag-btn" id="flag7" onclick="toggleFlag(7)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Краткий ответ. По одной букве в каждую клетку, без пробелов.</span></div>
+    <div class="task-body">
+      <div style="font-size:.86rem;margin-bottom:10px;">Горы Южной Сибири — Алтай, Саяны, хребты Забайкалья — пережили несколько эпох складчатости и превратились в складчато-глыбовые. Как называется такой тип гор?</div>
+      <div id="cells7" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T8 -->
+  <div class="task" id="task8">
+    <div class="task-head"><span class="task-num">Задание 8</span><button class="task-flag-btn" id="flag8" onclick="toggleFlag(8)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Заполните пропуски. Запишите номер подходящего слова под каждой буквой. Два номера лишние.</span></div>
+    <div class="task-body">
+      <div class="refs-box"><div class="refs-label">Слова для справки</div><div id="refs8" class="refs-grid"></div></div>
+      <div style="font-size:.86rem;line-height:2.1;margin-bottom:10px;">Платформы имеют двухъярусное строение. Нижний ярус — <b>(А) ______</b>, сложенный древними деформированными породами. Там, где он выходит на поверхность, образуются <b>(Б) ______</b>. Верхний ярус — <b>(В) ______</b>, сложенный горизонтально залегающими осадочными породами. Именно с ним связаны <b>(Г) ______</b> полезные ископаемые — нефть, газ и уголь.</div>
+      <div class="match-answer-row" id="cells8"></div>
+    </div>
+  </div>
+
+  <!-- T9 -->
+  <div class="task" id="task9">
+    <div class="task-head"><span class="task-num">Задание 9</span><button class="task-flag-btn" id="flag9" onclick="toggleFlag(9)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Установите соответствие. Запишите номер из правого столбца под каждой буквой. Два номера лишние.</span></div>
+    <div class="task-body">
+      <div class="match-layout">
+        <div><div class="match-col-label">Тектоническая структура</div>
+          <div class="match-items">
+            <div class="match-item"><span class="ltr">А.</span>Древняя платформа</div>
+            <div class="match-item"><span class="ltr">Б.</span>Молодая платформа</div>
+            <div class="match-item"><span class="ltr">В.</span>Молодые складчатые области</div>
+            <div class="match-item"><span class="ltr">Г.</span>Древние складчатые области</div>
+          </div>
+        </div>
+        <div><div class="match-col-label">Характерный рельеф</div><div id="mr9" class="match-items"></div></div>
+      </div>
+      <div class="match-answer-row" id="cells9"></div>
+    </div>
+  </div>
+
+  <!-- T10 -->
+  <div class="task" id="task10">
+    <div class="task-head"><span class="task-num">Задание 10</span><button class="task-flag-btn" id="flag10" onclick="toggleFlag(10)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Отметьте ВСЕ верные утверждения:</div>
+      <div id="ch10" class="choices-list"></div>
+      <div id="cells10" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T11 -->
+  <div class="task" id="task11">
+    <div class="task-head"><span class="task-num">Задание 11</span><button class="task-flag-btn" id="flag11" onclick="toggleFlag(11)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Какой вид выветривания приводит к образованию карстовых воронок и пустот в известняках?</div>
+      <div id="ch11" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t11" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- T12 -->
+  <div class="task" id="task12">
+    <div class="task-head"><span class="task-num">Задание 12</span><button class="task-flag-btn" id="flag12" onclick="toggleFlag(12)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Отметьте ВСЕ верные утверждения:</div>
+      <div id="ch12" class="choices-list"></div>
+      <div id="cells12" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T13 -->
+  <div class="task" id="task13">
+    <div class="task-head"><span class="task-num">Задание 13</span><button class="task-flag-btn" id="flag13" onclick="toggleFlag(13)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Где в России особенно широко распространён мерзлотный рельеф?</div>
+      <div id="ch13" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t13" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- T14 -->
+  <div class="task" id="task14">
+    <div class="task-head"><span class="task-num">Задание 14</span><button class="task-flag-btn" id="flag14" onclick="toggleFlag(14)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Краткий ответ. По одной букве в каждую клетку, без пробелов.</span></div>
+    <div class="task-body">
+      <div style="font-size:.86rem;margin-bottom:10px;">Здания и сооружения в районах многолетней мерзлоты возводят на _______, чтобы избежать просадки грунта при его оттаивании.</div>
+      <div id="cells14" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T15 -->
+  <div class="task" id="task15">
+    <div class="task-head"><span class="task-num">Задание 15</span><button class="task-flag-btn" id="flag15" onclick="toggleFlag(15)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Отметьте ВСЕ верные утверждения:</div>
+      <div id="ch15" class="choices-list"></div>
+      <div id="cells15" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T16 -->
+  <div class="task" id="task16">
+    <div class="task-head"><span class="task-num">Задание 16</span><button class="task-flag-btn" id="flag16" onclick="toggleFlag(16)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Краткий ответ. По одной букве в каждую клетку, без пробелов.</span></div>
+    <div class="task-body">
+      <div style="font-size:.86rem;margin-bottom:10px;">Крупное скопление полезных ископаемых, имеющее промышленное значение, называется _______.</div>
+      <div id="cells16" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T17 -->
+  <div class="task" id="task17">
+    <div class="task-head"><span class="task-num">Задание 17</span><button class="task-flag-btn" id="flag17" onclick="toggleFlag(17)" title="Отметить для возврата">⚑</button><span class="task-pts">2 балла</span>
+      <span class="task-q">Установите соответствие. Запишите номер из правого столбца под каждой буквой. Один номер лишний.</span></div>
+    <div class="task-body">
+      <div class="match-layout">
+        <div><div class="match-col-label">Полезное ископаемое</div>
+          <div class="match-items">
+            <div class="match-item"><span class="ltr">А.</span>Природный газ</div>
+            <div class="match-item"><span class="ltr">Б.</span>Золото</div>
+            <div class="match-item"><span class="ltr">В.</span>Асбест</div>
+            <div class="match-item"><span class="ltr">Г.</span>Калийные соли</div>
+          </div>
+        </div>
+        <div><div class="match-col-label">Район добычи</div><div id="mr17" class="match-items"></div></div>
+      </div>
+      <div class="match-answer-row" id="cells17"></div>
+    </div>
+  </div>
+
+  <!-- T18 -->
+  <div class="task" id="task18">
+    <div class="task-head"><span class="task-num">Задание 18</span><button class="task-flag-btn" id="flag18" onclick="toggleFlag(18)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Железные руды Курской магнитной аномалии приурочены к:</div>
+      <div id="ch18" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t18" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- T19 -->
+  <div class="task" id="task19">
+    <div class="task-head"><span class="task-num">Задание 19</span><button class="task-flag-btn" id="flag19" onclick="toggleFlag(19)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span>
+      <span class="task-q">Выберите ОДИН правильный ответ. Запишите его номер в клетку.</span></div>
+    <div class="task-body">
+      <div class="task-sub-q">Какой вывод следует из того, что большинство крупных рек России течёт на север?</div>
+      <div id="ch19" class="choices-list"></div>
+      <div class="cells-row"><input class="cell" id="t19" maxlength="1" autocomplete="off"></div>
+    </div>
+  </div>
+
+  <!-- Confirm block -->
+  <div id="confirm-block" style="background:var(--paper);border-radius:4px;padding:20px 16px;text-align:center;box-shadow:0 1px 5px rgba(0,0,0,.06);margin-top:6px;">
+    <div style="font-size:.88rem;font-weight:600;margin-bottom:8px;color:var(--vpr);">Задания 1–19 выполнены?</div>
+    <div style="font-size:.8rem;color:var(--muted);margin-bottom:14px;line-height:1.6;">
+      После нажатия кнопки задания 1–19 будут <b>заблокированы</b> — вернуться и исправить ответы не получится.<br>
+      Откроется блок заданий ВПР (20–22).
+    </div>
+    <button onclick="confirmPart1()"
+      style="padding:11px 28px;background:var(--vpr);color:#F5E8CC;border:none;border-radius:4px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;letter-spacing:.02em;">
+      Подтвердить и перейти к заданиям ВПР →
+    </button>
+  </div>
+
+  <!-- VPR block -->
+  <div id="vpr-block" style="display:none;">
+  <div class="vpr-divider">▸ Задания в формате ВПР</div>
+
+  <!-- T20 -->
+  <div class="task vpr" id="task20">
+    <div class="task-head"><span class="task-num">Задание 20</span><button class="task-flag-btn" id="flag20" onclick="toggleFlag(20)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span><span class="task-badge">ВПР · базовый</span>
+      <span class="task-q">Установите соответствие между слоями горных пород, обозначенными на рисунке буквами, и геологическими эрами.</span></div>
+    <div class="task-body">
+      <div style="font-size:.86rem;margin-bottom:10px;">Студенты геологического факультета анализировали профиль геологического строения территории, показанный на рисунке. Установите соответствие между слоями горных пород, обозначенными на рисунке буквами, и геологическими эрами, к которым относится их образование: к каждому элементу первого столбца подберите соответствующий элемент из второго столбца.</div>
+      <div style="margin-bottom:12px;">
+        <img src="data:image/jpeg;base64,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" alt="Профиль геологического строения" style="max-width:100%;border-radius:4px;border:1px solid var(--vpr-light);">
+      </div>
+      <div style="font-size:.84rem;margin-bottom:12px;background:#FAF5FF;padding:10px 12px;border-radius:4px;border:1px solid var(--vpr-light);">
+        <b>СЛОИ ГОРНЫХ ПОРОД</b><br>
+        А) А &nbsp;&nbsp; Б) Б &nbsp;&nbsp; В) В<br><br>
+        <b>ГЕОЛОГИЧЕСКИЕ ЭРЫ</b><br>
+        1) мезозойская &nbsp;&nbsp; 2) протерозойская &nbsp;&nbsp; 3) кайнозойская
+      </div>
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">Запишите цифру под каждой буквой:</div>
+      <div class="match-answer-row" id="cells20"></div>
+    </div>
+  </div>
+
+  <!-- Text for 21-22 -->
+  <div class="task vpr">
+    <div class="task-head"><span class="task-num">Задания 21–22</span><span class="task-badge">ВПР · текст</span>
+      <span class="task-q">Прочитайте текст и выполните задания 21 и 22.</span></div>
+    <div class="task-body">
+      <div class="vpr-text-title">Тектоническое строение и рельеф России: от равнин до молодых гор</div>
+      <div class="vpr-text">Западно-Сибирская равнина — одна из крупнейших низменных равнин мира. В её основании лежит молодая платформа, кристаллический фундамент которой глубоко погружён под мощный осадочный чехол. Там, где фундамент перекрыт осадочными породами, формируются обширные плоские участки, заболоченные низменности. Именно с этим осадочным чехлом связаны крупнейшие в России месторождения нефти и природного газа.<br><br>К востоку от Западно-Сибирской равнины поверхность заметно поднимается — начинается Среднесибирское плоскогорье. Здесь кристаллический фундамент Сибирской платформы в ряде мест выходит на поверхность. С этими выходами фундамента связаны месторождения железных руд, медно-никелевых руд и других металлов.<br><br>На севере Западно-Сибирской равнины и в Среднесибирском плоскогорье широко распространена многолетняя мерзлота. Строительство здесь затруднено: при нагревании грунта от зданий мёрзлые породы оттаивают и проседают.<br><br>На крайнем юго-западе России, между Чёрным и Каспийским морями, поднимается Большой Кавказ. Эти горы молодые: они образовались в кайнозойскую эру в ходе альпийской эпохи складчатости и продолжают расти до сих пор. Литосферные плиты в этом районе продолжают сближаться, что обусловливает высокую сейсмическую активность. Похожая ситуация наблюдается на Камчатке и Курильских островах, где Тихоокеанская плита погружается под Евразийскую: здесь часты сильные землетрясения и действуют многочисленные вулканы.</div>
+    </div>
+  </div>
+
+  <!-- T21 -->
+  <div class="task vpr" id="task21">
+    <div class="task-head"><span class="task-num">Задание 21</span><button class="task-flag-btn" id="flag21" onclick="toggleFlag(21)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span><span class="task-badge">ВПР · базовый</span>
+      <span class="task-q">В тексте говорится об участках платформ, где кристаллический фундамент перекрыт осадочным чехлом. Запишите географический термин, которым обозначают такие участки.</span></div>
+    <div class="task-body">
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">Ответ:</div>
+      <div id="cells21" class="cells-row"></div>
+    </div>
+  </div>
+
+  <!-- T22 -->
+  <div class="task vpr" id="task22">
+    <div class="task-head"><span class="task-num">Задание 22</span><button class="task-flag-btn" id="flag22" onclick="toggleFlag(22)" title="Отметить для возврата">⚑</button><span class="task-pts">1 балл</span><span class="task-badge">ВПР · повышенный · ручная проверка</span>
+      <span class="task-q">Используя текст и свои знания, объясните, почему землетрясения и вулканизм сосредоточены именно на Кавказе, Камчатке и Курильских островах, а не на Западно-Сибирской равнине или Среднесибирском плоскогорье.</span></div>
+    <div class="task-body">
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;">Запишите развёрнутый ответ:</div>
+      <textarea class="manual-area" id="manual22" placeholder="Напишите объяснение..."></textarea>
+      <div class="manual-note">⚠ Это задание проверяется учителем вручную.</div>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px;">Все задания выполнены? Нажми, чтобы сдать работу.</div>
+    <button id="submit-btn" onclick="submitExam()">Сдать контрольную работу ✓</button>
+  </div>
+  </div><!-- /vpr-block -->
+
+  </div><!-- /page-wrap -->
+  </div>
+</div><!-- /exam-screen -->
+
+<!-- ═══════════ RESULT ═══════════ -->
+<div id="result-screen" class="screen">
+  <div class="result-card">
+    <div class="strata">
+      <div class="s1"></div><div class="s2"></div><div class="s3"></div>
+      <div class="s4"></div><div class="s5"></div><div class="s6"></div>
+    </div>
+    <div class="result-inner" id="result-inner">
+      <div class="loader"><div class="spinner"></div>Загрузка...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TEACHER ═══════════ -->
+<div id="teacher-screen" class="screen">
+  <div class="t-topbar">
+    <h2>Режим учителя · КР3</h2>
+    <button class="t-topbar-btn" onclick="loadTeacher()">↻ Обновить</button>
+    <button class="t-topbar-btn" onclick="diagBin()">🔍 Диагностика</button>
+    <button class="t-topbar-btn t-danger-btn" onclick="deleteAllSubmissions()">🗑 Удалить все</button>
+    <button class="t-topbar-btn" onclick="show('home-screen')">← Выйти</button>
+  </div>
+  <div class="t-list" id="t-list">
+    <div class="loader"><div class="spinner"></div>Загрузка...</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ══ Config ══════════════════════════════════════════
+const BIN_ID = '69bc1d34b7ec241ddc82c5fc';
+const MKEY   = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const PIN    = '10951538';
+const API    = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+const HDR    = { 'Content-Type':'application/json', 'X-Master-Key': MKEY };
+
+const TASK_MAX = {1:2,2:1,3:1,4:2,5:1,6:1,7:1,8:2,9:2,10:2,11:1,12:2,13:1,14:1,15:2,16:1,17:2,18:1,19:1,20:1,21:1};
+const TOTAL_MAX = Object.values(TASK_MAX).reduce((a,b)=>a+b,0); // 29
+const GRAND_MAX = TOTAL_MAX + 1; // +1 for task 22
+
+const LABELS = {
+  1:'Утверждения §21+25',2:'Эпоха Урала',3:'Фундамент',4:'Стадии складч.',
+  5:'Плиты (термин)',6:'Возрождённые горы',7:'Тип гор',8:'Пропуски платформа',
+  9:'Структуры→рельеф',10:'Утверждения §21-25',11:'Карст',12:'Утверждения §22-25',
+  13:'Мерзлотный рельеф',14:'Сваи',15:'Утверждения §22-26',16:'Месторождение',
+  17:'ПИ→район',18:'КМА',19:'Уклон России',20:'Слои→эры (ВПР)',21:'Плиты (ВПР)'
+};
+
+// ══ Exam data ════════════════════════════════════════
+const ORIG = {
+  t1:[{num:1,text:'Геохронологическую таблицу читают снизу вверх: снизу — древние породы, сверху — молодые'},{num:2,text:'Осадочный чехол платформы сложён преимущественно вертикальными слоями'},{num:3,text:'Барханы и дюны создаёт ледник'},{num:4,text:'Нефть, природный газ и уголь — главные топливно-энергетические минеральные ресурсы России'},{num:5,text:'Вулканы в России действуют на Большом Кавказе'},{num:6,text:'Рудные полезные ископаемые связаны с осадочным чехлом платформ'}],t1c:new Set([1,4]),
+  t2:[{num:1,text:'Альпийской'},{num:2,text:'Каледонской'},{num:3,text:'Герцинской'},{num:4,text:'Киммерийской'}],t2c:3,
+  t4:[{num:1,text:'Горная область разрушается внешними силами, поверхность выравнивается'},{num:2,text:'Земная кора прогибается, накапливаются морские осадки'},{num:3,text:'Кристаллический фундамент становится основой будущей платформы'},{num:4,text:'Породы смяты в складки, поднимаются горы'}],t4c:'2413',
+  t5:[{num:1,text:'Выходы кристаллического фундамента на поверхность'},{num:2,text:'Области платформ, где фундамент перекрыт осадочным чехлом'},{num:3,text:'Подвижные участки земной коры на границах плит'},{num:4,text:'Горные хребты, образованные при разломах фундамента'}],t5c:2,
+  t6:[{num:1,text:'Накопления осадочных пород в морском бассейне'},{num:2,text:'Смятия пород в складки при столкновении плит'},{num:3,text:'Раскола и подъёма глыб старого платформенного фундамента'},{num:4,text:'Таяния ледника и отложения моренного материала'}],t6c:3,
+  t8r:[{num:1,text:'щиты'},{num:2,text:'нерудные'},{num:3,text:'осадочный чехол'},{num:4,text:'плиты'},{num:5,text:'кристаллический фундамент'},{num:6,text:'рудные'}],t8c:[5,1,3,2],
+  t9r:[{num:1,text:'Высокие молодые горы с вулканизмом'},{num:2,text:'Обширные равнины'},{num:3,text:'Возрождённые горы'},{num:4,text:'Низменности и плато'},{num:5,text:'Аласы и термокарстовые котловины'},{num:6,text:'Зандровые равнины'}],t9c:[2,4,1,3],
+  t10:[{num:1,text:'Альпийская эпоха складчатости относится к мезозойской эре'},{num:2,text:'Выветривание бывает трёх видов: физическое, химическое, органическое'},{num:3,text:'Рудные месторождения обычно приурочены к складчатым областям или фундаментам древних платформ'},{num:4,text:'Западно-Сибирская равнина расположена на древней платформе'},{num:5,text:'Самый большой покровный ледник в древности образовался на Скандинавском и Кольском полуостровах'},{num:6,text:'Уголь в России добывают только в европейской части страны'}],t10c:new Set([2,3,5]),
+  t11:[{num:1,text:'Физическое'},{num:2,text:'Органическое'},{num:3,text:'Химическое'},{num:4,text:'Тектоническое'}],t11c:3,
+  t12:[{num:1,text:'При органическом выветривании породы разрушают корни растений и кислоты, образующиеся при разложении остатков организмов'},{num:2,text:'Среднесибирское плоскогорье расположено к западу от реки Енисей'},{num:3,text:'Рудные полезные ископаемые находят чаще всего в разрушенных горах или на щитах платформ'},{num:4,text:'Оползни часто возникают на крутых берегах рек — Волги, Оки, Дона'},{num:5,text:'Мезозойская эра включает три периода: триасовый, юрский, меловой'},{num:6,text:'Щиты — области платформ, где фундамент перекрыт осадочным чехлом'}],t12c:new Set([1,3,4,5]),
+  t13:[{num:1,text:'На Русской равнине и Урале'},{num:2,text:'В Среднесибирском плоскогорье и Сибири'},{num:3,text:'На Северном Кавказе и в Приморском крае'},{num:4,text:'На Западно-Сибирской равнине южнее Новосибирска'}],t13c:2,
+  t15:[{num:1,text:'Молодые платформы России — Западно-Сибирская, Скифская, Колымская'},{num:2,text:'Территория России в целом имеет небольшой уклон к северу'},{num:3,text:'При химическом выветривании изменяется состав горных пород под влиянием воды, кислорода и кислот'},{num:4,text:'Основные месторождения нефти в России расположены в Якутии и Приморском крае'},{num:5,text:'Землетрясения и вулканизм приурочены к областям современной тектонической активности'},{num:6,text:'Курская магнитная аномалия — один из крупнейших в мире бассейнов железных руд'}],t15c:new Set([1,2,3,5,6]),
+  t17r:[{num:1,text:'Урал (Соликамск)'},{num:2,text:'Урал, Республика Тыва, Республика Бурятия'},{num:3,text:'Восточная Сибирь и Дальний Восток'},{num:4,text:'Север Западной Сибири (Медвежье, Уренгойское, Ямбургское)'},{num:5,text:'Кольский полуостров и Карелия'}],t17c:[4,3,2,1],
+  t18:[{num:1,text:'Осадочному чехлу молодой платформы'},{num:2,text:'Складчатым областям альпийского возраста'},{num:3,text:'Кристаллическому фундаменту древней платформы'},{num:4,text:'Зандровым равнинам ледниковой аккумуляции'}],t18c:3,
+  t19:[{num:1,text:'Россия расположена в субарктическом климатическом поясе'},{num:2,text:'В России преобладает равнинный рельеф'},{num:3,text:'Территория России имеет общий уклон поверхности к северу'},{num:4,text:'Реки России берут начало в горах Южной Сибири'}],t19c:3,
+};
+
+const ANSWERS = {
+  1:{type:'multi',correct:null,max:2},2:{type:'single',correct:null,max:1},
+  3:{type:'short',correct:['ФУНДАМЕНТОМ','ФУНДАМЕНТ'],max:1},4:{type:'seq',n:4,correct:null,max:2},
+  5:{type:'single',correct:null,max:1},6:{type:'single',correct:null,max:1},
+  7:{type:'short',correct:['ВОЗРОЖДЁННЫЕ','ВОЗРОЖДЕННЫЕ'],max:1},
+  8:{type:'match',labels:['А','Б','В','Г'],correct:null,max:2},
+  9:{type:'match',labels:['А','Б','В','Г'],correct:null,max:2},10:{type:'multi',correct:null,max:2},
+  11:{type:'single',correct:null,max:1},12:{type:'multi',correct:null,max:2},
+  13:{type:'single',correct:null,max:1},14:{type:'short',correct:['СВАЯХ','СВАИ'],max:1},
+  15:{type:'multi',correct:null,max:2},16:{type:'short',correct:['МЕСТОРОЖДЕНИЕ','МЕСТОРОЖДЕНИЕМ'],max:1},
+  17:{type:'match',labels:['А','Б','В','Г'],correct:null,max:2},
+  18:{type:'single',correct:null,max:1},19:{type:'single',correct:null,max:1},
+  20:{type:'match',labels:['А','Б','В'],correct:['3','1','2'],max:1},
+  21:{type:'short',correct:['ПЛИТЫ','ПЛИТА'],max:1},
+};
+
+const ex_scores = {};
+// Stores the shuffled ref lists actually shown to the student (for review display)
+const shownRefs = {};
+
+// ══ Shuffle / renumber ════════════════════════════════
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function renumber(s){const m={};const items=s.map((x,i)=>{m[x.num]=i+1;return{num:i+1,text:x.text};});return{items,o2n:m};}
+function rC(id,items){const w=document.getElementById(id);if(!w)return;w.innerHTML='';items.forEach(({num,text})=>{const d=document.createElement('div');d.className='choice-item';d.innerHTML=`<span class="choice-num">${num}.</span>${text}`;w.appendChild(d);});}
+function rMR(id,items){const w=document.getElementById(id);if(!w)return;w.innerHTML='';items.forEach(({num,text})=>{const d=document.createElement('div');d.className='match-item';d.innerHTML=`<span class="num">${num}.</span>${text}`;w.appendChild(d);});}
+function rRef(id,items){const w=document.getElementById(id);if(!w)return;w.innerHTML='';items.forEach(({num,text})=>{const d=document.createElement('div');d.className='ref-chip';d.innerHTML=`<span class="ref-n">${num}.</span> ${text}`;w.appendChild(d);});}
+
+function renderAll(){
+  let r;
+  r=renumber(shuffle(ORIG.t1));rC('ch1',r.items);ANSWERS[1].correct=new Set([...ORIG.t1c].map(n=>String(r.o2n[n])));
+  r=renumber(shuffle(ORIG.t2));rC('ch2',r.items);ANSWERS[2].correct=String(r.o2n[ORIG.t2c]);
+  r=renumber(shuffle(ORIG.t4));rC('ch4',r.items);ANSWERS[4].correct=ORIG.t4c.split('').map(n=>String(r.o2n[parseInt(n)])).join('');
+  r=renumber(shuffle(ORIG.t5));rC('ch5',r.items);ANSWERS[5].correct=String(r.o2n[ORIG.t5c]);
+  r=renumber(shuffle(ORIG.t6));rC('ch6',r.items);ANSWERS[6].correct=String(r.o2n[ORIG.t6c]);
+  r=renumber(shuffle(ORIG.t8r));rRef('refs8',r.items);ANSWERS[8].correct=ORIG.t8c.map(n=>String(r.o2n[n]));shownRefs[8]=r.items;
+  r=renumber(shuffle(ORIG.t9r));rMR('mr9',r.items);ANSWERS[9].correct=ORIG.t9c.map(n=>String(r.o2n[n]));shownRefs[9]=r.items;
+  r=renumber(shuffle(ORIG.t10));rC('ch10',r.items);ANSWERS[10].correct=new Set([...ORIG.t10c].map(n=>String(r.o2n[n])));
+  r=renumber(shuffle(ORIG.t11));rC('ch11',r.items);ANSWERS[11].correct=String(r.o2n[ORIG.t11c]);
+  r=renumber(shuffle(ORIG.t12));rC('ch12',r.items);ANSWERS[12].correct=new Set([...ORIG.t12c].map(n=>String(r.o2n[n])));
+  r=renumber(shuffle(ORIG.t13));rC('ch13',r.items);ANSWERS[13].correct=String(r.o2n[ORIG.t13c]);
+  r=renumber(shuffle(ORIG.t15));rC('ch15',r.items);ANSWERS[15].correct=new Set([...ORIG.t15c].map(n=>String(r.o2n[n])));
+  r=renumber(shuffle(ORIG.t17r));rMR('mr17',r.items);ANSWERS[17].correct=ORIG.t17c.map(n=>String(r.o2n[n]));shownRefs[17]=r.items;
+  r=renumber(shuffle(ORIG.t18));rC('ch18',r.items);ANSWERS[18].correct=String(r.o2n[ORIG.t18c]);
+  r=renumber(shuffle(ORIG.t19));rC('ch19',r.items);ANSWERS[19].correct=String(r.o2n[ORIG.t19c]);
+}
+
+// ══ Cell builders ════════════════════════════════════
+function makeCell(id,nextId){
+  const el=document.createElement('input');el.type='text';el.maxLength=1;el.className='cell';el.id=id;el.autocomplete='off';
+  el.addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/\s/g,'').slice(-1);this.classList.toggle('filled',!!this.value);if(this.value&&nextId)document.getElementById(nextId)?.focus();});
+  el.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!this.value){const m=id.match(/^(.+?)(\d+)$/);if(m)document.getElementById(m[1]+(parseInt(m[2])-1))?.focus();}});
+  return el;
+}
+function bN(c,p,n){const w=document.getElementById(c);if(!w)return;w.innerHTML='';for(let i=0;i<n;i++)w.appendChild(makeCell(p+i,i<n-1?p+(i+1):null));}
+function bMatch(c,labels,p){const w=document.getElementById(c);if(!w)return;w.innerHTML='';labels.forEach((l,i)=>{const d=document.createElement('div');d.className='match-cell-wrap';const lbl=document.createElement('div');lbl.className='match-cell-lbl';lbl.textContent=l;d.appendChild(lbl);d.appendChild(makeCell(p+i,i<labels.length-1?p+(i+1):null));w.appendChild(d);});}
+function sSingle(id){const el=document.getElementById(id);if(!el)return;el.addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/\s/g,'').slice(-1);this.classList.toggle('filled',!!this.value);});}
+
+function initCells(){
+  bN('cells1','c1_',17);sSingle('t2');bN('cells3','c3_',17);bN('cells4','c4_',4);
+  sSingle('t5');sSingle('t6');bN('cells7','c7_',17);
+  bMatch('cells8',['А','Б','В','Г'],'c8_');bMatch('cells9',['А','Б','В','Г'],'c9_');
+  bN('cells10','c10_',17);sSingle('t11');bN('cells12','c12_',17);sSingle('t13');bN('cells14','c14_',17);
+  bN('cells15','c15_',17);bN('cells16','c16_',17);bMatch('cells17',['А','Б','В','Г'],'c17_');
+  sSingle('t18');sSingle('t19');bMatch('cells20',['А','Б','В'],'c20_');bN('cells21','c21_',17);
+}
+
+// ══ Read values ══════════════════════════════════════
+function gC(id){return(document.getElementById(id)?.value||'').toUpperCase().trim();}
+function gN(p,n){const v=[];for(let i=0;i<n;i++){const c=gC(p+i);if(c)v.push(c);}return v;}
+function gM(p,n){return Array.from({length:n},(_,i)=>gC(p+i));}
+
+// ══ Lock cells (no color feedback in student mode) ════
+function lockCell(id){const el=document.getElementById(id);if(!el)return;el.classList.add('readonly');el.readOnly=true;}
+
+// ══ Calc score (no visual feedback) ══════════════════
+const SPFX={single:{2:'t2',5:'t5',6:'t6',11:'t11',13:'t13',18:'t18',19:'t19'},
+  multi:{1:'c1_',10:'c10_',12:'c12_',15:'c15_'},
+  match:{8:'c8_',9:'c9_',17:'c17_',20:'c20_'},
+  short:{3:'c3_',7:'c7_',14:'c14_',16:'c16_',21:'c21_'}};
+
+function scoreTask(n){
+  const a=ANSWERS[n];let pts=0;
+  if(a.type==='single'){
+    const id=SPFX.single[n]||'t'+n;
+    pts=gC(id)===a.correct?1:0;
+    lockCell(id);
+  }else if(a.type==='multi'){
+    const p=SPFX.multi[n];const entered=gN(p,17);const es=new Set(entered);
+    const missing=[...a.correct].filter(v=>!es.has(v)).length;
+    const extra=[...es].filter(v=>v&&!a.correct.has(v)).length;
+    pts=missing===0&&extra===0?2:Math.max(missing,extra)===1?1:0;
+    for(let i=0;i<17;i++){const el=document.getElementById(p+i);if(el){el.readOnly=true;el.classList.add('readonly');}}
+  }else if(a.type==='match'){
+    const p=SPFX.match[n];const vals=gM(p,a.labels.length);let wrong=0;
+    vals.forEach((v,i)=>{if(v!==a.correct[i])wrong++;lockCell(p+i);});
+    pts=Math.max(0,a.max-wrong);
+  }else if(a.type==='seq'){
+    const p='c4_';const ent=gM(p,a.n);const str=ent.join('');
+    if(str===a.correct){pts=2;}
+    else{const d=ent.filter((v,i)=>v!==a.correct[i]).length;pts=(d===2&&str.split('').sort().join('')===a.correct.split('').sort().join(''))?1:0;}
+    for(let i=0;i<a.n;i++)lockCell(p+i);
+  }else if(a.type==='short'){
+    const p=SPFX.short[n];const entered=gN(p,17).join('');
+    const variants=Array.isArray(a.correct)?a.correct:[a.correct];
+    pts=variants.includes(entered)?1:0;
+    for(let i=0;i<17;i++){const el=document.getElementById(p+i);if(el){el.readOnly=true;el.classList.add('readonly');}}
+  }
+  ex_scores[n]=pts;
+  return pts;
+}
+
+
+// ══ Collect student answers + correct answers for teacher review ══
+function collectStudentAnswers(){
+  const sa={};
+  const ca={};
+  // single
+  for(const [n,id] of Object.entries(SPFX.single)){
+    sa[n]=gC(id);
+    ca[n]=ANSWERS[parseInt(n)].correct;
+  }
+  // multi
+  for(const [n,p] of Object.entries(SPFX.multi)){
+    sa[n]=gN(p,17);
+    ca[n]=[...ANSWERS[parseInt(n)].correct];
+  }
+  // match — also save the shuffled ref list shown to the student
+  for(const [n,p] of Object.entries(SPFX.match)){
+    const ni=parseInt(n);
+    const labels=ANSWERS[ni].labels;
+    sa[n]=gM(p,labels.length);
+    ca[n]=ANSWERS[ni].correct;
+    if(shownRefs[ni]) sa['refs'+n]=shownRefs[ni];
+  }
+  // seq
+  sa[4]=gM('c4_',4);
+  ca[4]=ANSWERS[4].correct; // string like '2413'
+  // short — save ALL correct variants
+  for(const [n,p] of Object.entries(SPFX.short)){
+    sa[n]=gN(p,17).join('');
+    const c=ANSWERS[parseInt(n)].correct;
+    ca[n]=Array.isArray(c)?c:typeof c==='string'?[c]:[c];
+  }
+  return {sa,ca};
+}
+
+
+
+// ══ Task flags ══════════════════════════════════════
+const flaggedTasks = new Set();
+
+function toggleFlag(n){
+  const btn = document.getElementById('flag'+n);
+  if(flaggedTasks.has(n)){
+    flaggedTasks.delete(n);
+    if(btn) btn.classList.remove('flagged');
+  } else {
+    flaggedTasks.add(n);
+    if(btn) btn.classList.add('flagged');
+  }
+  buildProgressBar(); // update bar immediately
+}
+
+function resetFlags(){
+  flaggedTasks.clear();
+  document.querySelectorAll('.task-flag-btn').forEach(b => b.classList.remove('flagged'));
+}
+
+
+// ══ Exam Timer ══════════════════════════════════════
+let _timerSecondsLeft = 0;
+let _timerInterval   = null;
+
+const TIMER_TOTAL   = 3600; // 60:00
+const TIMER_WARN_40 = 2400; // 40:00 — green pill
+const TIMER_WARN_20 = 1200; // 20:00 — yellow pill + yellow timer
+const TIMER_WARN_10 = 600;  // 10:00 — yellow timer
+const TIMER_WARN_5  = 300;  // 05:00 — red timer + red pill
+const TIMER_WARN_1  = 60;   // 01:00 — red flash + red pill
+const TIMER_RED     = 300;  // go red at 5:00
+const TIMER_FLASH   = 60;   // flash at 1:00
+
+function timerFmt(s){
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function timerUpdateDisplay(){
+  const el = document.getElementById('exam-timer');
+  if(!el) return;
+  const s = _timerSecondsLeft;
+  el.textContent = timerFmt(s);
+  el.classList.remove('timer-yellow','timer-red','timer-flash');
+  if(s <= TIMER_FLASH){        // <= 1:00 — red + flash
+    el.classList.add('timer-red','timer-flash');
+  } else if(s <= TIMER_RED){   // <= 5:00 — red
+    el.classList.add('timer-red');
+  } else if(s <= TIMER_WARN_10){ // <= 10:00 — yellow
+    el.classList.add('timer-yellow');
+  }
+}
+
+function timerStart(){
+  timerStop(); // clear any existing
+  _timerSecondsLeft = TIMER_TOTAL;
+  timerUpdateDisplay();
+  const _warnShown = {};
+  _timerInterval = setInterval(()=>{
+    _timerSecondsLeft--;
+    timerUpdateDisplay();
+    const s = _timerSecondsLeft;
+    // Warn banners — each fires exactly once
+    if(s === TIMER_WARN_40 && !_warnShown[40]){
+      _warnShown[40] = true;
+      showTimerWarn('Осталось 40 минут', 'green', 5000);
+    }
+    if(s === TIMER_WARN_20 && !_warnShown[20]){
+      _warnShown[20] = true;
+      showTimerWarn('Осталось 20 минут. Рекомендуем приступить к заданиям ВПР', 'yellow', 5000);
+    }
+    if(s === TIMER_WARN_5 && !_warnShown[5]){
+      _warnShown[5] = true;
+      showTimerWarn('Осталось 5 минут', 'red', 5000);
+    }
+    if(s === TIMER_WARN_1 && !_warnShown[1]){
+      _warnShown[1] = true;
+      showTimerWarn('Осталась 1 минута!', 'red', 5000);
+    }
+    if(s <= 0){
+      timerStop();
+      timerExpired();
+    }
+  }, 1000);
+}
+
+function timerStop(){
+  if(_timerInterval){ clearInterval(_timerInterval); _timerInterval = null; }
+}
+
+function showTimerWarn(msg, colour, duration){
+  const el = document.getElementById('timer-warn-banner');
+  if(!el) return;
+  el.textContent = msg;
+  // Apply colour theme
+  el.className = 'timer-warn-banner timer-warn-' + (colour||'red') + ' timer-warn-show';
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{
+    el.classList.remove('timer-warn-show');
+    el.classList.add('timer-warn-hide');
+  }, duration||3000);
+}
+
+async function timerExpired(){
+  const el = document.getElementById('exam-timer');
+  if(el){ el.textContent = '00:00'; el.classList.add('timer-red'); el.classList.remove('timer-flash'); }
+  toast('Время вышло! Ответы сохраняются...', 6000);
+  // Auto-submit without confirm dialog
+  await submitExamAuto();
+}
+
+// ══ Exam progress bar ══════════════════════════════
+// Map task number -> function that returns true if task is "filled"
+function isTaskFilled(n){
+  // Single-cell tasks
+  const singles = {2:'t2',5:'t5',6:'t6',11:'t11',13:'t13',18:'t18',19:'t19'};
+  if(singles[n]) return !!gC(singles[n]);
+
+  // Multi (need at least 1 filled cell among 17)
+  const multis = {1:'c1_',10:'c10_',12:'c12_',15:'c15_'};
+  if(multis[n]) return gN(multis[n],17).length > 0;
+
+  // Short (need at least 1 filled cell among 17)
+  const shorts = {3:'c3_',7:'c7_',14:'c14_',16:'c16_',21:'c21_'};
+  if(shorts[n]) return gN(shorts[n],17).length > 0;
+
+  // Sequence task 4 (need at least 1 of 4)
+  if(n===4) return gN('c4_',4).length > 0;
+
+  // Match tasks: need at least 1 filled
+  const matches = {8:'c8_',9:'c9_',17:'c17_',20:'c20_'};
+  if(matches[n]){
+    const len = n===20 ? 3 : 4;
+    return gM(matches[n],len).some(v=>!!v);
+  }
+
+  // Task 22: textarea
+  if(n===22) return !!(document.getElementById('manual22')?.value||'').trim();
+
+  return false;
+}
+
+function buildProgressBar(){
+  const bar = document.getElementById('exam-progress-bar');
+  const inner = document.getElementById('exam-progress-inner');
+  const examScreen = document.getElementById('exam-screen');
+  if(!bar || !inner) return;
+
+  const vprOpen = document.getElementById('vpr-block')?.style.display !== 'none';
+  // Part 1: tasks 1-19. Part 2 (VPR): only tasks 20-22
+  const startTask = vprOpen ? 20 : 1;
+  const maxTask   = vprOpen ? 22 : 19;
+  let cells = '';
+  let filled = 0;
+  let total = maxTask - startTask + 1;
+
+  for(let n=startTask; n<=maxTask; n++){
+    const isVpr = n >= 20;
+    const f = isTaskFilled(n);
+    if(f) filled++;
+    const flagged = flaggedTasks.has(n);
+    let boxCls = isVpr
+      ? (f ? 'prog-vpr prog-filled' : 'prog-vpr')
+      : (f ? 'prog-filled' : '');
+    if(flagged) boxCls += ' prog-flagged';
+    const flagDot = flagged ? '<div class="prog-flag-dot"></div>' : '';
+    cells += `<div class="prog-cell" onclick="scrollToTask(${n})">
+      <div class="prog-cell-box ${boxCls}">${n}</div>
+      ${flagDot}
+    </div>`;
+  }
+
+  const sectionLabel = vprOpen ? 'Задания ВПР' : 'Задания 1–19';
+  inner.innerHTML = `<div class="prog-top-row">
+    <span class="prog-label">${sectionLabel}</span>
+    <span id="exam-timer" class="exam-timer">${timerFmt(_timerSecondsLeft)}</span>
+    <span class="prog-count">${filled}&thinsp;/&thinsp;${total}</span>
+  </div>
+  <div class="prog-cells">${cells}</div>`;
+
+  // Show bar and offset exam content
+  bar.style.display = 'block';
+  if(examScreen) examScreen.classList.add('has-progress');
+
+  // Measure actual bar height and apply as padding
+  requestAnimationFrame(()=>{
+    const h = bar.offsetHeight;
+    if(examScreen) examScreen.style.paddingTop = h + 'px';
+    // Update CSS variable for warn banner positioning
+    document.documentElement.style.setProperty('--bar-h', h + 'px');
+  });
+}
+
+function hideProgressBar(){
+  const bar = document.getElementById('exam-progress-bar');
+  const examScreen = document.getElementById('exam-screen');
+  if(bar) bar.style.display = 'none';
+  if(examScreen){ examScreen.classList.remove('has-progress'); examScreen.style.paddingTop = ''; }
+}
+
+function scrollToTask(n){
+  const el = document.getElementById('task'+n);
+  if(!el || el.style.display==='none') return;
+  const bar = document.getElementById('exam-progress-bar');
+  const offset = bar ? bar.offsetHeight + 8 : 8;
+  const top = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({top, behavior:'smooth'});
+}
+
+// Attach input listeners to update progress in real time
+function attachProgressListeners(){
+  const screen = document.getElementById('exam-screen');
+  if(!screen) return;
+  screen.addEventListener('input', ()=>{
+    clearTimeout(screen._progTimer);
+    screen._progTimer = setTimeout(buildProgressBar, 80);
+  });
+}
+
+// ══ Confirm Part 1 ═══════════════════════════════════
+function confirmPart1(){
+  for(let n=1;n<=19;n++){
+    if(ANSWERS[n])scoreTask(n);
+    const task=document.getElementById('task'+n);
+    if(task){
+      task.querySelectorAll('input,textarea').forEach(el=>{el.readOnly=true;el.classList.add('readonly');});
+      task.style.display='none';
+    }
+  }
+  document.getElementById('confirm-block').style.display='none';
+  document.getElementById('vpr-block').style.display='block';
+  buildProgressBar();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══ Submit ═══════════════════════════════════════════
+async function submitExam(){
+  if(!confirm('Сдать контрольную работу? После этого изменить ответы будет невозможно.'))return;
+
+  // Score remaining (20-21)
+  for(let n=20;n<=21;n++){if(ANSWERS[n]&&ex_scores[n]===undefined)scoreTask(n);}
+
+  const totalAuto=Object.values(ex_scores).reduce((s,v)=>s+(v||0),0);
+  const surname=sessionStorage.getItem('kr3_sur')||'Неизвестно';
+  const name=sessionStorage.getItem('kr3_nm')||'Неизвестно';
+
+  timerStop(); // stop timer on manual submit
+  // Lock everything
+  document.querySelectorAll('#exam-screen input,#exam-screen textarea').forEach(el=>{
+    el.readOnly=true;el.classList.add('readonly');
+  });
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Сохранение...';
+
+  // Save to JSONBin
+  toast('Сохранение работы...', 8000);
+  try{
+    const data=await getBin();
+    if(!data.submissions)data.submissions=[];
+    const key=getKey(surname,name);
+    const existing=data.submissions.findIndex(s=>getKey(s.surname,s.name)===key);
+    const {sa,ca}=collectStudentAnswers();
+    const manual22val=(document.getElementById('manual22')?.value||'').trim();
+    const entry={
+      surname,name,
+      scores:{...ex_scores},
+      totalAuto,
+      studentAnswers:sa,
+      correctAnswers:ca,
+      manual22:manual22val,
+      score22:manual22val===''?0:null,
+      published:false,at:now()
+    };
+    if(existing>=0)data.submissions[existing]=entry;
+    else data.submissions.push(entry);
+    await putBin(data);
+    toast('✓ Работа сдана!');
+    sessionStorage.removeItem('kr3_sur');
+    sessionStorage.removeItem('kr3_nm');
+    show('home-screen');
+    const b=document.getElementById('pending-banner');
+    b.innerHTML=`<b>${surname} ${name}</b> — контрольная работа сдана и находится на проверке у учителя. Результат появится позже.`;
+    b.style.display='block';
+    document.getElementById('s-surname').value='';
+    document.getElementById('s-name').value='';
+    document.getElementById('r-surname').value=surname;
+    document.getElementById('r-name').value=name;
+  }catch(e){
+    console.error('Submit error:', e);
+    toast('Ошибка сохранения: ' + e.message, 7000);
+    btn.disabled=false;
+    btn.textContent='Сдать контрольную работу ✓';
+  }
+}
+
+// ══ Auto-submit (timer expired) ══════════════════════
+async function submitExamAuto(){
+  // Score remaining tasks
+  for(let n=1;n<=21;n++){if(ANSWERS[n]&&ex_scores[n]===undefined)scoreTask(n);}
+
+  const totalAuto=Object.values(ex_scores).reduce((s,v)=>s+(v||0),0);
+  const surname=sessionStorage.getItem('kr3_sur')||'Неизвестно';
+  const name=sessionStorage.getItem('kr3_nm')||'Неизвестно';
+
+  // Lock everything
+  document.querySelectorAll('#exam-screen input,#exam-screen textarea').forEach(el=>{
+    el.readOnly=true;el.classList.add('readonly');
+  });
+  const btn=document.getElementById('submit-btn');
+  if(btn){btn.disabled=true;btn.textContent='Время вышло ✓';}
+
+  toast('Сохранение работы...', 8000);
+  try{
+    const {sa,ca}=collectStudentAnswers();
+    const data=await getBin();
+    if(!data.submissions)data.submissions=[];
+    const key=getKey(surname,name);
+    const existing=data.submissions.findIndex(s=>getKey(s.surname,s.name)===key);
+    const manual22val=(document.getElementById('manual22')?.value||'').trim();
+    const entry={
+      surname,name,
+      scores:{...ex_scores},
+      totalAuto,
+      studentAnswers:sa,
+      correctAnswers:ca,
+      manual22:manual22val,
+      score22:manual22val===''?0:null,
+      published:false,at:now()
+    };
+    if(existing>=0)data.submissions[existing]=entry;
+    else data.submissions.push(entry);
+    await putBin(data);
+    toast('✓ Работа сохранена');
+    sessionStorage.removeItem('kr3_sur');
+    sessionStorage.removeItem('kr3_nm');
+    show('home-screen');
+    const b=document.getElementById('pending-banner');
+    b.innerHTML=`<b>${surname} ${name}</b> — время вышло, контрольная работа сохранена и отправлена на проверку.`;
+    b.style.display='block';
+    document.getElementById('s-surname').value='';
+    document.getElementById('s-name').value='';
+    document.getElementById('r-surname').value=surname;
+    document.getElementById('r-name').value=name;
+  }catch(e){
+    console.error('Auto-submit error:',e);
+    toast('Ошибка сохранения: '+e.message,7000);
+  }
+}
+
+// ══ initExam ══════════════════════════════════════════
+function initExam(sur, nm){
+  // Reset scores and UI
+  Object.keys(ex_scores).forEach(k=>delete ex_scores[k]);
+  // Reset all answers
+  document.querySelectorAll('#exam-screen input').forEach(el=>{
+    el.value='';el.readOnly=false;
+    el.className=el.tagName==='INPUT'&&el.classList.contains('cell')?'cell':'';
+  });
+  document.querySelectorAll('#exam-screen textarea').forEach(el=>{el.value='';el.readOnly=false;});
+  // Reset VPR block and confirm block
+  document.getElementById('confirm-block').style.display='block';
+  document.getElementById('vpr-block').style.display='none';
+  // Re-render shuffled choices
+  renderAll();
+  initCells();
+  // Update header
+  document.getElementById('exam-meta').textContent='Ученик: '+sur+' '+nm;
+  // Reset flags and init progress bar
+  resetFlags();
+  buildProgressBar();
+  attachProgressListeners();
+  window.scrollTo(0,0);
+}
+
+// ══ Helpers ══════════════════════════════════════════
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id !== 'exam-screen'){ hideProgressBar(); timerStop(); }
+  window.scrollTo(0,0);
+}
+function toast(msg,ms=2800){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);
+}
+function getKey(sur,nm){return(sur+'|'+nm).toLowerCase().trim();}
+function gradeOf(pts){
+  const score = Math.round(pts / GRAND_MAX * 5 * 100) / 100;
+  if(score >= 4.83) return '5';
+  if(score >= 4.50) return '5−';
+  if(score >= 4.17) return '4+';
+  if(score >= 3.83) return '4';
+  if(score >= 3.50) return '4−';
+  if(score >= 3.17) return '3+';
+  if(score >= 2.83) return '3';
+  if(score >= 2.50) return '3−';
+  return '2';
+}
+function gradeScore(pts){
+  return Math.round(pts / GRAND_MAX * 5 * 100) / 100;
+}
+function gradeCaption(g){
+  const map = {
+    '5':  '💎 Кристаллический фундамент знаний. Никакая эрозия не возьмёт.',
+    '5−': '🏔️ Почти щит — фундамент на поверхности, но кое-где ещё прикрыт чехлом.',
+    '4+': '⛰️ Складчатость завершена, горы выросли. Осталось чуть выветрить лишнее.',
+    '4':  '🪨 Надёжная платформа. Осадочный чехол ровный, залегание горизонтальное.',
+    '4−': '🌋 Молодая платформа: фундамент есть, но чехол ещё накапливается.',
+    '3+': '🗻 Герцинская складчатость: горы поднялись, но до Кавказа пока далеко.',
+    '3':  '🔄 Возрождённые горы: старый фундамент, новые попытки подняться.',
+    '3−': '🌊 Каледонская эпоха: процессы идут, но рельеф пока не оформился.',
+    '2':  '🏜️ Осадочный чехол без фундамента. Требуется тектоническая активность.',
+  };
+  return map[g] || '';
+}
+function now(){
+  return new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// ══ JSONBin ══════════════════════════════════════════
+async function getBin(){
+  const r=await fetch(API+'/latest',{headers:HDR});
+  if(!r.ok){
+    if(r.status===404||r.status===400)return{submissions:[]};
+    throw new Error('getBin HTTP '+r.status);
+  }
+  const j=await r.json();
+  // JSONBin v3 wraps in .record; handle both
+  const rec = j.record !== undefined ? j.record : j;
+  if(Array.isArray(rec)) return {submissions:rec};
+  if(rec && rec.submissions) return rec;
+  return {submissions:[]};
+}
+async function putBin(data){
+  const r=await fetch(API,{method:'PUT',headers:HDR,body:JSON.stringify(data)});
+  if(!r.ok){
+    const txt=await r.text().catch(()=>'');
+    throw new Error('putBin HTTP '+r.status+': '+txt.slice(0,200));
+  }
+  return r;
+}
+
+// ══ HOME: Start ══════════════════════════════════════
+async function startExam(){
+  const sur=document.getElementById('s-surname').value.trim();
+  const nm=document.getElementById('s-name').value.trim();
+  if(!sur||!nm){document.getElementById('start-err').style.display='block';return;}
+  document.getElementById('start-err').style.display='none';
+  const btn=document.getElementById('start-btn');
+  btn.disabled=true;btn.textContent='Проверка...';
+  try{
+    const data=await getBin();
+    const key=getKey(sur,nm);
+    const existing=(data.submissions||[]).find(s=>getKey(s.surname,s.name)===key);
+    if(existing){
+      btn.disabled=false;btn.textContent='▶  Начать работу';
+      const b=document.getElementById('pending-banner');
+      if(existing.published){
+        b.innerHTML=`<b>${sur} ${nm}</b> — работа уже проверена. Воспользуйтесь разделом «Узнать результат».`;
+      }else{
+        b.innerHTML=`<b>${sur} ${nm}</b> — работа уже сдана и находится на проверке. Повторное прохождение не разрешено.`;
+      }
+      b.style.display='block';
+      return;
+    }
+  }catch(e){}
+  btn.disabled=false;btn.textContent='▶  Начать работу';
+  sessionStorage.setItem('kr3_sur',sur);
+  sessionStorage.setItem('kr3_nm',nm);
+  // Show instruction screen first
+  const greeting = document.getElementById('instr-greeting');
+  if(greeting) greeting.textContent = sur + ' ' + nm + ', добро пожаловать!';
+  show('instr-screen');
+}
+
+function beginExam(){
+  const sur=sessionStorage.getItem('kr3_sur')||'';
+  const nm=sessionStorage.getItem('kr3_nm')||'';
+  show('exam-screen');
+  initExam(sur,nm);
+  timerStart(); // start timer when student clicks "Начать"
+}
+
+// ══ HOME: Get result ══════════════════════════════════
+async function getResult(){
+  const sur=document.getElementById('r-surname').value.trim();
+  const nm=document.getElementById('r-name').value.trim();
+  if(!sur||!nm){document.getElementById('res-err').style.display='block';return;}
+  document.getElementById('res-err').style.display='none';
+  show('result-screen');
+  document.getElementById('result-inner').innerHTML='<div class="loader"><div class="spinner"></div>Загрузка...</div>';
+  try{
+    const data=await getBin();
+    const sub=(data.submissions||[]).find(s=>getKey(s.surname,s.name)===getKey(sur,nm));
+    renderResult(sub,sur,nm);
+  }catch(e){
+    document.getElementById('result-inner').innerHTML='<div class="loader">Ошибка загрузки. Попробуй позже.</div>';
+  }
+}
+
+function renderResult(sub,sur,nm){
+  const el=document.getElementById('result-inner');
+  if(!sub){
+    el.innerHTML=`
+      <div class="pending-view">
+        <div class="pv-icon">🔍</div>
+        <div class="pv-title">Работа не найдена</div>
+        <div class="pv-sub">Проверь написание фамилии и имени<br>или работа ещё не сдавалась.</div>
+      </div>
+      <button class="r-back" onclick="show('home-screen')">← Назад</button>`;
+    return;
+  }
+  if(!sub.published){
+    el.innerHTML=`
+      <div class="pending-view">
+        <div class="pv-icon">⏳</div>
+        <div class="pv-title">Контрольная на проверке</div>
+        <div class="pv-sub"><b>${sub.surname} ${sub.name}</b><br>Работа сдана ${sub.at||''}.<br>
+          Результат появится после проверки учителем.</div>
+      </div>
+      <button class="r-back" onclick="show('home-screen')">← Назад</button>`;
+    return;
+  }
+  const s22=sub.score22??0;
+  const total=sub.totalAuto+s22;
+  // Build task cells grid (tasks 1-22)
+  let taskCells='';
+  for(let n=1;n<=21;n++){
+    const pts=(sub.scores||{})[n]||0, mx=TASK_MAX[n];
+    const cls = pts===mx ? 'tcell-ok' : pts>0 ? 'tcell-part' : 'tcell-bad';
+    taskCells+=`<div class="tcell-wrap"><div class="tcell-num">${n}</div><div class="r-tcell ${cls}">${pts}</div></div>`;
+  }
+  const s22cls = s22===1?'tcell-ok':'tcell-bad';
+  taskCells+=`<div class="tcell-wrap"><div class="tcell-num">22</div><div class="r-tcell ${s22cls}">${s22}</div></div>`;
+  // Store sub reference for review
+  window._lastResultSub = sub;
+  el.innerHTML=`
+    <div class="r-name">${sub.surname} ${sub.name}</div>
+    <div class="r-date">Сдано: ${sub.at||'—'}</div>
+    <div class="r-grade-row">
+      <div class="r-grade-cell grade-${gradeOf(total).replace('+','plus').replace('−','minus')}">${gradeOf(total)}</div>
+      <div class="r-score-stack">
+        <div class="r-score-main">${total}<span class="r-score-of">/${GRAND_MAX}</span></div>
+        <div class="r-score-five">${gradeScore(total).toFixed(2)}/5,00</div>
+      </div>
+    </div>
+    <div class="r-grade-caption">${gradeCaption(gradeOf(total))}</div>
+    <div class="r-tcells-label">Баллы по заданиям:</div>
+    <div class="r-tcells-grid">${taskCells}</div>
+    <button class="r-back" style="background:#5A3010;margin-bottom:8px;" onclick="showStudentReview(window._lastResultSub)">🔎 Разбор работы — посмотреть все ответы</button>
+    <button class="r-back" onclick="show('home-screen')">← На главную</button>`;
+}
+
+// ══ Teacher login ═════════════════════════════════════
+function teacherLogin(){
+  const pin=document.getElementById('t-pin').value;
+  if(pin!==PIN){document.getElementById('pin-err').style.display='block';document.getElementById('t-pin').value='';return;}
+  document.getElementById('pin-err').style.display='none';
+  document.getElementById('t-pin').value='';
+  show('teacher-screen');
+  loadTeacher();
+}
+
+// ══ Teacher: load ════════════════════════════════════
+async function loadTeacher(){
+  const el=document.getElementById('t-list');
+  el.innerHTML='<div class="loader"><div class="spinner"></div>Загрузка...</div>';
+  try{
+    const raw=await fetch(API+'/latest',{headers:HDR});
+    const rawText=await raw.text();
+    console.log('JSONBin status:', raw.status, 'body:', rawText.slice(0,500));
+    if(!raw.ok){
+      if(raw.status===404||raw.status===400){
+        console.log('Bin empty, initialising...');
+        await putBin({submissions:[]});
+        _binData={submissions:[]};
+        renderTeacher();
+        return;
+      }
+      throw new Error('HTTP '+raw.status+': '+rawText.slice(0,200));
+    }
+    let parsed;
+    try{ parsed=JSON.parse(rawText); }
+    catch(pe){ throw new Error('JSON parse fail: '+rawText.slice(0,200)); }
+    const record = parsed.record !== undefined ? parsed.record : parsed;
+    console.log('record keys:', Object.keys(record));
+    if(Array.isArray(record)){
+      _binData={submissions:record};
+    } else if(record.submissions){
+      _binData=record;
+    } else {
+      console.warn('No submissions key:', JSON.stringify(record).slice(0,300));
+      _binData={submissions:[]};
+      const raw_str = JSON.stringify(record, null, 2).slice(0, 800);
+      el.innerHTML='<div class="t-empty" style="text-align:left;padding:16px;font-size:.72rem;opacity:.7;white-space:pre-wrap;">Бин пустой или неожиданная структура.\n\nСодержимое:\n'+raw_str+'</div>';
+      return;
+    }
+    renderTeacher();
+  }
+  catch(e){
+    console.error('loadTeacher error:', e);
+    el.innerHTML='<div class="t-empty">Ошибка загрузки: '+e.message+'</div>';
+  }
+}
+let _binData=null;
+
+function renderTeacher(){
+  const subs=_binData.submissions||[];
+  const el=document.getElementById('t-list');
+  if(!subs.length){el.innerHTML='<div class="t-empty">Пока нет сданных работ</div>';return;}
+  const sorted=[...subs].map((s,i)=>({...s,_i:i})).sort((a,b)=>{
+    if(a.published!==b.published)return a.published?1:-1;
+    return(b.at||'')>(a.at||'')?1:-1;
+  });
+  el.innerHTML=sorted.map(sub=>buildSubCard(sub,sub._i)).join('');
+}
+
+function buildSubCard(sub,i){
+  const scored = sub.score22 != null;
+  const total  = sub.totalAuto + (sub.score22 ?? 0);
+  const bCls   = sub.published ? 'badge-pub' : scored ? 'badge-ready' : sub.manual22 ? 'badge-wait' : 'badge-ready';
+  const bTxt   = sub.published ? '✓ Опубл.' : scored ? 'Проверено' : sub.manual22 ? '⚠ Ждёт' : 'Авто';
+  const scoreStr = scored ? gradeScore(total).toFixed(2) : '—';
+  const gradeStr = scored ? gradeOf(total) : '—';
+
+  // ── Task 22 review (always visible) ──
+  const s22now = sub.score22;
+  const manualBlock = sub.manual22
+    ? `<div class="t-section-lbl">📝 Задание 22 — развёрнутый ответ</div>
+       <div class="manual-box">${sub.manual22}</div>
+       <div class="score-row">
+         <span class="score-label">Оценка учителя:</span>
+         <button class="score-btn score-btn-num ${s22now===1?'sel-ok':''}" onclick="setScore22(${i},1)" ${s22now!=null?'disabled title="Балл уже выставлен"':''}>1</button>
+         <button class="score-btn score-btn-num ${s22now===0?'sel-bad':''}" onclick="setScore22(${i},0)" ${s22now!=null?'disabled title="Балл уже выставлен"':''}>0</button>
+         ${s22now!=null?'<span style="font-size:.7rem;opacity:.5;margin-left:4px;">🔒 зафиксировано</span>':''}
+       </div>
+       <details class="t-criteria-details"><summary class="t-criteria-summary">📋 Критерии и ключ</summary>
+         <div class="t-criteria-body">
+           <p><b>1 балл</b> — оба элемента:</p>
+           <ul><li>Кавказ/Камчатка/Курилы — границы литосферных плит (субдукция/коллизия)</li><li>З.Сибирь/Среднесибирское — центр плиты, вдали от границ</li></ul>
+           <p><b>0 баллов</b> — один элемент или неверное объяснение</p>
+           <p class="t-criteria-example"><b>Образцовый ответ:</b> Кавказ — зона столкновения Евразийской и Аравийской плит, Камчатка и Курилы — зона субдукции Тихоокеанской плиты под Евразийскую. Активное взаимодействие вызывает землетрясения и вулканизм. Западная Сибирь и Среднесибирское плоскогорье — центр Евразийской плиты, тектоническая активность минимальна.</p>
+         </div>
+       </details>`
+    : `<div style="font-size:.75rem;opacity:.5;margin-bottom:6px;font-style:italic;">Задание 22 не заполнено — балл 0 выставлен автоматически.</div>
+       <details class="t-criteria-details"><summary class="t-criteria-summary">📋 Критерии и ключ</summary>
+         <div class="t-criteria-body">
+           <p><b>1 балл</b> — оба элемента: (1) Кавказ/Камчатка/Курилы — границы плит; (2) З.Сибирь/Среднесибирское — центр платформы.</p>
+           <p><b>0 баллов</b> — только один элемент или ошибочное объяснение.</p>
+         </div>
+       </details>`;
+
+  // ── Scores block (hidden until score22 is set) ──
+  let scoresBlock = '';
+  if(scored){
+    let taskCells='';
+    for(let n=1;n<=21;n++){
+      const pts=(sub.scores||{})[n]||0, mx=TASK_MAX[n];
+      const cls = pts===mx?'tcell-ok':pts>0?'tcell-part':'tcell-bad';
+      taskCells+=`<div class="tcell-wrap"><div class="tcell-num">${n}</div><div class="t-tcell ${cls}">${pts}</div></div>`;
+    }
+    const s22cls = s22now===1?'tcell-ok':'tcell-bad';
+    taskCells+=`<div class="tcell-wrap"><div class="tcell-num">22</div><div class="t-tcell ${s22cls}">${s22now}</div></div>`;
+    scoresBlock = `
+      <div class="t-section-lbl" style="margin-top:10px;">📊 Баллы по заданиям</div>
+      <div class="t-tcells-grid">${taskCells}</div>
+      <div class="sub-total" style="margin-top:6px;">Итого: <b>${total}/${GRAND_MAX}</b> · ${gradeScore(total).toFixed(2)}/5</div>`;
+  } else {
+    scoresBlock = `<div class="t-pending-hint">⏳ Выставьте балл за задание 22, чтобы увидеть итоговый результат</div>`;
+  }
+
+  // ── Answer review button (shown only after scoring) ──
+  const reviewBtn = scored
+    ? `<button class="t-topbar-btn" style="margin:8px 0 4px;font-size:.75rem;padding:6px 14px;" onclick="showAnswerReview(${i})">🔎 Просмотр ответов ученика</button>`
+    : '';
+
+  const canPub = scored;
+  const pubBtn = `<button class="pub-btn ${sub.published?'repub':''}" ${canPub?'':'disabled'}
+    onclick="publishResult(${i})">${sub.published?'↻ Переопубликовать':'📤 Опубликовать результат'}</button>`;
+
+  return `<div class="sub-card" id="sc-${i}">
+    <div class="sub-head" onclick="toggleCard(${i})">
+      <span class="sub-name">${sub.surname} ${sub.name}</span>
+      <span class="sub-time">${sub.at||''}</span>
+      ${scored ? `<span class="sub-score-chip">${total}/${GRAND_MAX}</span><span class="sub-grade-chip grade-${gradeStr.replace('+','plus').replace('−','minus')}">${gradeStr}</span>` : ''}
+      <span class="badge ${bCls}">${bTxt}</span>
+    </div>
+    <div class="sub-body" id="sb-${i}">
+      ${manualBlock}
+      ${scoresBlock}
+      ${reviewBtn}
+      ${pubBtn}
+    </div>
+  </div>`;
+}
+
+
+function toggleCard(i){document.getElementById('sb-'+i).classList.toggle('open');}
+
+async function setScore22(i,val){
+  // Lock: cannot change score once set
+  if(_binData && _binData.submissions[i] && _binData.submissions[i].score22 != null){
+    toast('Балл уже выставлен и заблокирован от изменений', 3500);
+    return;
+  }
+  toast('Сохранение...');
+  try{
+    const data=await getBin();
+    if(data.submissions[i].score22 != null){
+      toast('Балл уже выставлен и заблокирован от изменений', 3500);
+      return;
+    }
+    data.submissions[i].score22=val;
+    _binData=data;
+    await putBin(data);
+    toast('✓ Балл сохранён и заблокирован');
+    renderTeacher();
+    document.getElementById('sb-'+i).classList.add('open');
+  }catch(e){console.error('setScore22 error:',e);toast('Ошибка сохранения: '+e.message,5000);}
+}
+
+async function publishResult(i){
+  toast('Публикация...');
+  try{
+    const data=await getBin();
+    const sub=data.submissions[i];
+    if(!sub.manual22&&sub.score22==null)sub.score22=0;
+    sub.published=true;
+    _binData=data;
+    await putBin(data);
+    toast('✓ Результат опубликован!');
+    renderTeacher();
+    document.getElementById('sb-'+i).classList.add('open');
+  }catch(e){console.error('publishResult error:',e);toast('Ошибка публикации: '+e.message,5000);}
+}
+
+
+async function deleteAllSubmissions(){
+  if(!confirm('Удалить ВСЕ результаты учеников? Это действие необратимо.')) return;
+  const count = (_binData?.submissions||[]).length;
+  if(count === 0){ toast('Нет результатов для удаления'); return; }
+  toast('Удаление...', 5000);
+  try{
+    const data = await getBin();
+    data.submissions = [];
+    _binData = data;
+    await putBin(data);
+    toast('✓ Все результаты удалены');
+    renderTeacher();
+  } catch(e){
+    console.error('deleteAll error:', e);
+    toast('Ошибка: ' + e.message, 5000);
+  }
+}
+
+async function diagBin(){
+  const el=document.getElementById('t-list');
+  el.innerHTML='<div class="loader"><div class="spinner"></div>Загрузка диагностики...</div>';
+  try{
+    const r=await fetch(API+'/latest',{headers:HDR});
+    const txt=await r.text();
+    el.innerHTML='<div style="padding:14px;font-size:.72rem;white-space:pre-wrap;opacity:.85;word-break:break-all;">HTTP '+r.status+'\n\n'+txt.slice(0,3000)+'</div>';
+  }catch(e){
+    el.innerHTML='<div style="padding:14px;font-size:.72rem;color:#FF9090;">Fetch error: '+e.message+'</div>';
+  }
+}
+
+
+// ══ Answer Review ════════════════════════════════════
+function closeReview(){
+  document.getElementById('review-overlay').classList.remove('open');
+}
+
+// ── Shared: build full task review HTML (used by teacher + student) ──
+function buildTaskReviewHTML(n, sa, ca, sc, sub, teacherMode){
+  const pts = (n <= 21 ? (sc[n] || 0) : (sub.score22 ?? 0));
+  const max = TASK_MAX[n] || (n===22 ? 1 : 0);
+
+  // ── Task definitions (full questions + choices) ──
+  const TASK_DEF = {
+    1:{
+      type:'multi',
+      q:'Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).',
+      sub:'Отметьте ВСЕ верные утверждения:',
+      choices: ORIG.t1
+    },
+    2:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'К какой эпохе складчатости относится формирование Уральских гор?',
+      choices: ORIG.t2
+    },
+    3:{
+      type:'short',
+      q:'Краткий ответ. По одной букве в каждую клетку, без пробелов.',
+      sub:'Нижний ярус платформы, сложенный древними деформированными породами, называется кристаллическим _______.'
+    },
+    4:{
+      type:'seq',
+      q:'Установите правильную последовательность. Запишите цифры подряд — по одной в каждую клетку.',
+      sub:'Стадии развития складчатой области — от первой к последней:',
+      choices: ORIG.t4
+    },
+    5:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'Что такое «плиты» в строении платформ?',
+      choices: ORIG.t5
+    },
+    6:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'В результате какого процесса образуются возрождённые горы?',
+      choices: ORIG.t6
+    },
+    7:{
+      type:'short',
+      q:'Краткий ответ. По одной букве в каждую клетку, без пробелов.',
+      sub:'Горы Южной Сибири — Алтай, Саяны, хребты Забайкалья — пережили несколько эпох складчатости и превратились в складчато-глыбовые. Как называется такой тип гор?'
+    },
+    8:{
+      type:'match',
+      labels:['А','Б','В','Г'],
+      q:'Заполните пропуски. Запишите номер подходящего слова под каждой буквой. Два номера лишние.',
+      sub:'Платформы имеют двухъярусное строение: нижний ярус — (А), выходы на поверхность — (Б), верхний ярус — (В), связанные с ним (Г) полезные ископаемые.',
+      refs: ORIG.t8r,
+      lefts:['А — нижний ярус','Б — выходы фундамента','В — верхний ярус','Г — тип ископаемых']
+    },
+    9:{
+      type:'match',
+      labels:['А','Б','В','Г'],
+      q:'Установите соответствие. Запишите номер из правого столбца под каждой буквой. Два номера лишние.',
+      sub:'',
+      lefts:['А — Древняя платформа','Б — Молодая платформа','В — Молодые складчатые области','Г — Древние складчатые области'],
+      refs: ORIG.t9r
+    },
+    10:{
+      type:'multi',
+      q:'Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).',
+      sub:'Отметьте ВСЕ верные утверждения:',
+      choices: ORIG.t10
+    },
+    11:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'Какой вид выветривания приводит к образованию карстовых воронок и пустот в известняках?',
+      choices: ORIG.t11
+    },
+    12:{
+      type:'multi',
+      q:'Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).',
+      sub:'Отметьте ВСЕ верные утверждения:',
+      choices: ORIG.t12
+    },
+    13:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'Где в России особенно широко распространён мерзлотный рельеф?',
+      choices: ORIG.t13
+    },
+    14:{
+      type:'short',
+      q:'Краткий ответ. По одной букве в каждую клетку, без пробелов.',
+      sub:'Здания и сооружения в районах многолетней мерзлоты возводят на _______, чтобы избежать просадки грунта при его оттаивании.'
+    },
+    15:{
+      type:'multi',
+      q:'Выберите ВСЕ правильные ответы. Запишите их номера в клетки подряд (порядок не важен).',
+      sub:'Отметьте ВСЕ верные утверждения:',
+      choices: ORIG.t15
+    },
+    16:{
+      type:'short',
+      q:'Краткий ответ. По одной букве в каждую клетку, без пробелов.',
+      sub:'Крупное скопление полезных ископаемых, имеющее промышленное значение, называется _______.'
+    },
+    17:{
+      type:'match',
+      labels:['А','Б','В','Г'],
+      q:'Установите соответствие. Запишите номер из правого столбца под каждой буквой. Один номер лишний.',
+      sub:'',
+      lefts:['А — Природный газ','Б — Золото','В — Асбест','Г — Калийные соли'],
+      refs: ORIG.t17r
+    },
+    18:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'Железные руды Курской магнитной аномалии приурочены к:',
+      choices: ORIG.t18
+    },
+    19:{
+      type:'single',
+      q:'Выберите ОДИН правильный ответ. Запишите его номер в клетку.',
+      sub:'Какой вывод следует из того, что большинство крупных рек России течёт на север?',
+      choices: ORIG.t19
+    },
+    20:{
+      type:'match',
+      labels:['А','Б','В'],
+      q:'Установите соответствие между слоями горных пород, обозначенными на рисунке буквами, и геологическими эрами.',
+      sub:'',
+      img:'data:image/jpeg;base64,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',
+      imgAlt:'Профиль геологического строения',
+      lefts:['А — слой А','Б — слой Б','В — слой В'],
+      refs:[{num:1,text:'мезозойская'},{num:2,text:'протерозойская'},{num:3,text:'кайнозойская'}]
+    },
+    21:{
+      type:'short',
+      q:'В тексте говорится об участках платформ, где кристаллический фундамент перекрыт осадочным чехлом. Запишите географический термин, которым обозначают такие участки.',
+      sub:'Ответ:',
+      vprText:true,
+      img:'data:image/jpeg;base64,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',
+      imgAlt:'Профиль геологического строения'
+    },
+    22:{
+      type:'manual',
+      q:'Используя текст и свои знания, объясните, почему землетрясения и вулканизм сосредоточены именно на Кавказе, Камчатке и Курильских островах, а не на Западно-Сибирской равнине или Среднесибирском плоскогорье.',
+      sub:'',
+      vprText:true,
+      criteria:`<div class="review-criteria"><div class="review-criteria-title">📋 Критерии проверки</div><div class="review-criteria-body"><p><b>1 балл</b> — ответ содержит оба элемента:</p><ul><li>Кавказ, Камчатка и Курилы находятся на границах литосферных плит (зоны субдукции / коллизии), где происходит активное взаимодействие плит</li><li>Западная Сибирь и Среднесибирское плоскогорье расположены в центре платформ — вдали от границ плит, поэтому сейсмически и вулканически неактивны</li></ul><p><b>0 баллов</b> — ответ неполный, содержит только один элемент, или объяснение неверное</p><p style="margin-top:8px;font-style:italic;opacity:.7"><b>Примерный ответ:</b> Кавказ, Камчатка и Курильские острова расположены на границах литосферных плит: Кавказ — в зоне столкновения Евразийской и Аравийской плит, Камчатка и Курилы — в зоне субдукции Тихоокеанской плиты под Евразийскую. На этих границах происходит активное взаимодействие плит, что вызывает землетрясения и вулканизм. Западная Сибирь и Среднесибирское плоскогорье находятся в центре Евразийской плиты, вдали от её границ, поэтому тектоническая активность здесь минимальна.</p></div></div>`
+    }
+  };
+
+  const def  = TASK_DEF[n];
+  const type = def.type;
+  let bodyHtml = '';
+
+  // ── Prepend VPR text block if needed ──
+  if(def.vprText){
+    bodyHtml += `<div class="review-vpr-text-wrap">
+      <div class="review-vpr-title">Тектоническое строение и рельеф России: от равнин до молодых гор</div>
+      <div class="review-vpr-text">Западно-Сибирская равнина — одна из крупнейших низменных равнин мира. В её основании лежит молодая платформа, кристаллический фундамент которой глубоко погружён под мощный осадочный чехол. Там, где фундамент перекрыт осадочными породами, формируются обширные плоские участки, заболоченные низменности. Именно с этим осадочным чехлом связаны крупнейшие в России месторождения нефти и природного газа.<br><br>К востоку от Западно-Сибирской равнины поверхность заметно поднимается — начинается Среднесибирское плоскогорье. Здесь кристаллический фундамент Сибирской платформы в ряде мест выходит на поверхность. С этими выходами фундамента связаны месторождения железных руд, медно-никелевых руд и других металлов.<br><br>На севере Западно-Сибирской равнины и в Среднесибирском плоскогорье широко распространена многолетняя мерзлота. Строительство здесь затруднено: при нагревании грунта от зданий мёрзлые породы оттаивают и проседают.<br><br>На крайнем юго-западе России, между Чёрным и Каспийским морями, поднимается Большой Кавказ. Эти горы молодые: они образовались в кайнозойскую эру в ходе альпийской эпохи складчатости и продолжают расти до сих пор. Литосферные плиты в этом районе продолжают сближаться, что обусловливает высокую сейсмическую активность. Похожая ситуация наблюдается на Камчатке и Курильских островах, где Тихоокеанская плита погружается под Евразийскую: здесь часты сильные землетрясения и действуют многочисленные вулканы.</div>
+    </div>`;
+  }
+
+  // ── Prepend image if defined ──
+  if(def.img){
+    bodyHtml += `<div style="margin-bottom:10px;"><img src="${def.img}" alt="${def.imgAlt||''}" style="max-width:100%;border-radius:4px;border:1px solid #E8D8B8;"></div>`;
+  }
+
+  // ── Choice list renderer ──
+  function renderChoices(choices, studentAns, correctAns){
+    // studentAns: array (multi) or string (single/seq)
+    const studentSet = Array.isArray(studentAns) ? new Set(studentAns.map(String)) : new Set([String(studentAns)]);
+    const correctSet = Array.isArray(correctAns) ? new Set(correctAns.map(String)) : new Set([String(correctAns)]);
+    return choices.map(c => {
+      const numStr = String(c.num);
+      const chosen  = studentSet.has(numStr);
+      const correct = correctSet.has(numStr);
+      let cls = '';
+      let icon = '';
+      if(chosen && correct)  { cls='chosen-ok';  icon='✓ '; }
+      else if(chosen && !correct){ cls='chosen-bad'; icon='✗ '; }
+      else if(!chosen && correct){ cls='missed';    icon='→ '; }
+      return `<div class="review-choice ${cls}">
+        <span class="review-choice-num">${icon}${c.num}.</span>
+        <span>${c.text}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Cells renderer ──
+  // cellsRow: values=student answer string, corrects=correct string, allGreen=force all ok
+  function cellsRow(values, corrects, allGreen){
+    const vArr = typeof values === 'string' ? values.split('') : (Array.isArray(values) ? values : []);
+    const cArr = typeof corrects === 'string' ? corrects.split('') : (Array.isArray(corrects) ? corrects : []);
+    const len  = Math.max(vArr.length, cArr.length, 3);
+    let out = '';
+    for(let k=0;k<len;k++){
+      const v = (vArr[k]||'').toUpperCase();
+      const c = (cArr[k]||'').toUpperCase();
+      const filled = !!v;
+      const ok = allGreen ? filled : (filled && v === c);
+      out += `<div class="review-cell ${filled ? (ok?'ok':'bad') : 'empty'}">${v||'·'}</div>`;
+    }
+    return out;
+  }
+
+  if(type==='single'){
+    const ans = sa[n] || '';
+    const cor = ca[n] || '';
+    bodyHtml = `<div class="review-sub">${def.sub}</div>`;
+    if(def.choices) bodyHtml += `<div class="review-choices">${renderChoices(def.choices, ans, cor)}</div>`;
+    bodyHtml += `<div class="review-cells-wrap">
+      <span class="review-cell-lbl">Ответ:</span>
+      <div class="review-cells">
+        <div class="review-cell ${ans?(ans===cor?'ok':'bad'):'empty'}">${ans||'·'}</div>
+      </div>
+    </div>`;
+    if(ans !== cor) bodyHtml += `<div class="review-answer-line">Правильный ответ: <b>${cor}</b></div>`;
+  }
+  else if(type==='multi'){
+    const entered   = Array.isArray(sa[n]) ? sa[n] : [];
+    const correctArr= Array.isArray(ca[n]) ? ca[n] : [];
+    const correctSet= new Set(correctArr.map(String));
+    bodyHtml = `<div class="review-sub">${def.sub}</div>`;
+    if(def.choices) bodyHtml += `<div class="review-choices">${renderChoices(def.choices, entered, correctArr)}</div>`;
+    const cells = entered.map(v => {
+      const ok = correctSet.has(String(v));
+      return `<div class="review-cell ${ok?'ok':'bad'}">${v}</div>`;
+    }).join('');
+    bodyHtml += `<div class="review-cells-wrap">
+      <span class="review-cell-lbl">Ответ:</span>
+      <div class="review-cells">${cells||'<div class="review-cell empty">·</div>'}</div>
+    </div>`;
+    const missed = correctArr.filter(v=>!new Set(entered.map(String)).has(String(v)));
+    if(missed.length) bodyHtml += `<div class="review-answer-line">Правильные, не указанные: <b>${missed.join(', ')}</b></div>`;
+  }
+  else if(type==='seq'){
+    const entered = Array.isArray(sa[n]) ? sa[n] : (typeof sa[n]==='string'?sa[n].split(''):[]);
+    const corStr  = typeof ca[n]==='string' ? ca[n] : (Array.isArray(ca[n])?ca[n].join(''):ca[n]||'');
+    bodyHtml = `<div class="review-sub">${def.sub}</div>`;
+    if(def.choices) bodyHtml += `<div class="review-choices">${def.choices.map(c=>`<div class="review-choice"><span class="review-choice-num">${c.num}.</span><span>${c.text}</span></div>`).join('')}</div>`;
+    bodyHtml += `<div class="review-cells-wrap">
+      <span class="review-cell-lbl">Ответ:</span>
+      <div class="review-cells">${cellsRow(entered, corStr.split(''))}</div>
+    </div>`;
+    if(entered.join('') !== corStr) bodyHtml += `<div class="review-answer-line">Правильная последовательность: <b>${corStr}</b></div>`;
+  }
+  else if(type==='match'){
+    const labels  = def.labels || [];
+    const student = Array.isArray(sa[n]) ? sa[n] : [];
+    const correct = Array.isArray(ca[n]) ? ca[n] : [];
+    // Use saved shuffled refs if available, otherwise fall back to def.refs
+    const refsToShow = sa['refs'+n] || def.refs;
+    if(refsToShow){
+      bodyHtml += `<div class="review-refs">`;
+      refsToShow.forEach(r => { bodyHtml += `<span class="review-ref-chip"><b>${r.num}.</b> ${r.text}</span>`; });
+      bodyHtml += `</div>`;
+    }
+    // Left column items
+    if(def.lefts){
+      bodyHtml += `<div class="review-match-table">`;
+      def.lefts.forEach((lft, idx2) => {
+        const sv = student[idx2] || '';
+        const cv = correct[idx2]  || '';
+        const ok = sv && sv === cv;
+        bodyHtml += `<div class="review-match-tr">
+          <div class="review-match-left">${lft}</div>
+          <div class="review-match-cell ${sv?(ok?'ok':'bad'):'empty'}">${sv||'·'}</div>
+          ${!ok && cv ? `<div class="review-match-correct">→ ${cv}</div>` : '<div></div>'}
+        </div>`;
+      });
+      bodyHtml += `</div>`;
+    } else {
+      const cells = labels.map((lbl,idx2) => {
+        const sv = student[idx2]||''; const cv = correct[idx2]||'';
+        return `<div class="review-match-lbl-wrap"><div class="review-match-lbl">${lbl}</div><div class="review-match-cell ${sv?(sv===cv?'ok':'bad'):'empty'}">${sv||'·'}</div></div>`;
+      }).join('');
+      bodyHtml += `<div class="review-match-row">${cells}</div>`;
+    }
+  }
+  else if(type==='short'){
+    const ans = typeof sa[n]==='string' ? sa[n] : (Array.isArray(sa[n])?sa[n].join(''):sa[n]||'');
+    // ca is now always an array of valid variants
+    const variants = Array.isArray(ca[n]) ? ca[n] : (ca[n] ? [ca[n]] : []);
+    const ansUp = ans.toUpperCase();
+    // Find matching variant (whole-word)
+    const matchedVariant = variants.find(v => v.toUpperCase() === ansUp);
+    const isCorrect = !!matchedVariant;
+    // For cell coloring: if correct use matched variant (all green), else use first variant for per-letter hint
+    const refVariant = matchedVariant || variants[0] || '';
+    bodyHtml = `<div class="review-sub">${def.sub}</div>
+    <div class="review-cells-wrap">
+      <span class="review-cell-lbl">Ответ:</span>
+      <div class="review-cells">${cellsRow(ans, refVariant, isCorrect)}</div>
+    </div>`;
+    if(!isCorrect){
+      const varList = variants.map(v=>`<b>${v}</b>`).join(' или ');
+      bodyHtml += `<div class="review-answer-line">Правильный ответ: ${varList}</div>`;
+    } else if(variants.length > 1){
+      const varList = variants.map(v=>`<b>${v}</b>`).join(' или ');
+      bodyHtml += `<div class="review-answer-line" style="color:#2D5A1B;">✓ Принимается любой из вариантов: ${varList}</div>`;
+    }
+  }
+  else if(type==='manual'){
+    const s22 = sub.score22 ?? null;
+    if(sub.manual22){
+      bodyHtml = `<div class="review-manual-box">${sub.manual22}</div>`;
+      if(s22 !== null) bodyHtml += `<div class="review-score-line">Балл: <span class="${s22>0?'review-score-ok':'review-score-bad'}">${s22}/1</span></div>`;
+      else bodyHtml += `<div class="review-score-line" style="opacity:.45">Ожидает проверки учителем</div>`;
+    } else {
+      bodyHtml = `<div class="review-score-line"><i style="opacity:.5">Ответ не заполнен.</i> Балл: <span class="review-score-bad">0/1</span></div>`;
+    }
+    if(def.criteria) bodyHtml += def.criteria;
+  }
+
+  const pCls = pts===max ? 'pts-ok' : pts>0 ? 'pts-part' : 'pts-bad';
+  const badge = n===22 && sub.score22===null ? '' : `<span class="review-pts-badge ${pCls}">${pts}/${max} б.</span>`;
+  const vpr   = n >= 20 ? ' review-task-vpr' : '';
+  return `<div class="review-task${vpr}">
+    <div class="review-task-head">
+      <span class="review-task-num">Задание ${n}</span>
+      ${badge}
+      <span class="review-task-q">${def.q}</span>
+    </div>
+    <div class="review-task-body">${bodyHtml}</div>
+  </div>`;
+}
+
+// ── Teacher: open answer review ──
+function showAnswerReview(i){
+  const sub = _binData.submissions[i];
+  const sa  = sub.studentAnswers || {};
+  const ca  = sub.correctAnswers || {};
+  const sc  = sub.scores || {};
+
+  document.getElementById('review-title').textContent =
+    'Ответы: ' + sub.surname + ' ' + sub.name + ' · ' + (sub.at||'');
+  document.getElementById('review-delete-btn').style.display = 'inline-block';
+  document.getElementById('review-delete-btn').onclick = () => deleteSubmission(i);
+
+  let out = '';
+  for(let n=1; n<=22; n++) out += buildTaskReviewHTML(n, sa, ca, sc, sub, true);
+  document.getElementById('review-content').innerHTML = out;
+  const ov = document.getElementById('review-overlay');
+  ov.classList.add('open');
+  ov.scrollTop = 0;
+}
+
+// ── Delete submission ──
+async function deleteSubmission(i){
+  if(!confirm('Удалить результаты этого ученика? Это действие нельзя отменить.')) return;
+  closeReview();
+  toast('Удаление...', 5000);
+  try{
+    const data = await getBin();
+    data.submissions.splice(i, 1);
+    _binData = data;
+    await putBin(data);
+    toast('✓ Результат удалён');
+    renderTeacher();
+  } catch(e){
+    console.error('deleteSubmission error:', e);
+    toast('Ошибка удаления: ' + e.message, 5000);
+  }
+}
+
+// ── Student: open own answer review (after result published) ──
+function showStudentReview(sub){
+  const sa = sub.studentAnswers || {};
+  const ca = sub.correctAnswers || {};
+  const sc = sub.scores || {};
+
+  document.getElementById('review-title').textContent =
+    'Разбор: ' + sub.surname + ' ' + sub.name;
+  document.getElementById('review-delete-btn').style.display = 'none';
+
+  let out = '';
+  for(let n=1; n<=22; n++) out += buildTaskReviewHTML(n, sa, ca, sc, sub, false);
+  document.getElementById('review-content').innerHTML = out;
+  const ov = document.getElementById('review-overlay');
+  ov.classList.add('open');
+  ov.scrollTop = 0;
+}
+
+
+// ══ Keyboard shortcuts ═══════════════════════════════
+document.getElementById('s-surname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('s-name').focus();});
+document.getElementById('s-name').addEventListener('keydown',e=>{if(e.key==='Enter')startExam();});
+document.getElementById('r-surname').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('r-name').focus();});
+document.getElementById('r-name').addEventListener('keydown',e=>{if(e.key==='Enter')getResult();});
+</script>
+
+<!-- ═══════════ ANSWER REVIEW OVERLAY ═══════════ -->
+<div id="review-overlay">
+  <div class="review-wrap">
+    <div class="review-header">
+      <div class="review-title" id="review-title">Ответы ученика</div>
+      <button class="review-close" id="review-delete-btn" style="display:none;background:rgba(200,60,40,.25);border-color:rgba(200,60,40,.5);color:#FF9090;margin-right:6px;" onclick="">🗑 Удалить</button>
+      <button class="review-close" onclick="closeReview()">✕ Закрыть</button>
+    </div>
+    <div id="review-content"></div>
+  </div>
+</div>
+</body>
+</html>
