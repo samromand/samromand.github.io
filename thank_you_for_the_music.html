@@ -773,34 +773,56 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 16px 20px;
+    padding: 16px 24px;
     margin-bottom: 28px;
     box-shadow: var(--shadow);
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 18px;
     animation: fadeDown 0.6s 0.15s ease both;
   }
 
-  .player-label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent);
-    white-space: nowrap;
+  .player-play-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(200,135,58,0.35);
+    transition: opacity 0.15s, transform 0.1s;
+    line-height: 1;
   }
+  .player-play-btn:hover  { opacity: 0.88; }
+  .player-play-btn:active { transform: scale(0.94); }
+  .player-play-btn:disabled { background:#ccc; box-shadow:none; cursor:not-allowed; opacity:0.5; }
 
-  .player-wrap audio {
-    flex: 1;
-    min-width: 0;
-    height: 36px;
-    accent-color: var(--accent);
+  .player-info { display:flex; flex-direction:column; gap:3px; flex:1; }
+
+  .player-title { font-size:14px; font-weight:600; color:var(--text); }
+
+  .player-counter { font-size:12px; color:var(--muted); }
+  .player-counter .counter-val { font-weight:700; color:var(--accent); }
+
+  .player-now-playing {
+    font-size:12px; color:var(--accent); font-weight:600;
+    display:none; align-items:center; gap:5px;
   }
+  .player-now-playing.visible { display:flex; }
 
-  .player-wrap audio::-webkit-media-controls-panel {
-    background: var(--surface);
+  .player-pulse {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--accent);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { transform:scale(1); opacity:1; }
+    50%      { transform:scale(1.5); opacity:0.5; }
   }
 
 
@@ -2262,10 +2284,17 @@
   </div>
 
   <div class="player-wrap">
-    <span class="player-label">&#9835; Listen</span>
-    <audio controls src="abba_thank_you.mp3">
-      Your browser does not support the audio element.
-    </audio>
+    <button class="player-play-btn" id="player-btn" onclick="playerPlay()">&#9654;</button>
+    <div class="player-info">
+      <div class="player-title">&#9835; Thank You for the Music — ABBA</div>
+      <div class="player-counter" id="player-counter">
+        <span class="counter-val">2</span> listens remaining
+      </div>
+      <div class="player-now-playing" id="player-now-playing">
+        <div class="player-pulse"></div> Now playing…
+      </div>
+    </div>
+    <audio id="player-audio" src="abba_thank_you.mp3" onended="playerOnEnded()"></audio>
   </div>
 
   <div class="lyrics-card" id="lyrics"></div>
@@ -5076,6 +5105,77 @@ function closeCertChooser() {
 document.getElementById('cert-chooser').addEventListener('click', e => {
   if (e.target === document.getElementById('cert-chooser')) closeCertChooser();
 });
+
+
+// ─── Custom audio player (2 listens, no seek, no pause) ───────────────────────
+let playerListensLeft = 2;
+let playerPlaying     = false;
+let playerLastTime    = 0;
+
+function playerPlay() {
+  if (playerListensLeft <= 0 || playerPlaying) return;
+  const audio = document.getElementById('player-audio');
+  const btn   = document.getElementById('player-btn');
+
+  audio.currentTime = 0;
+  playerLastTime = 0;
+
+  audio.addEventListener('timeupdate', playerTrackTime);
+  audio.addEventListener('seeking',    playerBlockSeek);
+
+  audio.play().then(() => {
+    playerPlaying = true;
+    btn.disabled = true;
+    btn.style.opacity = '0.35';
+    document.getElementById('player-now-playing').classList.add('visible');
+    updatePlayerCounter();
+  }).catch(err => {
+    console.error('Audio play error:', err);
+    audio.removeEventListener('timeupdate', playerTrackTime);
+    audio.removeEventListener('seeking', playerBlockSeek);
+  });
+}
+
+function playerTrackTime() {
+  const audio = document.getElementById('player-audio');
+  if (playerPlaying) playerLastTime = audio.currentTime;
+}
+
+function playerBlockSeek() {
+  const audio = document.getElementById('player-audio');
+  audio.currentTime = playerLastTime;
+}
+
+function playerOnEnded() {
+  const audio = document.getElementById('player-audio');
+  audio.removeEventListener('timeupdate', playerTrackTime);
+  audio.removeEventListener('seeking',    playerBlockSeek);
+
+  playerPlaying = false;
+  playerListensLeft = Math.max(0, playerListensLeft - 1);
+
+  document.getElementById('player-now-playing').classList.remove('visible');
+
+  const btn = document.getElementById('player-btn');
+  if (playerListensLeft > 0) {
+    btn.disabled = false;
+    btn.style.opacity = '';
+  } else {
+    btn.innerHTML = '&#9646;&#9646;';
+    btn.disabled = true;
+  }
+  updatePlayerCounter();
+}
+
+function updatePlayerCounter() {
+  const el = document.getElementById('player-counter');
+  if (playerListensLeft === 0) {
+    el.innerHTML = '<span class="counter-val" style="color:var(--wrong)">No listens remaining</span>';
+  } else {
+    el.innerHTML = '<span class="counter-val">' + playerListensLeft + '</span> listen' + (playerListensLeft !== 1 ? 's' : '') + ' remaining';
+  }
+}
+
 
 </script>
 </body>
