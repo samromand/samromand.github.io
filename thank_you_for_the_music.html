@@ -5107,21 +5107,14 @@ document.getElementById('cert-chooser').addEventListener('click', e => {
 });
 
 
-// ─── Custom audio player (2 listens, no seek, no pause) ───────────────────────
+// ─── Custom audio player (2 listens, no pause UI) ─────────────────────────────
 let playerListensLeft = 2;
 let playerPlaying     = false;
-let playerLastTime    = 0;
 
 function playerPlay() {
   if (playerListensLeft <= 0 || playerPlaying) return;
   const audio = document.getElementById('player-audio');
   const btn   = document.getElementById('player-btn');
-
-  audio.currentTime = 0;
-  playerLastTime = 0;
-
-  audio.addEventListener('timeupdate', playerTrackTime);
-  audio.addEventListener('seeking',    playerBlockSeek);
 
   audio.play().then(() => {
     playerPlaying = true;
@@ -5131,26 +5124,10 @@ function playerPlay() {
     updatePlayerCounter();
   }).catch(err => {
     console.error('Audio play error:', err);
-    audio.removeEventListener('timeupdate', playerTrackTime);
-    audio.removeEventListener('seeking', playerBlockSeek);
   });
 }
 
-function playerTrackTime() {
-  const audio = document.getElementById('player-audio');
-  if (playerPlaying) playerLastTime = audio.currentTime;
-}
-
-function playerBlockSeek() {
-  const audio = document.getElementById('player-audio');
-  audio.currentTime = playerLastTime;
-}
-
 function playerOnEnded() {
-  const audio = document.getElementById('player-audio');
-  audio.removeEventListener('timeupdate', playerTrackTime);
-  audio.removeEventListener('seeking',    playerBlockSeek);
-
   playerPlaying = false;
   playerListensLeft = Math.max(0, playerListensLeft - 1);
 
