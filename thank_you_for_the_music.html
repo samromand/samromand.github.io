@@ -2312,6 +2312,9 @@
     </div>
     <button class="rank-refresh-btn" id="rank-refresh-btn" onclick="refreshRank()">&#8635; Refresh rank</button>
   </div>
+  <div id="quiz-cert-wrap" style="text-align:center;display:none;margin-top:16px">
+    <button class="cert-download-btn" onclick="downloadMyCertificate()">🎓 Download my certificate</button>
+  </div>
 
 </div>
 <script>
@@ -3621,6 +3624,15 @@ async function checkAnswers() {
   launchScoreAnimation(pct);
 
   if (currentUser) {
+    // Populate myAlreadyResult so cert button works immediately after check
+    myAlreadyResult = {
+      id:         currentAttemptId,
+      name:       currentUser,
+      correct,
+      total,
+      pct,
+      finishedAt: new Date().toISOString(),
+    };
     // Small delay to avoid JSONBin rate limit after registerAttempt
     await new Promise(r => setTimeout(r, 2000));
     saveResult(correct, total, pct, answersSnapshot).then(() => {
@@ -5069,7 +5081,56 @@ async function downloadMyCertificate(showScore) {
 }
 
 
-// ─── Certificate chooser ───────────────────────────────────────────────────────
+// ─── Live rank (shown after Check in quiz view) ────────────────────────────────
+async function fetchAndShowRank() {
+  try {
+    const data = await readBin();
+    const finished = (data.results || []).filter(r =>
+      r.status === 'finished' && r.name !== 'Varvara Akimova'
+    );
+    finished.sort((a, b) => {
+      if (b.correct !== a.correct) return b.correct - a.correct;
+      return new Date(a.finishedAt) - new Date(b.finishedAt);
+    });
+    const total  = finished.length;
+    const myIdx  = finished.findIndex(r => r.id === currentAttemptId);
+    const rank   = myIdx + 1;
+    const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+    myAlreadyRank = myIdx >= 0 ? rank : null;
+    // Update myAlreadyResult with server data if available
+    if (myIdx >= 0) myAlreadyResult = finished[myIdx];
+
+    const banner = document.getElementById('rank-banner');
+    banner.classList.add('visible');
+    document.getElementById('rank-medal').textContent = medals[rank] || '🎵';
+
+    const ordinals = ['','1st','2nd','3rd'];
+    const ord = ordinals[rank] || rank + 'th';
+    if (myIdx === -1) {
+      document.getElementById('rank-position').textContent = 'Rank pending';
+      document.getElementById('rank-detail').textContent = ' Rank pending';
+    } else {
+      document.getElementById('rank-position').textContent = ord + ' place out of ' + total;
+      document.getElementById('rank-detail').textContent = rank === 1 ? ' You\'re leading! 🎉' : ' Well done!';
+    }
+
+    // Show cert button if quiz is closed
+    if (data.quizClosed && myIdx >= 0) {
+      document.getElementById('quiz-cert-wrap').style.display = 'block';
+    }
+  } catch(e) { console.error('fetchAndShowRank failed', e); }
+}
+
+async function refreshRank() {
+  const btn = document.getElementById('rank-refresh-btn');
+  btn.classList.add('spinning');
+  btn.innerHTML = '&#8635; Updating…';
+  await fetchAndShowRank();
+  btn.classList.remove('spinning');
+  btn.innerHTML = '&#8635; Refresh rank';
+}
+
+
 let _certChooserMode = 'staff';
 
 function showCertChooser(mode) {
