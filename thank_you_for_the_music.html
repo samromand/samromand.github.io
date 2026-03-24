@@ -1889,6 +1889,71 @@
     text-decoration: underline;
   }
 
+
+  /* ── Quiz closing timer ─────────────────────────────────────────────────── */
+  #closing-timer {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 8000;
+    background: var(--surface);
+    border: 2px solid var(--wrong);
+    border-radius: 20px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.25);
+    padding: 36px 44px 32px;
+    text-align: center;
+    min-width: 280px;
+    animation: fadeUp 0.3s ease both;
+  }
+  #closing-timer.visible { display: block; }
+  .closing-timer-icon { font-size: 36px; margin-bottom: 12px; }
+  .closing-timer-title {
+    font-family: "DM Serif Display", serif;
+    font-size: 22px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .closing-timer-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .closing-timer-count {
+    font-family: "DM Serif Display", serif;
+    font-size: 56px;
+    color: var(--wrong);
+    line-height: 1;
+    margin-bottom: 16px;
+    transition: color 0.3s;
+  }
+  .closing-timer-count.urgent { color: #c0392b; }
+  .closing-timer-btn {
+    font-family: "DM Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 28px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(200,135,58,0.3);
+    transition: opacity 0.15s;
+  }
+  .closing-timer-btn:hover { opacity: 0.9; }
+  /* Backdrop */
+  #closing-timer-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 7999;
+  }
+  #closing-timer-backdrop.visible { display: block; }
+
 </style>
 </head>
 <body>
@@ -2082,6 +2147,17 @@
   </div>
 </div>
 
+
+<!-- ── Quiz closing timer ────────────────────────────────────────────────── -->
+<div id="closing-timer-backdrop"></div>
+<div id="closing-timer">
+  <div class="closing-timer-icon">⏱️</div>
+  <div class="closing-timer-title">Quiz is closing!</div>
+  <div class="closing-timer-sub">Submit your answers now.<br>Your progress will be saved automatically.</div>
+  <div class="closing-timer-count" id="closing-timer-count">30</div>
+  <button class="closing-timer-btn" onclick="checkAnswers()">✅ Submit now</button>
+</div>
+
 <!-- ── Quiz closed screen ────────────────────────────────────────────────── -->
 <div id="quiz-closed-screen" style="display:none">
   <div class="quiz-closed-card">
@@ -2099,7 +2175,7 @@
 <div id="already-screen" style="display:none">
   <div class="already-wrap">
     <div style="text-align:right;margin-bottom:16px">
-      <button class="main-btn btn-reset" onclick="location.reload()" style="font-size:13px;padding:8px 18px">&#8962; Home</button>
+      <button class="main-btn btn-reset" onclick="homeWithSave()" style="font-size:13px;padding:8px 18px">&#8962; Home</button>
     </div>
     <div class="already-header">
       <div class="already-icon">✅</div>
@@ -2301,8 +2377,7 @@
 
   <div class="controls">
     <button class="main-btn btn-check" onclick="checkAnswers()">Check answers</button>
-    <button class="main-btn btn-reset" onclick="resetAll()">Reset</button>
-    <button class="main-btn btn-reset" onclick="location.reload()">&#8962; Home</button>
+    <button class="main-btn btn-reset" onclick="homeWithSave()">&#8962; Home</button>
   </div>
   <div class="score-banner" id="score"></div>
   <div class="rank-banner" id="rank-banner">
@@ -2353,6 +2428,7 @@ const HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY, '
 
 let currentUser = null;   // set after student login
 let currentAttemptId = null;
+let pendingDraft = null;  // draft to restore when quiz starts
 
 // ─── Called right after student PIN login ──────────────────────────────────────
 async function registerAttempt(name) {
@@ -2602,12 +2678,13 @@ function renderList(results) {
   }
   list.innerHTML = '';
   results.forEach(r => {
-    const isFinished = r.status === 'finished';
+    const isFinished = r.status === 'finished' || r.status === 'draft-finalized';
     const isManual   = r.source === 'manual';
     const canExpand  = isFinished && !isManual && r.answers && r.answers.length > 0;
 
     const statusClass = isManual ? 'manual'
       : isFinished       ? 'finished'
+      : r.status === 'draft-finalized' ? 'finished'
       : r.status === 'active'    ? 'active'
       : 'briefing';
 
@@ -2619,7 +2696,8 @@ function renderList(results) {
     const time = isFinished
       ? `Finished ${formatTime(r.finishedAt)}`
       : `Joined ${formatTime(r.startedAt)}`;
-    const manualTag  = isManual ? `<span class="manual-tag">paper</span>` : '';
+    const isDraft    = r.source === 'draft';
+    const manualTag  = isManual ? `<span class="manual-tag">paper</span>` : isDraft ? `<span class="manual-tag" style="background:#e8f0fe;color:#3a5cc5">draft</span>` : '';
     const scoreHtml  = isFinished
       ? `<div class="result-score ${isManual ? 'manual-score' : ''}">${r.correct}<span style="font-size:14px;color:var(--muted)">/300</span></div>`
       : statusPills[r.status]
@@ -2981,6 +3059,52 @@ async function checkPin() {
       data = await readBin();
       const results = data.results || [];
       existingResult = results.find(r => r.name === name && r.status === 'finished');
+      // Also treat draft-finalized as completed
+      if (!existingResult) {
+        const dfResult = results.find(r => r.name === name && r.status === 'draft-finalized');
+        if (dfResult) {
+          // Calculate score from draft client-side
+          if (dfResult.draft && !dfResult.correct) {
+            // Init quiz silently to get cell answers, then score
+            initQuiz(null); // build DOM to get dataset.answer values
+            let correct = 0, total = 0;
+            const answersSnapshot = [];
+            allCells.forEach((cell, i) => {
+              const d = dfResult.draft[i];
+              if (!d) return;
+              const isPrimary = !cell.dataset.syncId || cell.dataset.primary === '1';
+              if (!isPrimary) return;
+              const answer = cell.dataset.answer || '';
+              const typed  = d.val || '';
+              const hinted = !!d.hinted;
+              total++;
+              if (!hinted && typed.toLowerCase() === answer.toLowerCase()) correct++;
+              answersSnapshot.push({ answer, typed, hinted });
+            });
+            dfResult.correct = correct;
+            dfResult.total   = total;
+            dfResult.pct     = Math.round(correct / total * 100);
+            dfResult.answers = answersSnapshot;
+            // Save computed score back
+            try {
+              const idx2 = results.findIndex(r => r.id === dfResult.id);
+              if (idx2 >= 0) {
+                results[idx2] = dfResult;
+                await writeBin({ ...data, results });
+              }
+            } catch(e) { console.warn('Could not save draft score', e); }
+          }
+          existingResult = dfResult;
+        }
+      }
+      if (!existingResult) {
+        // Check for in-progress draft
+        const draftResult = results.find(r => r.name === name && (r.status === 'active' || r.status === 'briefing'));
+        if (draftResult) {
+          currentUser = name;
+          currentAttemptId = draftResult.id;
+        }
+      }
     } catch(e) {
       console.warn('Could not check existing results:', e);
     }
@@ -2996,18 +3120,50 @@ async function checkPin() {
       currentAttemptId = existingResult.id;
       showAlreadyScreen(name, existingResult, data);
     } else {
-      // Check if quiz is closed
-      if (data && data.quizClosed) {
+      const draftRecord = data ? (data.results || []).find(r => r.name === name && (r.status === 'active' || r.status === 'briefing')) : null;
+
+      // Check if quiz is closed — but still let active participants submit
+      if (data && data.quizClosed && !draftRecord) {
         const cs = document.getElementById('quiz-closed-screen');
         cs.style.display = 'flex';
         return;
       }
-      // Fresh start — show welcome/intro screen
-      document.getElementById('ws-name-text').textContent = name;
-      document.getElementById('welcome-screen').style.display = 'block';
-      wsInit();
-      registerAttempt(name);
-      initQuiz();
+      // Fresh start or resume — show welcome/intro screen
+      if (draftRecord && draftRecord.status === 'active') {
+        // Already past briefing — skip welcome screen, go straight to quiz
+        currentUser = name;
+        currentAttemptId = draftRecord.id;
+        pendingDraft = draftRecord.draft || null;
+        initQuiz(pendingDraft);
+        // Show quiz view directly
+        const banner = document.getElementById('welcome-banner');
+        document.getElementById('welcome-name').textContent = 'Welcome back, ' + name + '!';
+        banner.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // If quiz already closed, start timer immediately
+        if (data && data.quizClosed) {
+          startClosingTimer();
+        } else {
+          startClosingPoll();
+        }
+        // Note: if they return after quiz closed and had no active session,
+        // their draft was already finalized by toggleQuizClosed()
+      } else {
+        document.getElementById('ws-name-text').textContent = name;
+        document.getElementById('welcome-screen').style.display = 'block';
+        wsInit();
+        if (draftRecord) {
+          // Has briefing record — resume after instructions
+          currentUser = name;
+          currentAttemptId = draftRecord.id;
+          pendingDraft = draftRecord.draft || null;
+          initQuiz(pendingDraft);
+        } else {
+          pendingDraft = null;
+          await registerAttempt(name);
+          initQuiz(null);
+        }
+      }
     }
   } else {
     showPinError('Incorrect PIN. Please try again.');
@@ -3069,7 +3225,7 @@ const AK_SECTIONS = [
   { label: "Chorus (final)", isChorus: true, lines: CHORUS_FINAL_LINES },
 ];
 
-function initQuiz() {
+function initQuiz(draft) {
 
 
 const lyrics = [
@@ -3324,6 +3480,8 @@ function focusSkipHinted(idx, dir) {
 
 function onInput(e) {
   const el = e.target;
+  // Block any change to hinted cells
+  if (el.dataset.hinted === '1') { el.value = el.dataset.hintedVal || el.value; return; }
   if (el.value.length === 0) return;
   const val = el.value.slice(-1);
   if (val === ' ') { el.value = ''; return; } // block spaces
@@ -3341,6 +3499,8 @@ function onKeyDown(e) {
   const idx = getCellIndex(el);
 
   if (e.key === 'Backspace') {
+    // Never allow erasing a hinted cell
+    if (el.dataset.hinted === '1') { e.preventDefault(); return; }
     if (el.value === '') {
       e.preventDefault();
       // Find previous non-hinted cell, clear it, and focus it
@@ -3374,7 +3534,64 @@ function onKeyDown(e) {
   }
 }
 
+// ── Restore draft if provided ─────────────────────────────────────────────────
+if (draft && Array.isArray(draft)) {
+  draft.forEach((d, i) => {
+    if (!allCells[i]) return;
+    const cell = allCells[i];
+    if (d.hinted && d.val) {
+      // Apply hinted state to primary cell
+      cell.value = d.val;
+      cell.dataset.hinted = '1';
+      cell.readOnly = true;
+      cell.classList.remove('filled', 'correct', 'wrong', 'synced-mirror');
+      cell.classList.add('hinted');
+      // Apply hinted state to ALL mirrors manually
+      const sid = cell.dataset.syncId;
+      if (sid && syncMap[sid]) {
+        syncMap[sid].forEach(m => {
+          if (m === cell) return;
+          m.value = d.val;
+          m.dataset.hinted = '1';
+          m.readOnly = true;
+          m.classList.remove('filled', 'correct', 'wrong', 'synced-mirror');
+          m.classList.add('hinted');
+        });
+      }
+      updateHintBtnForCell(cell);
+    } else if (d.val) {
+      cell.value = d.val;
+      cell.dataset.hinted = '0';
+      cell.classList.remove('hinted');
+      cell.classList.add('filled');
+      propagateSync(cell);
+    }
+  });
+}
+
+// ── Auto-save draft every 15 seconds if active ───────────────────────────────
+setInterval(saveDraft, 15000);
+
 } // end initQuiz
+
+// ─── Draft save ───────────────────────────────────────────────────────────────
+async function saveDraft() {
+  if (!currentAttemptId || !currentUser) return;
+  // Only save if not finished
+  const draft = allCells.map(c => ({
+    val:    c.value || '',
+    hinted: c.dataset.hinted === '1',
+  }));
+  try {
+    const data = await readBin();
+    const results = data.results || [];
+    const idx = results.findIndex(r => r.id === currentAttemptId);
+    if (idx >= 0 && results[idx].status !== 'finished') {
+      results[idx].draft = draft;
+      await writeBin({ ...data, results });
+    }
+  } catch(e) { console.warn('saveDraft failed:', e); }
+}
 
 // ─── Welcome screen carousel ──────────────────────────────────────────────────
 const WS_TOTAL = 7; // total slides (0–6)
@@ -3451,8 +3668,10 @@ function startQuiz() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     allCells[0]?.focus();
   }, 400);
-  // Delay to avoid race condition with registerAttempt
-  setTimeout(() => updateAttemptStatus('active'), 3000);
+  // Update status immediately — registerAttempt is already done by now
+  updateAttemptStatus('active');
+  // Start polling for quiz close
+  startClosingPoll();
 }
 
 
@@ -5003,10 +5222,41 @@ async function toggleQuizClosed() {
     const data = await readBin();
     quizIsClosed = !data.quizClosed;
     data.quizClosed = quizIsClosed;
-    await writeBin(data);
-    updateCloseBtn();
-    document.getElementById('dash-status').textContent =
-      quizIsClosed ? 'Quiz closed — participants cannot enter.' : 'Quiz reopened.';
+
+    // When closing: finalize all active drafts as results
+    if (quizIsClosed) {
+      const now = new Date().toISOString();
+      let finalized = 0;
+      (data.results || []).forEach(r => {
+        if (r.status === 'active' && r.draft && Array.isArray(r.draft)) {
+          const scored = scoreDraftFromAK(r.draft);
+          if (scored) {
+            r.status     = 'finished';
+            r.finishedAt = now;
+            r.correct    = scored.correct;
+            r.total      = scored.total;
+            r.pct        = scored.pct;
+            r.answers    = scored.answers;
+            r.source     = r.source || 'draft'; // tag as draft-sourced
+            finalized++;
+          } else {
+            // No AK_SECTIONS yet (shouldn't happen) — mark as draft-finalized
+            r.status     = 'draft-finalized';
+            r.finishedAt = now;
+          }
+        }
+      });
+      const msg = `Quiz closed.${finalized > 0 ? ' ' + finalized + ' draft(s) auto-submitted.' : ''}`;
+      await writeBin(data);
+      updateCloseBtn();
+      document.getElementById('dash-status').textContent = msg;
+      // Reload results to show newly finalized entries
+      loadResults();
+    } else {
+      await writeBin(data);
+      updateCloseBtn();
+      document.getElementById('dash-status').textContent = 'Quiz reopened.';
+    }
   } catch(e) {
     console.error('toggleQuizClosed failed', e);
   }
@@ -5212,6 +5462,110 @@ function updatePlayerCounter() {
   } else {
     el.innerHTML = '<span class="counter-val">' + playerListensLeft + '</span> listen' + (playerListensLeft !== 1 ? 's' : '') + ' remaining';
   }
+}
+
+
+
+// ─── Quiz closing timer (shown to active participants when staff closes quiz) ──
+let closingTimerInterval  = null;
+let closingPollInterval   = null;
+let closingTimerActive    = false;
+
+function startClosingPoll() {
+  // Poll every 10 seconds while participant is on quiz page
+  closingPollInterval = setInterval(async () => {
+    if (closingTimerActive) return;
+    try {
+      const data = await readBin();
+      if (data.quizClosed) {
+        clearInterval(closingPollInterval);
+        startClosingTimer();
+      }
+    } catch(e) {}
+  }, 10000);
+}
+
+function startClosingTimer() {
+  if (closingTimerActive) return;
+  closingTimerActive = true;
+
+  const backdrop = document.getElementById('closing-timer-backdrop');
+  const modal    = document.getElementById('closing-timer');
+  const countEl  = document.getElementById('closing-timer-count');
+  backdrop.classList.add('visible');
+  modal.classList.add('visible');
+
+  let sec = 30;
+  countEl.textContent = sec;
+
+  closingTimerInterval = setInterval(() => {
+    sec--;
+    countEl.textContent = sec;
+    if (sec <= 10) countEl.classList.add('urgent');
+    if (sec <= 0) {
+      clearInterval(closingTimerInterval);
+      forceSubmit();
+    }
+  }, 1000);
+}
+
+function forceSubmit() {
+  // Hide timer
+  document.getElementById('closing-timer-backdrop').classList.remove('visible');
+  document.getElementById('closing-timer').classList.remove('visible');
+  // Run checkAnswers if not already finished
+  if (currentUser && currentAttemptId) {
+    checkAnswers();
+  }
+}
+
+
+// ─── Home with draft save ──────────────────────────────────────────────────────
+async function homeWithSave() {
+  await saveDraft();
+  location.reload();
+}
+
+
+// ─── Score a draft against AK_SECTIONS answer key (no DOM needed) ─────────────
+function scoreDraftFromAK(draft) {
+  if (!draft || !Array.isArray(draft) || !AK_SECTIONS) return null;
+  const seenSids = new Set();
+  const primaryCells = []; // {answer, sid}
+
+  AK_SECTIONS.forEach(section => {
+    if (!section.lines) return;
+    section.lines.forEach((tokens, li) => {
+      const syncLineIdx = (section.isChorus && li >= AK_CHORUS_LINES.length)
+        ? AK_CHORUS_LINES.length - 1 : li;
+      let blankIdx = 0;
+      tokens.forEach(tok => {
+        if (typeof tok === 'string') return;
+        tok[0].split('').forEach((ch, ci) => {
+          const sid = section.isChorus ? `c_${syncLineIdx}_${blankIdx}_${ci}` : null;
+          const isPrimary = !sid || !seenSids.has(sid);
+          if (sid) seenSids.add(sid);
+          if (isPrimary) primaryCells.push({ answer: ch.toLowerCase(), sid });
+        });
+        blankIdx++;
+      });
+    });
+  });
+
+  let correct = 0;
+  const total = primaryCells.length;
+  const answers = [];
+
+  primaryCells.forEach((pc, i) => {
+    const d = draft[i] || { val: '', hinted: false };
+    const typed  = (d.val || '').toLowerCase();
+    const hinted = !!d.hinted;
+    const ok = !hinted && typed === pc.answer;
+    if (ok) correct++;
+    answers.push({ answer: pc.answer, typed: d.val || '', hinted });
+  });
+
+  return { correct, total, pct: Math.round(correct / total * 100), answers };
 }
 
 
