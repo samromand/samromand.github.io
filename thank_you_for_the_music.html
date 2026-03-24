@@ -1891,58 +1891,12 @@
 
 
   /* ── Quiz closing timer ─────────────────────────────────────────────────── */
-  #closing-timer {
-    display: none;
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 8000;
-    background: var(--surface);
-    border: 2px solid var(--wrong);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    padding: 20px 24px 18px;
-    text-align: center;
-    width: 220px;
-    animation: fadeUp 0.3s ease both;
-  }
-  #closing-timer.visible { display: block; }
-  .closing-timer-icon { font-size: 28px; margin-bottom: 8px; }
-  .closing-timer-title {
-    font-family: "DM Serif Display", serif;
-    font-size: 17px;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .closing-timer-sub {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-  .closing-timer-count {
-    font-family: "DM Serif Display", serif;
-    font-size: 48px;
-    color: var(--wrong);
-    line-height: 1;
-    margin-bottom: 12px;
-    transition: color 0.3s;
-  }
-  .closing-timer-count.urgent { color: #c0392b; }
-  .closing-timer-btn {
-    font-family: "DM Sans", sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 9px 20px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    width: 100%;
-    transition: opacity 0.15s;
-  }
-  .closing-timer-btn:hover { opacity: 0.9; }
+
+
+
+
+
+
   /* No backdrop needed */
   #closing-timer-backdrop { display: none !important; }
 
@@ -2139,16 +2093,6 @@
   </div>
 </div>
 
-
-<!-- ── Quiz closing timer ────────────────────────────────────────────────── -->
-<div id="closing-timer-backdrop"></div>
-<div id="closing-timer">
-  <div class="closing-timer-icon">⏱️</div>
-  <div class="closing-timer-title">Quiz is closing!</div>
-  <div class="closing-timer-sub">Submit your answers now.<br>Your progress will be saved automatically.</div>
-  <div class="closing-timer-count" id="closing-timer-count">30</div>
-  <button class="closing-timer-btn" onclick="checkAnswers()">✅ Submit now</button>
-</div>
 
 <!-- ── Quiz closed screen ────────────────────────────────────────────────── -->
 <div id="quiz-closed-screen" style="display:none">
@@ -3136,10 +3080,7 @@ async function checkPin() {
         if (data && data.quizClosed) {
           startClosingTimer();
         } else {
-          startClosingPoll();
-        }
-        // Note: if they return after quiz closed and had no active session,
-        // their draft was already finalized by toggleQuizClosed()
+                }
       } else {
         document.getElementById('ws-name-text').textContent = name;
         document.getElementById('welcome-screen').style.display = 'block';
@@ -3663,7 +3604,6 @@ function startQuiz() {
   // Update status immediately — registerAttempt is already done by now
   updateAttemptStatus('active');
   // Start polling for quiz close
-  startClosingPoll();
 }
 
 
@@ -5158,16 +5098,14 @@ function showAlreadyScreen(name, result, binData) {
   fetchAlreadyRank(binData);
 
   // Show certificate button if quiz is closed
-  if (binData && binData.quizClosed) {
-    document.getElementById('already-cert-wrap').style.display = 'block';
-  }
+  showCertButtonIfClosed(binData);
 }
 
 async function fetchAlreadyRank() {
   try {
     const data = await readBin();
     const finished = (data.results || []).filter(r =>
-      r.status === 'finished' && r.name !== 'Varvara Akimova'
+      (r.status === 'finished' || r.status === 'draft-finalized') && r.name !== 'Varvara Akimova'
     );
     finished.sort((a, b) => {
       if (b.correct !== a.correct) return b.correct - a.correct;
@@ -5203,6 +5141,15 @@ async function refreshAlreadyRank() {
 }
 
 
+
+// ─── Show cert when quiz is closed ───────────────────────────────────────────
+function showCertButtonIfClosed(data) {
+  if (!data || !data.quizClosed) return;
+  const a = document.getElementById('already-cert-wrap');
+  if (a) a.style.display = 'block';
+  const q = document.getElementById('quiz-cert-wrap');
+  if (q) q.style.display = 'block';
+}
 
 // ─── Quiz closed state ─────────────────────────────────────────────────────────
 let quizIsClosed = false;
@@ -5327,8 +5274,9 @@ async function downloadMyCertificate(showScore) {
 async function fetchAndShowRank() {
   try {
     const data = await readBin();
+    showCertButtonIfClosed(data);
     const finished = (data.results || []).filter(r =>
-      r.status === 'finished' && r.name !== 'Varvara Akimova'
+      (r.status === 'finished' || r.status === 'draft-finalized') && r.name !== 'Varvara Akimova'
     );
     finished.sort((a, b) => {
       if (b.correct !== a.correct) return b.correct - a.correct;
@@ -5357,9 +5305,7 @@ async function fetchAndShowRank() {
     }
 
     // Show cert button if quiz is closed
-    if (data.quizClosed && myIdx >= 0) {
-      document.getElementById('quiz-cert-wrap').style.display = 'block';
-    }
+    showCertButtonIfClosed(data);
   } catch(e) { console.error('fetchAndShowRank failed', e); }
 }
 
@@ -5457,59 +5403,6 @@ function updatePlayerCounter() {
 }
 
 
-
-// ─── Quiz closing timer (shown to active participants when staff closes quiz) ──
-let closingTimerInterval  = null;
-let closingPollInterval   = null;
-let closingTimerActive    = false;
-
-function startClosingPoll() {
-  // Poll every 10 seconds while participant is on quiz page
-  closingPollInterval = setInterval(async () => {
-    if (closingTimerActive) return;
-    try {
-      const data = await readBin();
-      if (data.quizClosed) {
-        clearInterval(closingPollInterval);
-        startClosingTimer();
-      }
-    } catch(e) {}
-  }, 10000);
-}
-
-function startClosingTimer() {
-  if (closingTimerActive) return;
-  closingTimerActive = true;
-
-  const backdrop = document.getElementById('closing-timer-backdrop');
-  const modal    = document.getElementById('closing-timer');
-  const countEl  = document.getElementById('closing-timer-count');
-  backdrop.classList.add('visible');
-  modal.classList.add('visible');
-
-  let sec = 30;
-  countEl.textContent = sec;
-
-  closingTimerInterval = setInterval(() => {
-    sec--;
-    countEl.textContent = sec;
-    if (sec <= 10) countEl.classList.add('urgent');
-    if (sec <= 0) {
-      clearInterval(closingTimerInterval);
-      forceSubmit();
-    }
-  }, 1000);
-}
-
-function forceSubmit() {
-  // Hide timer
-  document.getElementById('closing-timer-backdrop').classList.remove('visible');
-  document.getElementById('closing-timer').classList.remove('visible');
-  // Run checkAnswers if not already finished
-  if (currentUser && currentAttemptId) {
-    checkAnswers();
-  }
-}
 
 
 // ─── Home with draft save ──────────────────────────────────────────────────────
