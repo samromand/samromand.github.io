@@ -2365,6 +2365,7 @@ const HEADERS = { 'Content-Type': 'application/json', 'X-Master-Key': BIN_KEY, '
 let currentUser = null;   // set after student login
 let currentAttemptId = null;
 let pendingDraft = null;  // draft to restore when quiz starts
+let quizFinished  = false; // stop autosave after finish
 
 // ─── Called right after student PIN login ──────────────────────────────────────
 async function registerAttempt(name) {
@@ -2384,7 +2385,7 @@ async function registerAttempt(name) {
     const data = await readBin();
     const results = data.results || [];
     results.push(attempt);
-    await writeBin({ results });
+    await writeBin({ ...data, results });
   } catch(e) { console.error('registerAttempt failed', e); }
 }
 
@@ -2395,7 +2396,7 @@ async function updateAttemptStatus(newStatus) {
     const idx = results.findIndex(r => r.id === currentAttemptId);
     if (idx >= 0 && results[idx].status !== 'finished') {
       results[idx].status = newStatus;
-      await writeBin({ results });
+      await writeBin({ ...data, results });
     }
   } catch(e) { console.error('updateAttemptStatus failed', e); }
 }
@@ -2424,7 +2425,7 @@ async function saveResult(correct, total, pct, answers) {
         answers: answers || [],
       };
       if (idx >= 0) results[idx] = updated; else results.push(updated);
-      await writeBin({ results });
+      await writeBin({ ...data, results });
       console.log('saveResult: write done ✓');
       return;
     } catch(e) {
@@ -3503,7 +3504,7 @@ if (draft && Array.isArray(draft)) {
 }
 
 // ── Auto-save draft every 15 seconds if active ───────────────────────────────
-setInterval(saveDraft, 15000);
+setInterval(() => { if (!quizFinished) saveDraft(); }, 15000);
 
 } // end initQuiz
 
@@ -3519,7 +3520,7 @@ async function saveDraft() {
     const data = await readBin();
     const results = data.results || [];
     const idx = results.findIndex(r => r.id === currentAttemptId);
-    if (idx >= 0 && results[idx].status !== 'finished') {
+    if (idx >= 0 && results[idx].status !== 'finished' && results[idx].status !== 'draft-finalized') {
       results[idx].draft = draft;
       await writeBin({ ...data, results });
     }
@@ -3737,6 +3738,7 @@ function akResetAll() {
 
 // ─── Check & Reset (global scope — called from HTML buttons) ──────────────────
 async function checkAnswers() {
+  quizFinished = true; // stop draft autosave
   let correct = 0, total = 0;
 
   allCells.forEach(cell => {
