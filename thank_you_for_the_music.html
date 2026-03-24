@@ -3770,9 +3770,14 @@ async function checkAnswers() {
     c.readOnly = true;
     c.tabIndex = -1;
   });
-  // Hide Check button, keep only Home
+  // Hide Check button, disable all hint buttons
   const checkBtn = document.querySelector('.btn-check');
   if (checkBtn) checkBtn.style.display = 'none';
+  document.querySelectorAll('.hint-btn').forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = '0.25';
+    btn.style.cursor = 'default';
+  });
 
   // Collect answers snapshot (primary cells only, for staff review)
   const answersSnapshot = allCells
