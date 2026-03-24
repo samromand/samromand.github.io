@@ -3078,7 +3078,7 @@ async function checkPin() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         // If quiz already closed, start timer immediately
         if (data && data.quizClosed) {
-          startClosingTimer();
+          setTimeout(() => checkAnswers(), 500);
         } else {
                 }
       } else {
@@ -3604,6 +3604,7 @@ function startQuiz() {
   // Update status immediately — registerAttempt is already done by now
   updateAttemptStatus('active');
   // Start polling for quiz close
+  startClosingPoll();
 }
 
 
@@ -5141,6 +5142,24 @@ async function refreshAlreadyRank() {
 }
 
 
+
+
+// ─── Poll for quiz close (auto-submit when staff closes) ──────────────────────
+let _closingPollTimer = null;
+
+function startClosingPoll() {
+  if (_closingPollTimer) return; // already running
+  _closingPollTimer = setInterval(async () => {
+    try {
+      const data = await readBin();
+      if (data.quizClosed) {
+        clearInterval(_closingPollTimer);
+        _closingPollTimer = null;
+        checkAnswers(); // auto-submit answers
+      }
+    } catch(e) {}
+  }, 10000);
+}
 
 // ─── Show cert when quiz is closed ───────────────────────────────────────────
 function showCertButtonIfClosed(data) {
