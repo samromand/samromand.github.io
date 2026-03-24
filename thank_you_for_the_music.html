@@ -3504,7 +3504,7 @@ if (draft && Array.isArray(draft)) {
 }
 
 // ── Auto-save draft every 15 seconds if active ───────────────────────────────
-setInterval(() => { if (!quizFinished) saveDraft(); }, 15000);
+setInterval(() => { if (!quizFinished) saveDraft(); }, 30000);
 
 } // end initQuiz
 
@@ -3765,6 +3765,15 @@ async function checkAnswers() {
   banner.style.display = 'block';
   banner.innerHTML = `Score: <span>${correct}&thinsp;/&thinsp;${total}</span> correct letters &nbsp;(${pct}%)`;
 
+  // Lock all cells — no editing after submission
+  allCells.forEach(c => {
+    c.readOnly = true;
+    c.tabIndex = -1;
+  });
+  // Hide Check button, keep only Home
+  const checkBtn = document.querySelector('.btn-check');
+  if (checkBtn) checkBtn.style.display = 'none';
+
   // Collect answers snapshot (primary cells only, for staff review)
   const answersSnapshot = allCells
     .filter(c => c.dataset.primary === '1')
@@ -3787,8 +3796,7 @@ async function checkAnswers() {
       pct,
       finishedAt: new Date().toISOString(),
     };
-    // Small delay to avoid JSONBin rate limit after registerAttempt
-    await new Promise(r => setTimeout(r, 2000));
+    // Save result immediately
     saveResult(correct, total, pct, answersSnapshot).then(() => {
       fetchAndShowRank();
     }).catch(() => {
