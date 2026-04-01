@@ -631,15 +631,17 @@ let pinBuf    = '';
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function fetchState() {
-  const res = await fetch(BIN_URL + '/latest', {
+  const url = `${BIN_URL}/latest?t=${Date.now()}`; // cache-bust
+  const res = await fetch(url, {
     headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
   });
   if (!res.ok) throw new Error(`JSONBin GET ${res.status}`);
   const body = await res.json();
-  // v3 may wrap in { record: [...] } or return array directly
-  return Array.isArray(body) ? body
-       : Array.isArray(body.record) ? body.record
-       : null;
+  console.log('JSONBin raw response:', JSON.stringify(body).slice(0, 200));
+  if (Array.isArray(body))               return body;
+  if (body && Array.isArray(body.record)) return body.record;
+  console.warn('Unexpected JSONBin shape:', body);
+  return null;
 }
 
 async function pushState() {
@@ -769,7 +771,6 @@ function clearErr() { document.getElementById('loginErr').classList.remove('on')
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function loginAs(who) {
-  // Show loading, hide login
   hidePage('pg-login');
   showLoading(true);
 
@@ -778,7 +779,15 @@ async function loginAs(who) {
     appState  = raw ? migrate(raw) : buildFresh();
   } catch(e) {
     console.error('Fetch failed:', e);
-    appState = buildFresh();
+    // Показываем ошибку и возвращаем на логин
+    showLoading(false);
+    showPage('pg-login');
+    const err = document.getElementById('loginErr');
+    err.textContent = 'Ошибка загрузки данных. Попробуйте ещё раз.';
+    err.classList.add('on');
+    pinBuf = ''; drawDots();
+    setTimeout(() => { err.classList.remove('on'); err.textContent = 'Неверный PIN-код'; }, 3000);
+    return;
   }
 
   showLoading(false);
