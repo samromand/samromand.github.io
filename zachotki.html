@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Зачётки · Весенняя сессия 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;700&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:       #f0ede8;
+  --surface:  #faf8f5;
+  --surface2: #f0ede8;
+  --border:   #ddd9d2;
+  --border2:  #ccc8c0;
+  --accent:   #6b7fa3;
+  --accent2:  #9b8bb4;
+  --green:    #4a9269;
+  --yellow:   #b07d3a;
+  --red:      #b55a5a;
+  --orange:   #b8663a;
+  --muted:    #8a93a8;
+  --gray:     #6e7a8a;
+  --text:     #2e2e2e;
+  --text-dim: #8a8880;
+  --radius:   12px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Golos Text', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(107,127,163,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107,127,163,0.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── VIEWS ───────────────────────────────────────────────────────────────── */
+.view { display: none; position: relative; z-index: 1; }
+.view.active { display: block; }
+
+/* ── LOGIN SCREEN ────────────────────────────────────────────────────────── */
+#view-login {
+  min-height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+#view-login.active { display: flex; }
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 36px 36px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 8px 40px rgba(107,127,163,0.1);
+  animation: fadeUp 0.5s ease both;
+}
+
+.login-logo {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-logo::before {
+  content: '';
+  display: inline-block;
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #c4b5d4, #8fa8c8);
+  border-radius: 8px;
+}
+
+.login-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.pin-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.pin-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.pin-dot.filled {
+  background: var(--accent);
+  transform: scale(1.1);
+}
+
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pin-key {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 0;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  user-select: none;
+}
+
+.pin-key:hover  { background: var(--border); border-color: var(--border2); }
+.pin-key:active { transform: scale(0.94); }
+
+.pin-key.wide {
+  grid-column: span 2;
+  font-size: 13px;
+  font-family: 'Golos Text', sans-serif;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.pin-key.del { color: var(--red); }
+
+.login-error {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
+  min-height: 20px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.login-error.show { opacity: 1; }
+
+/* ── TOP BAR ─────────────────────────────────────────────────────────────── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-logo {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, #c4b5d4, #8fa8c8);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.topbar-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.logout-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'Golos Text', sans-serif;
+  font-size: 12px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.logout-btn:hover { color: var(--text); background: var(--border); }
+
+/* ── CONTAINER ───────────────────────────────────────────────────────────── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+}
+
+/* ── PAGE HEADER ─────────────────────────────────────────────────────────── */
+.page-header { margin-bottom: 36px; animation: fadeDown 0.5s ease both; }
+
+.header-tag {
+  display: inline-block;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(107,127,163,0.35);
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin-bottom: 14px;
+  background: rgba(107,127,163,0.08);
+}
+
+.page-header h1 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(20px, 3.5vw, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.page-header p { font-size: 14px; color: var(--text-dim); }
+
+/* ── STAT PILLS ──────────────────────────────────────────────────────────── */
+.stats-bar {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 32px;
+  animation: fadeDown 0.5s 0.08s ease both;
+}
+
+.stat-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 50px; padding: 7px 14px;
+  font-size: 13px; color: var(--text-dim);
+}
+
+.stat-pill strong { color: var(--text); font-weight: 600; }
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── LEGEND ──────────────────────────────────────────────────────────────── */
+.legend {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 18px;
+  display: flex; flex-wrap: wrap; gap: 8px 18px;
+  margin-bottom: 28px;
+  animation: fadeDown 0.5s 0.12s ease both;
+  align-items: center;
+}
+
+.legend-title {
+  width: 100%; font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--text-dim); font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray); }
+
+/* ── STUDENTS LIST ───────────────────────────────────────────────────────── */
+.section-label {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 10px;
+  animation: fadeDown 0.5s 0.16s ease both;
+}
+
+.students-list { display: flex; flex-direction: column; gap: 10px; }
+
+.student-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  animation: fadeUp 0.5s ease both;
+}
+
+.student-card:hover {
+  border-color: rgba(107,127,163,0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(107,127,163,0.1);
+}
+
+.student-card-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; cursor: pointer; user-select: none;
+}
+
+.student-avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, #c4b5d4, #8fa8c8);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+}
+
+.student-name-block { flex: 1; min-width: 0; }
+.student-name { font-weight: 600; font-size: 14px; line-height: 1.3; }
+.student-name span { font-weight: 400; color: var(--text-dim); }
+
+.student-meta {
+  font-size: 11px; color: var(--text-dim);
+  margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+
+.zach-loc-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 5px; font-size: 10px; font-weight: 600;
+}
+
+.loc-student  { background: rgba(107,127,163,0.12); color: #4e6a96; border: 1px solid rgba(107,127,163,0.3); }
+.loc-starosta { background: rgba(155,139,180,0.12); color: #7a63a0; border: 1px solid rgba(155,139,180,0.3); }
+.loc-uch      { background: rgba(74,146,105,0.12);  color: #3a8060; border: 1px solid rgba(74,146,105,0.3); }
+.loc-unknown  { background: rgba(138,136,128,0.1);  color: var(--text-dim); border: 1px solid var(--border); }
+
+.progress-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.progress-ring-wrap { position: relative; width: 42px; height: 42px; }
+.progress-ring-wrap svg { transform: rotate(-90deg); }
+.progress-ring-bg   { fill: none; stroke: #ddd9d2; stroke-width: 3; }
+.progress-ring-fill { fill: none; stroke-width: 3; stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.25,1,0.5,1); }
+
+.progress-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-size: 9px; font-weight: 700;
+}
+
+.overall-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.badge-count { font-family: 'Unbounded', sans-serif; font-size: 16px; font-weight: 700; line-height: 1; }
+.badge-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.chevron { color: var(--text-dim); font-size: 16px; transition: transform 0.3s; flex-shrink: 0; }
+.student-card.open .chevron { transform: rotate(180deg); }
+
+.subjects-sep { border: none; border-top: 1px solid var(--border); margin: 0 18px 14px; display: none; }
+.student-card.open .subjects-sep { display: block; }
+
+.subjects-grid {
+  display: none; padding: 0 18px 18px; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.student-card.open .subjects-grid { display: grid; animation: fadeDown 0.25s ease both; }
+
+.subject-chip {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 5px;
+  transition: border-color 0.2s;
+}
+
+.subject-chip:hover { border-color: rgba(107,127,163,0.35); }
+.subject-chip-name  { font-size: 11px; color: var(--text-dim); line-height: 1.3; }
+.subject-chip-abbr  {
+  font-family: 'Unbounded', sans-serif; font-size: 9px;
+  font-weight: 600; color: var(--accent); margin-bottom: 1px;
+}
+
+/* ── STATUS BADGES ───────────────────────────────────────────────────────── */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
+}
+
+.s-done    { background: rgba(74,146,105,0.13);  color: #357a55; border: 1px solid rgba(74,146,105,0.3); }
+.s-written { background: rgba(78,106,150,0.12);  color: #3d618f; border: 1px solid rgba(78,106,150,0.28); }
+.s-passed  { background: rgba(176,125,58,0.13);  color: #8f6020; border: 1px solid rgba(176,125,58,0.3); }
+.s-none    { background: rgba(138,136,128,0.1);  color: var(--text-dim); border: 1px solid var(--border); }
+.s-retake  { background: rgba(184,102,58,0.13);  color: #9b4e1f; border: 1px solid rgba(184,102,58,0.3); }
+.s-skip    { background: rgba(138,147,168,0.12); color: #6e7a8a; border: 1px solid rgba(138,147,168,0.25); }
+  .s-upgrade { background: rgba(155,139,180,0.14); color: #7a63a0; border: 1px solid rgba(155,139,180,0.32); }
+
+/* ── CARD FOOTER ─────────────────────────────────────────────────────────── */
+.card-footer {
+  display: none; border-top: 1px solid var(--border);
+  margin: 0 18px; padding: 12px 0 16px; gap: 8px; flex-wrap: wrap;
+}
+
+.student-card.open .card-footer { display: flex; }
+
+.footer-chip {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--text-dim);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 9px;
+}
+
+.footer-chip strong { color: var(--text); }
+
+.edit-btn {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: 8px; padding: 5px 11px;
+  font-family: 'Golos Text', sans-serif; font-size: 11px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  transition: all 0.2s; flex-shrink: 0;
+}
+
+.edit-btn:hover { color: var(--accent); border-color: rgba(107,127,163,0.5); }
+
+/* ── STUDENT VIEW ────────────────────────────────────────────────────────── */
+#view-student .container { max-width: 760px; }
+
+.student-hero {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px;
+  display: flex; align-items: center; gap: 24px;
+  margin-bottom: 24px;
+  animation: fadeDown 0.5s ease both;
+}
+
+.student-hero-avatar {
+  width: 60px; height: 60px; border-radius: 14px; flex-shrink: 0;
+  background: linear-gradient(135deg, #c4b5d4, #8fa8c8);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-size: 18px; font-weight: 700; color: white;
+}
+
+.student-hero-name {
+  font-family: 'Unbounded', sans-serif; font-size: 18px; font-weight: 700;
+  line-height: 1.2; margin-bottom: 6px;
+}
+
+.student-hero-meta { font-size: 13px; color: var(--text-dim); }
+
+.student-hero-ring {
+  margin-left: auto; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+}
+
+.big-ring-wrap { position: relative; width: 72px; height: 72px; }
+.big-ring-wrap svg { transform: rotate(-90deg); }
+.big-ring-bg   { fill: none; stroke: #ddd9d2; stroke-width: 4; }
+.big-ring-fill { fill: none; stroke-width: 4; stroke-linecap: round;
+  transition: stroke-dashoffset 1s cubic-bezier(0.25,1,0.5,1); }
+.big-ring-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700;
+}
+
+.big-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.big-badge-count {
+  font-family: 'Unbounded', sans-serif; font-size: 24px; font-weight: 700; line-height: 1;
+}
+.big-badge-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.student-subjects-grid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  animation: fadeUp 0.5s 0.1s ease both;
+}
+
+/* ── ACADEMIC LEAVE VIEW ─────────────────────────────────────────────────── */
+#view-leave .container { max-width: 600px; }
+
+.leave-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 36px;
+  animation: fadeUp 0.5s ease both;
+  text-align: center;
+}
+
+.leave-icon { font-size: 48px; margin-bottom: 20px; }
+
+.leave-title {
+  font-family: 'Unbounded', sans-serif; font-size: 18px; font-weight: 700;
+  line-height: 1.3; margin-bottom: 10px;
+}
+
+.leave-sub {
+  font-size: 14px; color: var(--text-dim); line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.leave-info-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px 22px; text-align: left;
+  margin-bottom: 16px;
+}
+
+.leave-info-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-dim); font-weight: 600; margin-bottom: 12px;
+}
+
+.leave-info-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; line-height: 1.5; color: var(--text);
+  margin-bottom: 8px;
+}
+
+.leave-info-row:last-child { margin-bottom: 0; }
+.leave-info-row .ico { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+.leave-info-row a { color: var(--accent); text-decoration: none; }
+.leave-info-row a:hover { text-decoration: underline; }
+
+/* ── MODAL ───────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(46,46,46,0.35); backdrop-filter: blur(6px);
+  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px; width: 100%; max-width: 580px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(46,46,46,0.15);
+  transform: scale(0.95) translateY(10px); transition: transform 0.25s;
+}
+
+.modal-overlay.show .modal { transform: scale(1) translateY(0); }
+
+.modal-title {
+  font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700;
+  margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+}
+
+.modal-close {
+  margin-left: auto; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text-dim); border-radius: 8px; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 14px; transition: color 0.2s, background 0.2s;
+}
+
+.modal-close:hover { color: var(--text); background: var(--border); }
+
+.modal-section-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--text-dim); font-weight: 600;
+  margin-top: 18px; margin-bottom: 10px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+
+.loc-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.loc-radio { display: none; }
+
+.loc-radio + label {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 8px; font-size: 13px;
+  cursor: pointer; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text-dim);
+  transition: all 0.15s; user-select: none;
+}
+
+.loc-radio:checked + label {
+  border-color: rgba(107,127,163,0.55);
+  background: rgba(107,127,163,0.12);
+  color: var(--text);
+}
+
+.modal-grid { display: grid; gap: 10px; }
+
+.modal-row {
+  display: grid; grid-template-columns: 1fr 185px;
+  gap: 8px; align-items: center;
+}
+
+.modal-subj-name { font-size: 13px; color: var(--gray); line-height: 1.3; }
+.modal-subj-abbr {
+  font-size: 10px; color: var(--accent); font-weight: 600;
+  font-family: 'Unbounded', sans-serif; margin-bottom: 2px;
+}
+
+.modal-select, .modal-input {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 8px 10px;
+  font-family: 'Golos Text', sans-serif; font-size: 13px;
+  cursor: pointer; transition: border-color 0.2s; width: 100%;
+}
+
+.modal-select:focus, .modal-input:focus { outline: none; border-color: var(--accent); }
+.modal-input::placeholder { color: var(--text-dim); }
+.modal-input { cursor: text; }
+
+.modal-notes {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 8px; padding: 10px 12px;
+  font-family: 'Golos Text', sans-serif; font-size: 13px;
+  resize: vertical; min-height: 70px; margin-top: 4px;
+}
+
+.modal-notes:focus { outline: none; border-color: var(--accent); }
+
+.modal-footer { display: flex; gap: 10px; margin-top: 22px; }
+
+.btn {
+  flex: 1; padding: 11px; border-radius: 10px;
+  font-family: 'Golos Text', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; border: none;
+}
+
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #536080; }
+.btn-secondary { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+.btn-secondary:hover { color: var(--text); background: var(--border); }
+
+/* ── ANIMATIONS ──────────────────────────────────────────────────────────── */
+@keyframes fadeDown { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(14px);  } to { opacity:1; transform:translateY(0); } }
+@keyframes shake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
+
+.student-card:nth-child(1) { animation-delay: 0.20s; }
+.student-card:nth-child(2) { animation-delay: 0.27s; }
+.student-card:nth-child(3) { animation-delay: 0.34s; }
+.student-card:nth-child(4) { animation-delay: 0.41s; }
+.student-card:nth-child(5) { animation-delay: 0.48s; }
+.student-card:nth-child(6) { animation-delay: 0.55s; }
+.student-card:nth-child(7) { animation-delay: 0.62s; }
+.student-card:nth-child(8) { animation-delay: 0.69s; }
+.student-card:nth-child(9) { animation-delay: 0.76s; }
+
+/* ── SCROLLBAR ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+@media (max-width: 620px) {
+  .modal-row { grid-template-columns: 1fr; }
+  .student-hero { flex-wrap: wrap; }
+  .student-hero-ring { margin-left: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ LOGIN VIEW ══════════════════════ -->
+<div id="view-login" class="view active">
+  <div class="login-card">
+    <div class="login-logo">Зачётки · 2026</div>
+    <div class="login-title">Весенняя сессия</div>
+    <div class="login-sub">Введите ваш PIN-код для входа</div>
+
+    <div class="pin-label">PIN-код</div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key wide del" onclick="pinDel()">⌫</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+    </div>
+    <div class="login-error" id="loginError">Неверный PIN-код</div>
+  </div>
+</div>
+
+<!-- ══════════════════════ STAROSTA VIEW ══════════════════════ -->
+<div id="view-starosta" class="view">
+  <div class="topbar">
+    <div class="topbar-logo"></div>
+    <div>
+      <div class="topbar-title">Зачётки · Весенняя сессия 2026</div>
+      <div class="topbar-sub">Панель старосты</div>
+    </div>
+    <div class="topbar-right">
+      <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <div class="header-tag">Весенняя сессия · 2026</div>
+      <h1>Академическая группа</h1>
+      <p>Статус зачёток и оценок студентов</p>
+    </div>
+
+    <div class="stats-bar" id="statsBar"></div>
+
+    <div class="legend">
+      <div class="legend-title">Статусы оценок</div>
+      <div class="legend-item"><span class="status-badge s-done">✓ Проставлено</span> подписано преп. · <strong style="color:#357a55">идёт в прогресс</strong></div>
+      <div class="legend-item"><span class="status-badge s-written">✎ Вписано</span> без подписи преподавателя</div>
+      <div class="legend-item"><span class="status-badge s-passed">◎ Сдано</span> оценка есть, не вписана</div>
+      <div class="legend-item"><span class="status-badge s-retake">↺ Пересдача</span> задолженность · <strong style="color:#9b4e1f">идёт в прогресс</strong></div>
+      <div class="legend-item"><span class="status-badge s-upgrade">↑ На повышение</span> ждёт экзамена для улучшения оценки</div>
+      <div class="legend-item"><span class="status-badge s-skip">∅ Не проходил(а)</span> вычитается из счёта</div>
+      <div class="legend-item"><span class="status-badge s-none">— Нет данных</span></div>
+    </div>
+
+    <div class="section-label">Студенты группы</div>
+    <div class="students-list" id="studentsList"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ STUDENT VIEW ══════════════════════ -->
+<div id="view-student" class="view">
+  <div class="topbar">
+    <div class="topbar-logo"></div>
+    <div>
+      <div class="topbar-title">Зачётки · Весенняя сессия 2026</div>
+      <div class="topbar-sub" id="studentTopbarName"></div>
+    </div>
+    <div class="topbar-right">
+      <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="student-hero" id="studentHero"></div>
+
+    <div class="section-label" style="margin-bottom:10px">Предметы</div>
+
+    <div class="legend" style="margin-bottom:16px;animation-delay:0.08s">
+      <div class="legend-title">Статусы оценок</div>
+      <div class="legend-item"><span class="status-badge s-done">✓ Проставлено</span> подписано преподавателем · <strong style="color:#357a55">идёт в прогресс</strong></div>
+      <div class="legend-item"><span class="status-badge s-written">✎ Вписано</span> без подписи преподавателя</div>
+      <div class="legend-item"><span class="status-badge s-passed">◎ Сдано</span> оценка есть, не вписана</div>
+      <div class="legend-item"><span class="status-badge s-retake">↺ Пересдача</span> задолженность · <strong style="color:#9b4e1f">идёт в прогресс</strong></div>
+      <div class="legend-item"><span class="status-badge s-upgrade">↑ На повышение</span> ждёт экзамена для улучшения оценки</div>
+      <div class="legend-item"><span class="status-badge s-skip">∅ Не проходил(а)</span> вычитается из счёта</div>
+      <div class="legend-item"><span class="status-badge s-none">— Нет данных</span></div>
+    </div>
+
+    <div class="student-subjects-grid" id="studentSubjectsGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ACADEMIC LEAVE VIEW ══════════════════════ -->
+<div id="view-leave" class="view">
+  <div class="topbar">
+    <div class="topbar-logo"></div>
+    <div>
+      <div class="topbar-title">Зачётки · Весенняя сессия 2026</div>
+      <div class="topbar-sub" id="leaveTopbarName"></div>
+    </div>
+    <div class="topbar-right">
+      <button class="logout-btn" onclick="logout()">Выйти</button>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top:48px">
+    <div class="leave-card" id="leaveCard"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ MODAL (STAROSTA) ══════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span>✏️</span>
+      <span id="modalStudentName">Редактировать</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-section-label">Местонахождение зачётки</div>
+    <div class="loc-options">
+      <input type="radio" name="zachLoc" id="loc_student"  class="loc-radio" value="student">
+      <label for="loc_student">👤 У студента</label>
+      <input type="radio" name="zachLoc" id="loc_starosta" class="loc-radio" value="starosta">
+      <label for="loc_starosta">📬 У старосты</label>
+      <input type="radio" name="zachLoc" id="loc_uch"      class="loc-radio" value="uch">
+      <label for="loc_uch">🏛 В учебной части</label>
+      <input type="radio" name="zachLoc" id="loc_unknown"  class="loc-radio" value="unknown">
+      <label for="loc_unknown">❓ Неизвестно</label>
+    </div>
+
+    <div class="modal-section-label">МФК — названия курсов</div>
+    <div id="modalMfkNames" style="display:grid;gap:8px;margin-bottom:4px;"></div>
+
+    <div class="modal-section-label">Оценки по предметам</div>
+    <div class="modal-grid" id="modalSubjectsGrid"></div>
+
+    <div class="modal-section-label">Примечания</div>
+    <textarea class="modal-notes" id="modalNotes" placeholder="Любые заметки..."></textarea>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-primary"   onclick="saveModal()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SCRIPT ══════════════════════ -->
+<script>
+// ─── AUTH DATA ────────────────────────────────────────────────────────────────
+
+const STAROSTA_PIN = '10951538';
+
+// Students in active group
+const STUDENT_PINS = {
+  '3108': 's1',
+  '9572': 's2',
+  '6664': 's3',
+  '4469': 's4',
+  '8617': 's5',
+  '1538': 's6',
+  '5336': 's7',
+  '7721': 's8',
+  '8369': 's9',
+};
+
+// Students on academic leave (not in main group state)
+const LEAVE_PINS = {
+  '7914': { lastName: 'Дикарева',  firstName: 'Анастасия', patronymic: 'Дмитриевна' },
+  '5874': { lastName: 'Сотиров',   firstName: 'Илья',      patronymic: 'Геннадьевич' },
+};
+
+// ─── SUBJECTS ────────────────────────────────────────────────────────────────
+
+const SUBJECTS = [
+  { id: 'mfk1',    abbr: 'МФК 1',      name: 'Межфакультетский курс 1', isMfk: true },
+  { id: 'mfk2',    abbr: 'МФК 2',      name: 'Межфакультетский курс 2', isMfk: true },
+  { id: 'inyaz',   abbr: 'Ин. яз.',    name: 'Иностранный язык' },
+  { id: 'imgn',    abbr: 'ИМГН',       name: 'История и методология географических наук' },
+  { id: 'arktika', abbr: 'Арктика',    name: 'Социально-экономическая география Арктики' },
+  { id: 'germany', abbr: 'Германия',   name: 'Современная Германия: политика, экономика, общество, региональные проблемы' },
+  { id: 'sfmn',    abbr: 'СФМН',       name: 'Современная философия и методология науки' },
+  { id: 'kultgeo', abbr: 'КультурГео', name: 'Культурная география' },
+  { id: 'tek',     abbr: 'ТЭК',        name: 'География топливно-энергетического комплекса стран мира' },
+  { id: 'agro',    abbr: 'Агробизнес', name: 'Территориальные стратегии агробизнеса и развитие сельских территорий' },
+  { id: 'nir',     abbr: 'НИР',        name: 'Научно-исследовательская работа' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'none',    label: '— Нет данных' },
+  { value: 'done',    label: '✓ Проставлено' },
+  { value: 'written', label: '✎ Вписано' },
+  { value: 'passed',  label: '◎ Сдано' },
+  { value: 'upgrade', label: '↑ На повышение' },
+  { value: 'retake',  label: '↺ Пересдача' },
+  { value: 'skip',    label: '∅ Не проходил(а)' },
+];
+
+const LOC_CONFIG = {
+  student:  { cls: 'loc-student',  icon: '👤', label: 'У студента' },
+  starosta: { cls: 'loc-starosta', icon: '📬', label: 'У старосты' },
+  uch:      { cls: 'loc-uch',      icon: '🏛',  label: 'В учебной части' },
+  unknown:  { cls: 'loc-unknown',  icon: '❓', label: 'Неизвестно' },
+};
+
+const STUDENTS_INIT = [
+  { id: 's1', lastName: 'Захаров',     firstName: 'Александр', patronymic: 'Алексеевич' },
+  { id: 's2', lastName: 'Коряков',     firstName: 'Даниил',    patronymic: 'Юрьевич' },
+  { id: 's3', lastName: 'Крылова',     firstName: 'Екатерина', patronymic: 'Юрьевна' },
+  { id: 's4', lastName: 'Павлова',     firstName: 'Таисия',    patronymic: 'Джевдетовна' },
+  { id: 's5', lastName: 'Панфилов',    firstName: 'Никита',    patronymic: 'Дмитриевич' },
+  { id: 's6', lastName: 'Самойлов',    firstName: 'Роман',     patronymic: 'Андреевич' },
+  { id: 's7', lastName: 'Трубицына',   firstName: 'Наталия',   patronymic: 'Дмитриевна' },
+  { id: 's8', lastName: 'Шамсутдинов', firstName: 'Данил',     patronymic: 'Марсельевич' },
+  { id: 's9', lastName: 'Шарапова',    firstName: 'Анастасия', patronymic: 'Сергеевна' },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+
+const BIN_ID  = '69ccf7ff36566621a86bb523';
+const BIN_KEY = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+function defaultGrades() {
+  const g = {};
+  SUBJECTS.forEach(s => g[s.id] = 'none');
+  return g;
+}
+
+function migrateStudent(s) {
+  if (!s.zachLoc)  s.zachLoc  = 'unknown';
+  if (!s.mfkNames) s.mfkNames = { mfk1: '', mfk2: '' };
+  if ('mfk' in s.grades) { s.grades.mfk1 = s.grades.mfk; delete s.grades.mfk; }
+  SUBJECTS.forEach(subj => {
+    if (!(subj.id in s.grades)) s.grades[subj.id] = 'none';
+    if (s.grades[subj.id] === 'fail')    s.grades[subj.id] = 'retake';
+    if (s.grades[subj.id] === 'pending') s.grades[subj.id] = 'passed';
+  });
+  return s;
+}
+
+function buildInitialState() {
+  return STUDENTS_INIT.map(s => ({
+    ...s, zachLoc: 'unknown', grades: defaultGrades(),
+    mfkNames: { mfk1: '', mfk2: '' }, notes: '',
+  }));
+}
+
+async function loadState() {
+  try {
+    const res = await fetch(BIN_URL + '/latest', {
+      headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length > 0) {
+      data.forEach(migrateStudent);
+      return data;
+    }
+  } catch(e) { console.warn('JSONBin load error:', e); }
+  return buildInitialState();
+}
+
+async function saveState() {
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': BIN_KEY,
+      },
+      body: JSON.stringify(state),
+    });
+  } catch(e) { console.warn('JSONBin save error:', e); }
+}
+
+let state = [];
+let editingId = null;
+let currentSession = null; // 'starosta' | student_id
+
+// ─── PIN LOGIC ────────────────────────────────────────────────────────────────
+
+let pinBuffer = '';
+const MAX_PIN = 8; // starosta has 8-digit pin; students have 4; accept up to 8
+
+function updateDots() {
+  // Show 4 dots for 4-digit input, 8 for 8-digit (starosta)
+  const dots = document.getElementById('pinDots');
+  const len = pinBuffer.length;
+  // Dynamically show 4 or 8 dots based on current length
+  const show = len > 4 ? 8 : 4;
+  dots.innerHTML = '';
+  for (let i = 0; i < show; i++) {
+    const d = document.createElement('div');
+    d.className = 'pin-dot' + (i < len ? ' filled' : '');
+    dots.appendChild(d);
+  }
+}
+
+function pinPress(digit) {
+  if (pinBuffer.length >= MAX_PIN) return;
+  pinBuffer += digit;
+  updateDots();
+  clearError();
+
+  // Try match after 4 digits
+  if (pinBuffer.length === 4) {
+    const studentId = STUDENT_PINS[pinBuffer];
+    if (studentId) { doLogin(studentId); return; }
+    const leave = LEAVE_PINS[pinBuffer];
+    if (leave) { doLoginLeave(leave); return; }
+    // else wait — could be the start of 8-digit starosta pin
+  }
+
+  // Try 8-digit starosta match
+  if (pinBuffer.length === 8) {
+    if (pinBuffer === STAROSTA_PIN) { doLogin('starosta'); return; }
+    // No match at 8 digits
+    showError();
+  }
+}
+
+function pinDel() {
+  if (pinBuffer.length === 0) return;
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+  clearError();
+}
+
+function showError() {
+  document.getElementById('loginError').classList.add('show');
+  document.getElementById('pinDots').style.animation = 'shake 0.35s ease';
+  setTimeout(() => {
+    document.getElementById('pinDots').style.animation = '';
+    pinBuffer = '';
+    updateDots();
+  }, 400);
+}
+
+function clearError() {
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function doLogin(who) {
+  currentSession = who;
+  showView(who === 'starosta' ? 'starosta' : 'student');
+  pinBuffer = '';
+  updateDots();
+}
+
+function doLoginLeave(person) {
+  currentSession = 'leave_' + person.lastName;
+  showView('leave');
+  pinBuffer = '';
+  updateDots();
+  renderLeave(person);
+}
+
+function logout() {
+  currentSession = null;
+  pinBuffer = '';
+  updateDots();
+  clearError();
+  showView('login');
+}
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────────
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  if (name === 'starosta') renderStarosta();
+  if (name === 'student')  renderStudentView(currentSession);
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+function statusClass(v) {
+  return { done:'s-done', written:'s-written', passed:'s-passed', none:'s-none', retake:'s-retake', skip:'s-skip', upgrade:'s-upgrade' }[v] || 's-none';
+}
+
+function statusLabel(v) {
+  return { done:'✓ Проставлено', written:'✎ Вписано', passed:'◎ Сдано',
+           none:'—', retake:'↺ Пересдача', skip:'∅ Не проходил(а)', upgrade:'↑ На повышение' }[v] || '—';
+}
+
+function initials(s) { return (s.lastName[0] + s.firstName[0]).toUpperCase(); }
+function fullName(s)  { return `${s.lastName} ${s.firstName} ${s.patronymic}`; }
+
+function progressOf(s) {
+  const relevant = SUBJECTS.filter(subj => s.grades[subj.id] !== 'skip');
+  const closed   = relevant.filter(subj => s.grades[subj.id] === 'done' || s.grades[subj.id] === 'retake');
+  return { closed: closed.length, total: relevant.length };
+}
+
+function pct(s) {
+  const { closed, total } = progressOf(s);
+  return total === 0 ? 100 : Math.round(closed / total * 100);
+}
+
+function ringColor(p) {
+  if (p >= 80) return '#4a9269';
+  if (p >= 40) return '#b07d3a';
+  return '#b55a5a';
+}
+
+function makeRing(size, strokeW, p, color) {
+  const r    = (size - strokeW * 2) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (p / 100) * circ;
+  return { r, circ, offset, color };
+}
+
+// ─── STAROSTA RENDER ─────────────────────────────────────────────────────────
+
+function renderStarosta() {
+  renderStats();
+  renderStudents();
+}
+
+function renderStats() {
+  const bar = document.getElementById('statsBar');
+  const total      = state.length;
+  const atStudent  = state.filter(s => s.zachLoc === 'student').length;
+  const atStarosta = state.filter(s => s.zachLoc === 'starosta').length;
+  const atUch      = state.filter(s => s.zachLoc === 'uch').length;
+  const fullyDone  = state.filter(s => pct(s) === 100).length;
+
+  bar.innerHTML = `
+    <div class="stat-pill"><span class="stat-dot" style="background:#8a8880"></span>Студентов: <strong>${total}</strong></div>
+    <div class="stat-pill"><span class="stat-dot" style="background:#6b7fa3"></span>У студентов: <strong>${atStudent}</strong></div>
+    <div class="stat-pill"><span class="stat-dot" style="background:#9b8bb4"></span>У старосты: <strong>${atStarosta}</strong></div>
+    <div class="stat-pill"><span class="stat-dot" style="background:#4a9269"></span>В учебной части: <strong>${atUch}</strong></div>
+    <div class="stat-pill"><span class="stat-dot" style="background:#b07d3a"></span>Полностью закрыто: <strong>${fullyDone}</strong></div>
+  `;
+}
+
+function renderStudents() {
+  const list = document.getElementById('studentsList');
+  list.innerHTML = '';
+
+  state.forEach(s => {
+    const p = pct(s);
+    const { closed, total } = progressOf(s);
+    const { r, circ, offset, color } = makeRing(42, 3, p, ringColor(p));
+    const loc = LOC_CONFIG[s.zachLoc] || LOC_CONFIG.unknown;
+
+    const card = document.createElement('div');
+    card.className = 'student-card';
+    card.dataset.id = s.id;
+
+    card.innerHTML = `
+      <div class="student-card-header" onclick="toggleCard('${s.id}')">
+        <div class="student-avatar">${initials(s)}</div>
+        <div class="student-name-block">
+          <div class="student-name">${s.lastName} <span>${s.firstName} ${s.patronymic}</span></div>
+          <div class="student-meta">
+            <span class="zach-loc-badge ${loc.cls}">${loc.icon} Зачётка: ${loc.label}</span>
+            ${s.notes ? '<span>📝 Заметки</span>' : ''}
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-ring-wrap">
+            <svg width="42" height="42" viewBox="0 0 42 42">
+              <circle class="progress-ring-bg" cx="21" cy="21" r="${r}"/>
+              <circle class="progress-ring-fill" cx="21" cy="21" r="${r}"
+                stroke="${color}" stroke-dasharray="${circ.toFixed(2)}"
+                stroke-dashoffset="${offset.toFixed(2)}"/>
+            </svg>
+            <div class="progress-pct" style="color:${color}">${p}%</div>
+          </div>
+          <div class="overall-badge">
+            <div class="badge-count" style="color:${color}">${closed}/${total}</div>
+            <div class="badge-label">закрыто</div>
+          </div>
+          <button class="edit-btn" onclick="event.stopPropagation();openModal('${s.id}')">✏️ Изменить</button>
+        </div>
+        <div class="chevron">⌄</div>
+      </div>
+      <hr class="subjects-sep">
+      <div class="subjects-grid">
+        ${SUBJECTS.map(subj => {
+          const mfkName = subj.isMfk ? (s.mfkNames && s.mfkNames[subj.id]) : '';
+          return `<div class="subject-chip">
+            <div class="subject-chip-abbr">${subj.abbr}</div>
+            <div class="subject-chip-name">${mfkName ? `<span style="color:var(--text);font-weight:500">${mfkName}</span>` : subj.name}</div>
+            <div><span class="status-badge ${statusClass(s.grades[subj.id])}">${statusLabel(s.grades[subj.id])}</span></div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${s.notes
+        ? `<div class="card-footer"><div class="footer-chip">📝 <strong>Заметка:</strong> ${s.notes}</div></div>`
+        : `<div class="card-footer"></div>`}
+    `;
+    list.appendChild(card);
+  });
+}
+
+function toggleCard(id) {
+  document.querySelector(`.student-card[data-id="${id}"]`)?.classList.toggle('open');
+}
+
+// ─── STUDENT VIEW RENDER ──────────────────────────────────────────────────────
+
+function renderStudentView(studentId) {
+  const s = state.find(x => x.id === studentId);
+  if (!s) return;
+
+  const p = pct(s);
+  const { closed, total } = progressOf(s);
+  const color = ringColor(p);
+  const loc = LOC_CONFIG[s.zachLoc] || LOC_CONFIG.unknown;
+  const r = 32, sw = 4;
+  const size = 72;
+  const ri = (size - sw * 2) / 2;
+  const circ = 2 * Math.PI * ri;
+  const offset = circ - (p / 100) * circ;
+
+  document.getElementById('studentTopbarName').textContent = `${s.lastName} ${s.firstName}`;
+
+  document.getElementById('studentHero').innerHTML = `
+    <div class="student-hero-avatar">${initials(s)}</div>
+    <div style="flex:1;min-width:0">
+      <div class="student-hero-name">${s.lastName}</div>
+      <div style="font-size:14px;color:var(--text-dim);margin-bottom:8px">${s.firstName} ${s.patronymic}</div>
+      <span class="zach-loc-badge ${loc.cls}" style="font-size:12px;padding:4px 10px">${loc.icon} Зачётка: ${loc.label}</span>
+      ${s.notes ? `<div style="margin-top:8px;font-size:12px;color:var(--text-dim)">📝 ${s.notes}</div>` : ''}
+    </div>
+    <div class="student-hero-ring">
+      <div class="big-ring-wrap">
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+          <circle class="big-ring-bg" cx="${size/2}" cy="${size/2}" r="${ri}" stroke-width="${sw}"/>
+          <circle class="big-ring-fill" cx="${size/2}" cy="${size/2}" r="${ri}"
+            stroke="${color}" stroke-width="${sw}"
+            stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"/>
+        </svg>
+        <div class="big-ring-pct" style="color:${color}">${p}%</div>
+      </div>
+      <div class="big-badge">
+        <div class="big-badge-count" style="color:${color}">${closed}/${total}</div>
+        <div class="big-badge-label">закрыто</div>
+      </div>
+    </div>
+  `;
+
+  const grid = document.getElementById('studentSubjectsGrid');
+  grid.innerHTML = SUBJECTS.map(subj => {
+    const mfkName = subj.isMfk ? (s.mfkNames && s.mfkNames[subj.id]) : '';
+    const grade = s.grades[subj.id];
+    return `<div class="subject-chip" style="background:var(--surface);border-color:var(--border)">
+      <div class="subject-chip-abbr">${subj.abbr}</div>
+      <div class="subject-chip-name">${mfkName ? `<span style="color:var(--text);font-weight:500">${mfkName}</span>` : subj.name}</div>
+      <div><span class="status-badge ${statusClass(grade)}">${statusLabel(grade)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ─── ACADEMIC LEAVE RENDER ────────────────────────────────────────────────────
+
+function renderLeave(person) {
+  const fullName = `${person.lastName} ${person.firstName} ${person.patronymic}`;
+  const firstName = person.firstName;
+  document.getElementById('leaveTopbarName').textContent = `${person.lastName} ${person.firstName}`;
+  document.getElementById('leaveCard').innerHTML = `
+    <div class="leave-icon">📚</div>
+    <div class="leave-title">Академический отпуск</div>
+    <div class="leave-sub">
+      Здравствуйте, ${firstName}!<br>
+      Вы находитесь в академическом отпуске в текущем семестре.
+    </div>
+
+    <div class="leave-info-box">
+      <div class="leave-info-label">Местонахождение вашей зачётки</div>
+      <div class="leave-info-row">
+        <span class="ico">🏛</span>
+        <span>Ваша зачётная книжка хранится в <strong>учебной части</strong> на время академического отпуска.</span>
+      </div>
+    </div>
+
+    <div class="leave-info-box">
+      <div class="leave-info-label">Контакты инспектора курса учебной части</div>
+      <div class="leave-info-row">
+        <span class="ico">👩‍💼</span>
+        <span><strong>Киселёва Екатерина Сергеевна</strong></span>
+      </div>
+      <div class="leave-info-row">
+        <span class="ico">✉️</span>
+        <a href="mailto:ekaterinakiseleva@geogr.msu.ru">ekaterinakiseleva@geogr.msu.ru</a>
+      </div>
+      <div class="leave-info-row">
+        <span class="ico">📞</span>
+        <span>
+          <a href="tel:+74959392811">+7 (495) 939-2811</a><br>
+          <a href="tel:+79168144802">+7 (916) 814-4802</a>
+        </span>
+      </div>
+    </div>
+  `;
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+
+function openModal(id) {
+  editingId = id;
+  const s = state.find(x => x.id === id);
+  if (!s) return;
+
+  document.getElementById('modalStudentName').textContent = fullName(s);
+  document.getElementById('modalNotes').value = s.notes || '';
+
+  const locEl = document.getElementById('loc_' + s.zachLoc) || document.getElementById('loc_unknown');
+  locEl.checked = true;
+
+  const mfkNames = s.mfkNames || { mfk1: '', mfk2: '' };
+  document.getElementById('modalMfkNames').innerHTML = ['mfk1','mfk2'].map((mid, i) => `
+    <div class="modal-row">
+      <div><div class="modal-subj-abbr">МФК ${i+1}</div><div class="modal-subj-name">Название курса</div></div>
+      <input class="modal-input" id="mfkname_${mid}" placeholder="не указано" value="${mfkNames[mid] || ''}">
+    </div>
+  `).join('');
+
+  document.getElementById('modalSubjectsGrid').innerHTML = SUBJECTS.map(subj => `
+    <div class="modal-row">
+      <div><div class="modal-subj-abbr">${subj.abbr}</div><div class="modal-subj-name">${subj.name}</div></div>
+      <select class="modal-select" id="ms_${subj.id}">
+        ${STATUS_OPTIONS.map(opt =>
+          `<option value="${opt.value}"${s.grades[subj.id] === opt.value ? ' selected' : ''}>${opt.label}</option>`
+        ).join('')}
+      </select>
+    </div>
+  `).join('');
+
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+  editingId = null;
+}
+
+async function saveModal() {
+  if (!editingId) return;
+  const s = state.find(x => x.id === editingId);
+  if (!s) return;
+
+  const locChecked = document.querySelector('input[name="zachLoc"]:checked');
+  s.zachLoc = locChecked ? locChecked.value : 'unknown';
+  s.notes   = document.getElementById('modalNotes').value.trim();
+
+  if (!s.mfkNames) s.mfkNames = {};
+  ['mfk1','mfk2'].forEach(mid => {
+    const el = document.getElementById(`mfkname_${mid}`);
+    if (el) s.mfkNames[mid] = el.value.trim();
+  });
+
+  SUBJECTS.forEach(subj => {
+    const el = document.getElementById(`ms_${subj.id}`);
+    if (el) s.grades[subj.id] = el.value;
+  });
+
+  closeModal();
+  renderStarosta();
+
+  // Save to JSONBin in background; show subtle indicator
+  const saveBtn = document.querySelector('.btn-primary');
+  await saveState();
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── KEYBOARD SUPPORT ─────────────────────────────────────────────────────────
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('view-login').classList.contains('active')) {
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    if (e.key === 'Backspace') pinDel();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+// Show loading spinner on the login card while fetching data
+const loginCard = document.querySelector('.login-card');
+const loadingOverlay = document.createElement('div');
+loadingOverlay.style.cssText = `
+  position:absolute;inset:0;background:rgba(250,248,245,0.85);
+  border-radius:20px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;z-index:10;
+`;
+loadingOverlay.innerHTML = `
+  <div style="width:32px;height:32px;border:3px solid #ddd9d2;
+    border-top-color:#6b7fa3;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div style="font-size:13px;color:#8a8880">Загрузка данных…</div>
+`;
+loginCard.style.position = 'relative';
+loginCard.appendChild(loadingOverlay);
+
+// Add spin keyframe
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(spinStyle);
+
+(async () => {
+  state = await loadState();
+  loadingOverlay.remove();
+  updateDots();
+})();
+</script>
+</body>
+</html>
