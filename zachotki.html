@@ -715,6 +715,7 @@ body::before {
       <div class="topbar-sub">Панель старосты</div>
     </div>
     <div class="topbar-right">
+      <span id="saveIndicator" style="font-size:12px;color:var(--text-dim);opacity:0;transition:opacity 0.3s"></span>
       <button class="logout-btn" onclick="logout()">Выйти</button>
     </div>
   </div>
@@ -936,13 +937,20 @@ function buildInitialState() {
 async function loadState() {
   try {
     const res = await fetch(BIN_URL + '/latest', {
-      headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
+      headers: {
+        'X-Master-Key': BIN_KEY,
+        'X-Bin-Meta':   'false',
+      }
     });
-    if (!res.ok) throw new Error('fetch failed');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      data.forEach(migrateStudent);
-      return data;
+    // JSONBin v3 без мета возвращает напрямую record
+    const arr = Array.isArray(data) ? data
+              : (data.record && Array.isArray(data.record)) ? data.record
+              : null;
+    if (arr && arr.length > 0) {
+      arr.forEach(migrateStudent);
+      return arr;
     }
   } catch(e) { console.warn('JSONBin load error:', e); }
   return buildInitialState();
@@ -950,14 +958,16 @@ async function loadState() {
 
 async function saveState() {
   try {
-    await fetch(BIN_URL, {
+    const res = await fetch(BIN_URL, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-Master-Key': BIN_KEY,
+        'X-Bin-Versioning': 'false',
       },
       body: JSON.stringify(state),
     });
+    if (!res.ok) console.warn('JSONBin save failed:', res.status, await res.text());
   } catch(e) { console.warn('JSONBin save error:', e); }
 }
 
@@ -1348,9 +1358,13 @@ async function saveModal() {
   closeModal();
   renderStarosta();
 
-  // Save to JSONBin in background; show subtle indicator
-  const saveBtn = document.querySelector('.btn-primary');
+  const ind = document.getElementById('saveIndicator');
+  if (ind) { ind.textContent = '⏳ Сохранение…'; ind.style.opacity = '1'; }
   await saveState();
+  if (ind) {
+    ind.textContent = '✓ Сохранено';
+    setTimeout(() => { ind.style.opacity = '0'; }, 2000);
+  }
 }
 
 document.getElementById('modalOverlay').addEventListener('click', function(e) {
