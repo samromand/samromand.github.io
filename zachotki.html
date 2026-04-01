@@ -43,11 +43,16 @@ body::before {
 }
 
 /* ── PAGES ── */
-.page { display:none; position:relative; z-index:1; min-height:100vh; }
-.page.on { display:block; }
-#pg-login { display:flex; align-items:center; justify-content:center;
+.page { display:none !important; position:relative; z-index:1; min-height:100vh; }
+.page.on { display:block !important; animation: pgIn .35s cubic-bezier(.25,1,.5,1) both; }
+#pg-login { display:none !important; align-items:center; justify-content:center;
             padding:24px; min-height:100vh; }
-#pg-login.on { display:flex; }
+#pg-login.on { display:flex !important; animation: pgIn .35s cubic-bezier(.25,1,.5,1) both; }
+
+@keyframes pgIn {
+  from { opacity:0; transform:translateY(22px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
 /* ── LOGIN ── */
 .login-card {
@@ -460,7 +465,7 @@ body::before {
 </div>
 
 <!-- ══ STAROSTA ═══════════════════════════════════════════════════════════ -->
-<div id="pg-starosta" class="page">
+<div id="pg-starosta" class="page" style="display:none">
   <div class="topbar">
     <div class="tb-logo"></div>
     <div><div class="tb-title">Зачётки · Весенняя сессия 2026</div><div class="tb-sub">Панель старосты</div></div>
@@ -492,7 +497,7 @@ body::before {
 </div>
 
 <!-- ══ STUDENT ════════════════════════════════════════════════════════════ -->
-<div id="pg-student" class="page">
+<div id="pg-student" class="page" style="display:none">
   <div class="topbar">
     <div class="tb-logo"></div>
     <div><div class="tb-title">Зачётки · Весенняя сессия 2026</div><div class="tb-sub" id="stTopSub"></div></div>
@@ -516,7 +521,7 @@ body::before {
 </div>
 
 <!-- ══ LEAVE ══════════════════════════════════════════════════════════════ -->
-<div id="pg-leave" class="page">
+<div id="pg-leave" class="page" style="display:none">
   <div class="topbar">
     <div class="tb-logo"></div>
     <div><div class="tb-title">Зачётки · Весенняя сессия 2026</div><div class="tb-sub" id="lvTopSub"></div></div>
@@ -559,7 +564,7 @@ body::before {
 // CONFIG
 // ══════════════════════════════════════════════════════════════════════════════
 
-const BIN_ID  = '69ccf7ff36566621a86bb523';
+const BIN_ID  = '69cd2621856a682189ed1a53';
 const BIN_KEY = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
@@ -631,14 +636,18 @@ let pinBuf    = '';
 // ══════════════════════════════════════════════════════════════════════════════
 
 async function fetchState() {
-  const url = `${BIN_URL}/latest?t=${Date.now()}`; // cache-bust
+  const url = `${BIN_URL}/latest?t=${Date.now()}`;
   const res = await fetch(url, {
-    headers: { 'X-Master-Key': BIN_KEY, 'X-Bin-Meta': 'false' }
+    mode: 'cors',
+    headers: {
+      'X-Master-Key': BIN_KEY,
+      'X-Bin-Meta':   'false',
+    }
   });
   if (!res.ok) throw new Error(`JSONBin GET ${res.status}`);
   const body = await res.json();
   console.log('JSONBin raw response:', JSON.stringify(body).slice(0, 200));
-  if (Array.isArray(body))               return body;
+  if (Array.isArray(body))                return body;
   if (body && Array.isArray(body.record)) return body.record;
   console.warn('Unexpected JSONBin shape:', body);
   return null;
@@ -647,14 +656,18 @@ async function fetchState() {
 async function pushState() {
   const res = await fetch(BIN_URL, {
     method: 'PUT',
+    mode:   'cors',
     headers: {
-      'Content-Type':    'application/json',
-      'X-Master-Key':    BIN_KEY,
-      'X-Bin-Versioning':'false',
+      'Content-Type':     'application/json',
+      'X-Master-Key':     BIN_KEY,
+      'X-Bin-Versioning': 'false',
     },
     body: JSON.stringify(appState),
   });
-  if (!res.ok) throw new Error(`JSONBin PUT ${res.status}`);
+  if (!res.ok) {
+    const txt = await res.text().catch(()=>'');
+    throw new Error(`JSONBin PUT ${res.status}: ${txt}`);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -779,7 +792,6 @@ async function loginAs(who) {
     appState  = raw ? migrate(raw) : buildFresh();
   } catch(e) {
     console.error('Fetch failed:', e);
-    // Показываем ошибку и возвращаем на логин
     showLoading(false);
     showPage('pg-login');
     const err = document.getElementById('loginErr');
@@ -793,24 +805,37 @@ async function loginAs(who) {
   showLoading(false);
   pinBuf = ''; drawDots();
 
-  if (who === 'starosta') {
-    renderStarosta();
-    showPage('pg-starosta');
-  } else {
-    renderStudent(who);
-    showPage('pg-student');
+  try {
+    if (who === 'starosta') {
+      renderStarosta();
+      showPage('pg-starosta');
+    } else {
+      renderStudent(who);
+      showPage('pg-student');
+    }
+  } catch(e) {
+    console.error('Render failed:', e);
+    showPage('pg-login');
+    const err = document.getElementById('loginErr');
+    err.textContent = 'Ошибка отображения: ' + e.message;
+    err.classList.add('on');
+    setTimeout(() => { err.classList.remove('on'); err.textContent = 'Неверный PIN-код'; }, 5000);
   }
 }
 
 async function loginAsLeave(person) {
   hidePage('pg-login');
   showLoading(true);
-  // No data needed for leave page, tiny delay for UX consistency
-  await new Promise(r => setTimeout(r, 0));
+  await new Promise(r => setTimeout(r, 150));
   showLoading(false);
   pinBuf = ''; drawDots();
-  renderLeave(person);
-  showPage('pg-leave');
+  try {
+    renderLeave(person);
+    showPage('pg-leave');
+  } catch(e) {
+    console.error('Leave render failed:', e);
+    showPage('pg-login');
+  }
 }
 
 function doLogout() {
@@ -824,8 +849,14 @@ function doLogout() {
 // PAGE HELPERS
 // ══════════════════════════════════════════════════════════════════════════════
 
-function showPage(id)   { document.getElementById(id).classList.add('on'); }
-function hidePage(id)   { document.getElementById(id).classList.remove('on'); }
+function showPage(id) {
+  const el = document.getElementById(id);
+  el.classList.add('on');
+  window.scrollTo(0, 0);
+}
+function hidePage(id) {
+  document.getElementById(id).classList.remove('on');
+}
 function showLoading(v) { document.getElementById('pg-loading').style.display = v ? 'flex' : 'none'; }
 
 // ══════════════════════════════════════════════════════════════════════════════
