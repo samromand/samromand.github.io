@@ -426,8 +426,11 @@ body::before {
 
 @media(max-width:620px){
   .m-row{grid-template-columns:1fr}
-  .hero{flex-wrap:wrap}
-  .hero-ring{margin-left:0}
+  /* Hero card: на мобиле — всё вертикально, аватар + имя в одну строку, кольцо ниже */
+  .hero { flex-direction:column; align-items:flex-start; gap:16px; padding:20px; }
+  .hero-top-row { display:flex; align-items:center; gap:14px; width:100%; }
+  .hero-ring { margin-left:0; width:100%; justify-content:flex-start; gap:16px; }
+  .big-count { font-size:20px; }
 }
 </style>
 </head>
@@ -922,11 +925,25 @@ function renderStarosta() {
       <hr class="sep">
       <div class="subj-grid">
         ${SUBJECTS.map(subj => {
-          const mn = subj.mfk ? (s.mfkNames?.[subj.id] || '') : '';
+          const mn    = subj.mfk ? (s.mfkNames?.[subj.id] || '') : '';
+          const grade = s.grades[subj.id];
+          const dates = (s.dates && s.dates[subj.id]) || {};
+          const doneBlock = grade === 'done' ? `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">
+              <div>
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:2px">В зачётке</div>
+                <div style="font-size:11px;color:var(--text);font-weight:500">${dates.official || '—'}</div>
+              </div>
+              <div>
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:2px">Проставлено</div>
+                <div style="font-size:11px;color:var(--text);font-weight:500">${dates.actual || '—'}</div>
+              </div>
+            </div>` : '';
           return `<div class="subj-chip">
             <div class="chip-abbr">${subj.abbr}</div>
             <div class="chip-name">${mn ? `<span style="color:var(--text);font-weight:500">${mn}</span>` : subj.name}</div>
-            <span class="badge ${stClass(s.grades[subj.id])}">${stLabel(s.grades[subj.id])}</span>
+            <span class="badge ${stClass(grade)}">${stLabel(grade)}</span>
+            ${doneBlock}
           </div>`;
         }).join('')}
       </div>
@@ -957,12 +974,14 @@ function renderStudent(sid) {
   document.getElementById('stTopSub').textContent = `${s.lastName} ${s.firstName}`;
 
   document.getElementById('stHero').innerHTML = `
-    <div class="hero-av">${initials(s)}</div>
-    <div style="flex:1;min-width:0">
-      <div class="hero-name">${s.lastName}</div>
-      <div class="hero-meta" style="margin-bottom:8px">${s.firstName} ${s.patronymic}</div>
-      <span class="loc-badge ${loc.cls}" style="font-size:12px;padding:4px 10px">${loc.icon} Зачётка: ${loc.label}</span>
-      ${s.notes ? `<div style="margin-top:8px;font-size:12px;color:var(--dim)">📝 ${s.notes}</div>` : ''}
+    <div class="hero-top-row">
+      <div class="hero-av">${initials(s)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="hero-name">${s.lastName}</div>
+        <div class="hero-meta" style="margin-bottom:8px">${s.firstName} ${s.patronymic}</div>
+        <span class="loc-badge ${loc.cls}" style="font-size:12px;padding:4px 10px">${loc.icon} Зачётка: ${loc.label}</span>
+        ${s.notes ? `<div style="margin-top:8px;font-size:12px;color:var(--dim)">📝 ${s.notes}</div>` : ''}
+      </div>
     </div>
     <div class="hero-ring">
       <div class="big-ring">
@@ -982,11 +1001,25 @@ function renderStudent(sid) {
   `;
 
   document.getElementById('stSubjGrid').innerHTML = SUBJECTS.map(subj => {
-    const mn = subj.mfk ? (s.mfkNames?.[subj.id] || '') : '';
+    const mn    = subj.mfk ? (s.mfkNames?.[subj.id] || '') : '';
+    const grade = s.grades[subj.id];
+    const dates = (s.dates && s.dates[subj.id]) || {};
+    const doneBlock = grade === 'done' ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <div>
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:3px">Дата в зачётке</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">${dates.official || '—'}</div>
+        </div>
+        <div>
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:3px">Дата проставления</div>
+          <div style="font-size:12px;color:var(--text);font-weight:500">${dates.actual || '—'}</div>
+        </div>
+      </div>` : '';
     return `<div class="subj-chip" style="background:var(--surf)">
       <div class="chip-abbr">${subj.abbr}</div>
       <div class="chip-name">${mn ? `<span style="color:var(--text);font-weight:500">${mn}</span>` : subj.name}</div>
-      <span class="badge ${stClass(s.grades[subj.id])}">${stLabel(s.grades[subj.id])}</span>
+      <span class="badge ${stClass(grade)}">${stLabel(grade)}</span>
+      ${doneBlock}
     </div>`;
   }).join('');
 }
@@ -1037,16 +1070,35 @@ function openModal(sid) {
     </div>
   `).join('');
 
-  document.getElementById('mGrid').innerHTML = SUBJECTS.map(subj => `
+  const dates = s.dates || {};
+  document.getElementById('mGrid').innerHTML = SUBJECTS.map(subj => {
+    const d = dates[subj.id] || {};
+    const isDone = s.grades[subj.id] === 'done';
+    return `
     <div class="m-row">
       <div><div class="m-abbr">${subj.abbr}</div><div class="m-name">${subj.name}</div></div>
-      <select class="m-sel" id="ms_${subj.id}">
+      <select class="m-sel" id="ms_${subj.id}" onchange="toggleDateFields('${subj.id}',this.value)">
         ${STATUS_OPTS.map(o=>`<option value="${o.v}"${s.grades[subj.id]===o.v?' selected':''}>${o.l}</option>`).join('')}
       </select>
     </div>
-  `).join('');
+    <div id="mdf_${subj.id}" style="display:${isDone?'grid':'none'};grid-template-columns:1fr 1fr;gap:8px;padding:0 0 10px 0;border-bottom:1px solid var(--border);margin-bottom:2px">
+      <div>
+        <div class="m-abbr" style="margin-bottom:4px">Дата в зачётке</div>
+        <input class="m-inp" id="mdo_${subj.id}" placeholder="дд.мм.гггг" value="${d.official||''}">
+      </div>
+      <div>
+        <div class="m-abbr" style="margin-bottom:4px">Дата проставления</div>
+        <input class="m-inp" id="mda_${subj.id}" placeholder="дд.мм.гггг" value="${d.actual||''}">
+      </div>
+    </div>`;
+  }).join('');
 
   document.getElementById('modalOv').classList.add('on');
+}
+
+function toggleDateFields(subjId, val) {
+  const el = document.getElementById('mdf_' + subjId);
+  if (el) el.style.display = val === 'done' ? 'grid' : 'none';
 }
 
 function closeModal() {
@@ -1070,9 +1122,18 @@ async function saveModal() {
     const el = document.getElementById(`mi_${mid}`);
     if (el) s.mfkNames[mid] = el.value.trim();
   });
+  if (!s.dates) s.dates = {};
   SUBJECTS.forEach(subj => {
     const el = document.getElementById(`ms_${subj.id}`);
     if (el) s.grades[subj.id] = el.value;
+    if (el && el.value === 'done') {
+      const eo = document.getElementById(`mdo_${subj.id}`);
+      const ea = document.getElementById(`mda_${subj.id}`);
+      s.dates[subj.id] = {
+        official: eo ? eo.value.trim() : '',
+        actual:   ea ? ea.value.trim() : '',
+      };
+    }
   });
 
   closeModal();
