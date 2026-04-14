@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Геометрия — Прорешивание</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root {
+  --ink:#1a1a2e; --paper:#f5f0e8; --accent:#2d6a4f; --accent-dark:#1e4d38;
+  --muted:#8a8070; --border:#d4ccc0; --card-bg:#faf7f2;
+  --green:#2d6a4f; --green-bg:#e4f0eb;
+  --yellow:#b08000; --yellow-bg:#fef3cd;
+  --red:#c84b31; --red-bg:#fce8e4;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'Golos Text',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
+
+header{padding:1.1rem 2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;background:var(--paper);position:sticky;top:0;z-index:40;}
+.back-link{font-size:.8rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:.35rem;transition:color .15s;}
+.back-link:hover{color:var(--ink);}
+.header-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;}
+.badge{font-size:.7rem;padding:.2rem .6rem;border-radius:2px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:#e4f0eb;color:var(--accent);}
+.student-info{margin-left:auto;font-size:.84rem;color:var(--muted);display:none;align-items:center;gap:.5rem;}
+.btn-sm{font-size:.75rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:2px;padding:.25rem .65rem;cursor:pointer;transition:all .15s;}
+.btn-sm:hover{border-color:var(--ink);color:var(--ink);}
+
+/* screens */
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;}
+
+/* ── LOGIN ── */
+#sLogin{min-height:calc(100vh - 58px);display:none;align-items:center;justify-content:center;padding:2rem;}
+#sLogin.active{display:flex;}
+.login-card{background:#fff;border:1px solid var(--border);border-radius:2px;padding:2.5rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1.25rem;}
+.login-card h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;}
+.login-card p{font-size:.85rem;color:var(--muted);line-height:1.6;}
+.fg{display:flex;flex-direction:column;gap:.4rem;}
+.fg label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.fg input{font-family:'Golos Text',sans-serif;font-size:1rem;padding:.65rem .8rem;border:1px solid var(--border);background:#fff;border-radius:2px;outline:none;transition:border-color .15s;color:var(--ink);width:100%;}
+.fg input:focus{border-color:var(--ink);}
+.btn-primary{padding:.7rem;font-family:'Golos Text',sans-serif;font-size:.9rem;font-weight:500;border:none;border-radius:2px;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s;width:100%;}
+.btn-primary:hover{background:var(--accent-dark);}
+.btn-primary:disabled{background:var(--muted);cursor:not-allowed;}
+
+/* ── MENU ── */
+#sMenu{padding:2.5rem 2rem;max-width:880px;margin:0 auto;}
+.menu-head{margin-bottom:2rem;}
+.menu-head h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;}
+.menu-head p{font-size:.875rem;color:var(--muted);margin-top:.4rem;line-height:1.6;}
+.task-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+.tile{background:#fff;border:1px solid var(--border);border-radius:2px;padding:1.25rem;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:.75rem;position:relative;overflow:hidden;}
+.tile:hover{box-shadow:0 3px 14px rgba(0,0,0,.08);border-color:#bbb;transform:translateY(-1px);}
+.tile.locked{opacity:.5;cursor:not-allowed;}
+.tile.locked:hover{box-shadow:none;border-color:var(--border);transform:none;}
+.tile.empty-tasks{opacity:.6;cursor:not-allowed;}
+.tile.empty-tasks:hover{box-shadow:none;border-color:var(--border);transform:none;}
+.tile-num{width:32px;height:32px;border-radius:2px;background:#e4f0eb;color:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+.tile-title{font-weight:600;font-size:.9rem;}
+.tile-desc{font-size:.78rem;color:var(--muted);line-height:1.5;}
+.tile-bottom{display:flex;align-items:center;gap:.4rem;margin-top:auto;}
+.tdot-sm{width:9px;height:9px;border-radius:50%;}
+.dot-green{background:var(--green);}
+.dot-yellow{background:var(--yellow);}
+.dot-red{background:var(--red);}
+.dot-empty{background:var(--border);}
+.tile-lock-badge{position:absolute;top:.75rem;right:.75rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:rgba(0,0,0,.06);padding:.2rem .45rem;border-radius:2px;}
+.tile-count{margin-left:auto;font-size:.75rem;color:var(--muted);}
+
+/* ── PRACTICE ── */
+#sPractice{padding:2rem;max-width:760px;margin:0 auto;}
+.pnav{display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem;}
+.pnav-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;}
+.pnav-prog{margin-left:auto;font-size:.8rem;color:var(--muted);}
+.prog-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;}
+.tdots{display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.tdot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border);background:#fff;transition:all .2s;}
+.tdot.cur{border-color:var(--accent);background:var(--accent);transform:scale(1.3);}
+.tdot.green{border-color:var(--green);background:var(--green);}
+.tdot.yellow{border-color:var(--yellow);background:var(--yellow);}
+.tdot.red{border-color:var(--red);background:var(--red);}
+
+/* question card */
+.qcard{background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:1rem;}
+.qcard-head{padding:.75rem 1.25rem;background:var(--card-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;}
+.qnum{width:24px;height:24px;border-radius:2px;background:#e4f0eb;color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;}
+.qtag{font-size:.72rem;color:var(--muted);}
+.qpts{margin-left:auto;font-size:.72rem;color:var(--muted);background:rgba(0,0,0,.06);padding:.1rem .4rem;border-radius:10px;}
+.qbody{padding:1.5rem 1.25rem;display:flex;flex-direction:column;gap:1rem;}
+.qcond{font-size:.95rem;line-height:1.75;}
+
+/* ── А5 sticky formulas bar ── */
+.fml-bar{
+  position:sticky; top:58px; z-index:30;
+  background:var(--paper); border:1px solid var(--border);
+  border-radius:2px; padding:.6rem 1rem;
+  display:none; flex-wrap:wrap; gap:.4rem 1.5rem;
+  align-items:center; margin-bottom:1rem;
+  box-shadow:0 2px 8px rgba(0,0,0,.07);
+  font-size:.88rem; line-height:1.8;
+}
+.fml-bar.visible{display:flex;}
+.fml-bar-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);width:100%;margin-bottom:-.2rem;}
+
+/* А5 answer cells group */
+.a5-ans{display:flex;align-items:flex-end;gap:1.25rem;flex-wrap:wrap;margin-top:.25rem;}
+.a5-cell-wrap{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.a5-cell-label{font-size:.8rem;font-weight:600;color:var(--muted);}
+.a5-cell{
+  width:44px;height:44px;
+  border:1.5px solid var(--border);border-radius:2px;
+  font-family:'Golos Text',sans-serif;font-size:1.3rem;font-weight:600;
+  text-align:center;outline:none;background:#fff;color:var(--ink);
+  transition:border-color .15s,background .15s;
+  caret-color:var(--accent);
+}
+.a5-cell:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(200,75,49,.15);}
+.a5-cell.ok{border-color:var(--green);background:var(--green-bg);}
+.a5-cell.shake{animation:shake .35s;}
+
+/* options А1 */
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.25rem;}
+.q-opt{padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:2px;font-size:.9rem;background:#fff;text-align:left;display:flex;align-items:center;gap:.6rem;font-family:'Golos Text',sans-serif;width:100%;}
+.q-opt.correct{border-color:var(--green);background:var(--green-bg);}
+.opt-lbl{width:20px;height:20px;border-radius:2px;background:rgba(0,0,0,.07);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+
+/* answer */
+.ans-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.6rem;}
+.ans-row{display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap;}
+/* cell grid */
+.cell-group{display:flex;flex-direction:column;gap:.3rem;}
+.cell-group-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:center;}
+.cells{display:flex;gap:2px;}
+.cell{
+  width:28px;height:38px;
+  border:1.5px solid var(--border);border-radius:2px;
+  font-family:'Golos Text',sans-serif;font-size:1rem;font-weight:500;
+  text-align:center;outline:none;background:#fff;color:var(--ink);
+  transition:border-color .15s,background .15s;
+  caret-color:var(--accent);
+}
+.cell:focus{border-color:var(--accent);z-index:1;position:relative;}
+.cell.ok{border-color:var(--green);background:var(--green-bg);}
+.cell.shake{animation:shake .35s;}
+/* single wide cell (А1) */
+.cell-wide{width:38px;}
+/* check button aligned with cells */
+.btn-check{
+  padding:0 1.1rem;height:38px;
+  font-family:'Golos Text',sans-serif;font-size:.875rem;font-weight:500;
+  border:none;border-radius:2px;background:var(--accent);color:#fff;
+  cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0;
+}
+.btn-check:hover{background:var(--accent-dark);}
+.btn-check:disabled{background:var(--muted);cursor:not-allowed;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btn-check{padding:.65rem 1.25rem;font-family:'Golos Text',sans-serif;font-size:.875rem;font-weight:500;border:none;border-radius:2px;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.btn-check:hover{background:var(--accent-dark);}
+.btn-check:disabled{background:var(--muted);cursor:not-allowed;}
+
+/* feedback */
+.qfb{display:none;padding:.75rem 1rem;border-radius:2px;font-size:.875rem;line-height:1.5;margin-bottom:.75rem;}
+.qfb.show{display:block;}
+.qfb.ok{background:var(--green-bg);color:var(--green);}
+.qfb.err{background:var(--red-bg);color:var(--red);}
+
+/* ── self-assessment panel (А7, А8) ── */
+.sa-panel{display:none;background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:1rem;}
+.sa-panel.open{display:block;}
+.sa-solution{padding:1.25rem;border-bottom:1px solid var(--border);background:var(--card-bg);}
+.sa-solution-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;}
+.sa-solution-text{font-size:.9rem;line-height:2;color:var(--ink);}
+.sa-solution-text .sol-line{display:block;min-height:1.4em;}
+.sa-solution-text .sol-line.sol-gap{margin-top:.5rem;}
+.sa-answer-pill{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;
+  background:var(--ink);color:#fff;padding:.35rem .85rem;border-radius:2px;font-size:.85rem;font-weight:500;}
+.sa-qblock{padding:1.25rem;display:flex;flex-direction:column;gap:1rem;}
+.sa-question{font-size:.95rem;line-height:1.6;font-weight:500;}
+.sa-hint{font-size:.8rem;color:var(--muted);line-height:1.5;font-style:italic;}
+.sa-btns{display:flex;gap:.5rem;}
+.sa-btn{flex:1;padding:.65rem;font-family:'Golos Text',sans-serif;font-size:.875rem;font-weight:500;
+  border:1.5px solid var(--border);border-radius:2px;background:#fff;cursor:pointer;
+  transition:all .15s;color:var(--ink);}
+.sa-btn:hover{border-color:var(--ink);}
+.sa-btn.yes:hover{border-color:var(--green);background:var(--green-bg);color:var(--green);}
+.sa-btn.no:hover{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+.sa-verdict{padding:1.25rem;border-top:1px solid var(--border);}
+.sa-verdict-score{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;margin-bottom:.4rem;}
+.sa-verdict-score.s2{color:var(--green);}
+.sa-verdict-score.s1{color:var(--yellow);}
+.sa-verdict-score.s0{color:var(--red);}
+.sa-verdict-reason{font-size:.875rem;color:var(--muted);line-height:1.6;}
+
+/* actions */
+.qactions{display:flex;gap:.5rem;justify-content:flex-end;}
+.btn-act{padding:.6rem 1.25rem;font-family:'Golos Text',sans-serif;font-size:.875rem;font-weight:500;border:1px solid var(--border);border-radius:2px;background:#fff;color:var(--ink);cursor:pointer;transition:all .15s;}
+.btn-act:hover{border-color:var(--ink);}
+.btn-act.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+.btn-act.primary:hover{background:#2d2d4e;}
+
+/* summary */
+.summary{display:none;background:#fff;border:1px solid var(--border);border-radius:2px;padding:2rem;flex-direction:column;gap:1.25rem;}
+.summary.show{display:flex;}
+.summary-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;}
+.summary-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;}
+.sstat{background:var(--card-bg);border-radius:2px;padding:1rem;display:flex;flex-direction:column;gap:.2rem;}
+.sstat-n{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;}
+.sstat-l{font-size:.75rem;color:var(--muted);}
+.c-green{color:var(--green);}
+.c-yellow{color:var(--yellow);}
+.c-red{color:var(--red);}
+
+/* all done */
+.alldone{display:none;text-align:center;padding:3rem 1rem;flex-direction:column;gap:1rem;align-items:center;}
+.alldone.show{display:flex;}
+.alldone-icon{font-size:2.5rem;}
+.alldone h3{font-family:'Playfair Display',serif;font-size:1.3rem;}
+.alldone p{font-size:.875rem;color:var(--muted);line-height:1.6;max-width:360px;}
+
+/* toast */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:#fff;padding:.7rem 1.4rem;border-radius:2px;font-size:.84rem;z-index:200;transform:translateY(80px);opacity:0;transition:all .25s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
+
+/* ── PIN modal (reset) ── */
+.pin-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.5);z-index:100;align-items:center;justify-content:center;}
+.pin-overlay.active{display:flex;}
+.pin-box{background:var(--paper);border:1px solid var(--border);padding:2rem;width:100%;max-width:320px;display:flex;flex-direction:column;gap:1rem;}
+.pin-box h3{font-family:'Playfair Display',serif;font-size:1.1rem;}
+.pin-box p{font-size:.84rem;color:var(--muted);line-height:1.5;}
+.pin-input{font-family:'Golos Text',sans-serif;font-size:1.3rem;letter-spacing:.2em;text-align:center;padding:.65rem;border:1.5px solid var(--border);border-radius:2px;outline:none;width:100%;transition:border-color .15s;}
+.pin-input:focus{border-color:var(--ink);}
+.pin-input.err-shake{animation:shake .3s;border-color:var(--red);}
+.pin-btns{display:flex;gap:.5rem;}
+.pin-btn-ok{flex:2;padding:.6rem;background:var(--ink);color:#fff;border:none;border-radius:2px;font-family:'Golos Text',sans-serif;font-size:.875rem;cursor:pointer;}
+.pin-btn-no{flex:1;padding:.6rem;background:none;border:1px solid var(--border);border-radius:2px;font-family:'Golos Text',sans-serif;font-size:.875rem;cursor:pointer;color:var(--ink);}
+
+/* ── tile stats block ── */
+.tile-avg{font-size:.75rem;color:var(--muted);margin-top:.1rem;}
+.tile-avg strong{color:var(--ink);}
+.tile-reset-btn{
+  font-size:.68rem;color:var(--muted);background:none;
+  border:1px solid var(--border);border-radius:2px;
+  padding:.15rem .5rem;cursor:pointer;transition:all .15s;
+  white-space:nowrap;flex-shrink:0;margin-left:auto;
+}
+.tile-reset-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── grade summary bar (bottom of menu) ── */
+.grade-bar{
+  margin-top:1.5rem;background:#fff;border:1px solid var(--border);
+  border-radius:2px;padding:1.1rem 1.5rem;display:flex;
+  align-items:center;gap:2rem;flex-wrap:wrap;
+}
+.grade-bar-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.grade-item{display:flex;flex-direction:column;gap:.1rem;}
+.grade-sum{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;line-height:1;}
+.grade-mark{
+  font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;
+  color:var(--accent);margin-left:auto;
+}
+.grade-hint{font-size:.75rem;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M7 1.5L3.5 5.5L7 9.5" stroke="currentColor" stroke-width="1.4"/></svg>
+    Главная
+  </a>
+  <div class="header-title">Геометрия</div>
+  <span class="badge">Практика</span>
+  <div class="student-info" id="studentInfo">
+    <span id="sNameDisplay"></span>
+    <button class="btn-sm" onclick="logout()">Выйти</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div class="screen active" id="sLogin">
+  <div class="login-card">
+    <h2>Вход</h2>
+    <p>Введите своё имя — система запомнит прогресс и не будет повторять уже решённые задачи.</p>
+    <div class="fg"><label>Фамилия</label>
+      <input type="text" id="inLast" placeholder="Иванов" autocomplete="off" oninput="loginCheck()"></div>
+    <div class="fg"><label>Имя</label>
+      <input type="text" id="inFirst" placeholder="Иван" autocomplete="off" oninput="loginCheck()"
+        onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-primary" id="btnLogin" onclick="doLogin()" disabled>Начать</button>
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="screen" id="sMenu">
+  <div class="menu-head">
+    <h2 id="greetName">Привет!</h2>
+    <p>Выберите задание для отработки.</p>
+  </div>
+  <div class="task-grid" id="taskGrid"></div>
+  <div class="grade-bar" id="gradeBar" style="display:none">
+    <div class="grade-item">
+      <div class="grade-bar-label">Ожидаемый балл</div>
+      <div class="grade-sum" id="gradeSum">—</div>
+      <div class="grade-hint">сумма средних по заданиям</div>
+    </div>
+    <div class="grade-item">
+      <div class="grade-bar-label">Ожидаемая оценка</div>
+      <div class="grade-mark" id="gradeMark">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- PIN MODAL (reset) -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <h3>Сброс прогресса</h3>
+    <p id="pinDesc">Введите PIN учителя для сброса прогресса по заданию.</p>
+    <input type="password" class="pin-input" id="pinInput" maxlength="8" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')confirmReset()">
+    <div class="pin-btns">
+      <button class="pin-btn-no" onclick="closePinModal()">Отмена</button>
+      <button class="pin-btn-ok" onclick="confirmReset()">Сбросить</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRACTICE -->
+<div class="screen" id="sPractice">
+  <div class="pnav">
+    <button class="btn-sm" onclick="goMenu()">← К заданиям</button>
+    <div class="pnav-title" id="pTitle"></div>
+    <div class="pnav-prog" id="pProg"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <div class="tdots" id="tdots"></div>
+
+  <div class="fml-bar" id="fmlBar"></div>
+
+  <div class="qcard" id="qCard">
+    <div class="qcard-head">
+      <div class="qnum" id="qNum">1</div>
+      <span class="qtag" id="qTag"></span>
+      <span class="qpts" id="qPts">1 балл</span>
+    </div>
+    <div class="qbody" id="qBody"></div>
+  </div>
+
+  <div class="qfb" id="qFb"></div>
+  <div class="sa-panel" id="saPanel"></div>
+  <div class="qactions" id="qActions"></div>
+
+  <div class="alldone" id="allDone">
+    <div class="alldone-icon">🎉</div>
+    <h3>Все задачи этого типа решены!</h3>
+    <p>Вы прошли все доступные варианты. Можно вернуться к выбору или решить заново.</p>
+    <div style="display:flex;gap:.5rem;margin-top:.5rem">
+      <button class="btn-act" onclick="goMenu()">К заданиям</button>
+      <button class="btn-act primary" onclick="resetRestart()">Решить заново</button>
+    </div>
+  </div>
+
+  <div class="summary" id="summary">
+    <div class="summary-title">Итог сессии</div>
+    <div class="summary-stats">
+      <div class="sstat"><div class="sstat-n c-green" id="sumG">0</div><div class="sstat-l">Верно с первой попытки</div></div>
+      <div class="sstat"><div class="sstat-n" style="color:var(--yellow)" id="sumY">0</div><div class="sstat-l">Частично (1 балл)</div></div>
+      <div class="sstat"><div class="sstat-n c-red" id="sumR">0</div><div class="sstat-l">Не решено (0 баллов)</div></div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="btn-act" onclick="goMenu()">К заданиям</button>
+      <button class="btn-act primary" onclick="resetRestart()">Ещё раз</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════ CONFIG ════════════
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+const API_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const BINS     = { algebra:'69de56e6856a6821893298a0', geometry:'69de571c36566621a8b1abcb' };
+const SUBJECT  = 'geometry'; // this page uses geometry bin
+
+// ════════════ TASK META ════════════
+const META = [
+  { title:'Задание 1', desc:'Теорема Пифагора',                          pts:1, locked:false },
+  { title:'Задание 2', desc:'Тригонометрия в прямоугольном треугольнике',pts:1, locked:false },
+  { title:'Задание 3', desc:'Площади фигур',                             pts:1, locked:false },
+  { title:'Задание 4', desc:'Площадь трапеции с нахождением высоты',     pts:1, locked:false },
+  { title:'Задание 5', desc:'Центральные и вписанные углы',              pts:1, locked:false },
+  { title:'Задание 6', desc:'Верные/неверные утверждения',               pts:1, locked:false },
+  { title:'Задание 7', desc:'Задача с развёрнутым решением',             pts:2, locked:false },
+  { title:'Задание 8', desc:'Доказательство',                            pts:2, locked:false },
+];
+
+// ════════════ STATE ════════════
+let sKey  = '';   // storage key per student
+let sName = '';
+let taskDb = null;
+
+let tidx    = -1;
+let queue   = [];
+let pos     = 0;
+let results = [];   // [{taskId, status:'green'|'yellow'|'red'}]
+let attempts = 0;
+
+// ════════════ PROGRESS ════════════
+const pk = i => `prog_${sKey}_geo_${i}`;
+const loadProg = i => { const r=localStorage.getItem(pk(i)); return r?JSON.parse(r):[]; };
+const saveProg = (i,d) => localStorage.setItem(pk(i), JSON.stringify(d));
+
+// ════════════ DATA ════════════
+async function loadDb() {
+  const id = BINS[SUBJECT];
+  if (!id || id.includes('BIN_ID')) {
+    const r = localStorage.getItem('kr8_' + SUBJECT);
+    taskDb = r ? JSON.parse(r) : {tasks:Array.from({length:8},()=>[])};
+    return;
+  }
+  try {
+    const res = await fetch(`${JSONBIN_BASE}/${id}/latest`,{headers:{'X-Master-Key':API_KEY}});
+    const j = await res.json();
+    taskDb = j.record || {tasks:Array.from({length:8},()=>[])};
+  } catch {
+    const r = localStorage.getItem('kr8_' + SUBJECT);
+    taskDb = r ? JSON.parse(r) : {tasks:Array.from({length:8},()=>[])};
+  }
+}
+
+// ════════════ LOGIN ════════════
+function loginCheck() {
+  const l=document.getElementById('inLast').value.trim();
+  const f=document.getElementById('inFirst').value.trim();
+  document.getElementById('btnLogin').disabled=!(l&&f);
+}
+
+async function doLogin() {
+  const last =document.getElementById('inLast').value.trim();
+  const first=document.getElementById('inFirst').value.trim();
+  if(!last||!first) return;
+  sName = `${last} ${first}`;
+  sKey  = `${last}_${first}`.toLowerCase().replace(/\s+/g,'_');
+  const btn=document.getElementById('btnLogin');
+  btn.disabled=true; btn.textContent='Загрузка…';
+  await loadDb();
+  document.getElementById('sNameDisplay').textContent=sName;
+  document.getElementById('studentInfo').style.display='flex';
+  document.getElementById('greetName').textContent=`Привет, ${first}!`;
+  btn.textContent='Начать';
+  showS('sMenu'); renderMenu();
+}
+
+function logout() {
+  sKey=''; sName='';
+  document.getElementById('studentInfo').style.display='none';
+  document.getElementById('inLast').value='';
+  document.getElementById('inFirst').value='';
+  document.getElementById('btnLogin').disabled=true;
+  showS('sLogin');
+}
+
+// ════════════ SCREENS ════════════
+function showS(id) {
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  if(id==='sLogin') el.style.display='flex';
+}
+
+// ════════════ MENU ════════════
+// ════════════ SCORING HELPERS ════════════
+// Score for a single solved task: green=max pts, yellow=1 (partial), red=0
+function taskScore(status, taskIdx) {
+  if(status==='green') return META[taskIdx].pts;
+  if(status==='yellow') return 1;
+  return 0;
+}
+
+// Weighted average: last 10 solved have double weight
+// Returns null if no solved tasks
+function weightedAvg(prog, taskIdx) {
+  if(!prog.length) return null;
+  const scores = prog.map(p => taskScore(p.status, taskIdx));
+  const n = scores.length;
+  if(n === 0) return null;
+  // Split into older and last 10
+  const cutoff = Math.max(0, n - 10);
+  const older = scores.slice(0, cutoff);   // weight 1 each
+  const recent = scores.slice(cutoff);      // weight 2 each
+  const sum = older.reduce((a,b)=>a+b,0) + recent.reduce((a,b)=>a+b*2,0);
+  const cnt = older.length + recent.length * 2;
+  return sum / cnt;
+}
+
+// Grade from total expected score (out of 10)
+function calcGrade(total) {
+  if(total >= 9) return '5';
+  if(total >= 6) return '4';
+  if(total >= 4) return '3';
+  return '2';
+}
+
+// ════════════ MENU ════════════
+function renderMenu() {
+  let totalAvg = 0;
+  let anyData  = false;
+
+  document.getElementById('taskGrid').innerHTML = META.map((m,i) => {
+    const tasks  = taskDb?.tasks[i]||[];
+    const prog   = loadProg(i);
+    const green  = prog.filter(p=>p.status==='green').length;
+    const yellow = prog.filter(p=>p.status==='yellow').length;
+    const red    = prog.filter(p=>p.status==='red').length;
+    const done   = green+yellow+red;
+    const total  = tasks.length;
+
+    // Avg score
+    const avg = weightedAvg(prog, i);
+    if(avg !== null) { totalAvg += avg; anyData = true; }
+
+    const dots = tasks.slice(0,12).map(t=>{
+      const p=prog.find(p=>p.taskId===t.id);
+      return `<div class="tdot-sm dot-${p?p.status:'empty'}"></div>`;
+    }).join('');
+
+    const noTasks = total===0;
+    const cls = m.locked?'locked':noTasks?'empty-tasks':'';
+    const onclick = m.locked||noTasks ? '' : `onclick="startPractice(${i})"`;
+
+    const avgHtml = avg !== null
+      ? `<div class="tile-avg">Средний балл: <strong>${avg.toFixed(1)}</strong> / ${m.pts}</div>`
+      : '';
+
+    const resetBtn = !noTasks && !m.locked
+      ? `<button class="tile-reset-btn" onclick="event.stopPropagation();askReset(${i})">Сбросить</button>`
+      : '';
+
+    return `<div class="tile ${cls}" ${onclick}>
+      ${m.locked?'<span class="tile-lock-badge">скоро</span>':''}
+      <div class="tile-num">${i+1}</div>
+      <div><div class="tile-title">${m.title}</div><div class="tile-desc">${m.desc}</div></div>
+      ${avgHtml}
+      <div class="tile-bottom">
+        ${noTasks
+          ? `<span style="font-size:.75rem;color:var(--muted)">Нет задач</span>`
+          : `<div style="display:flex;gap:.3rem;flex-wrap:wrap">${dots}</div>
+             <span style="font-size:.75rem;color:var(--muted)">${done}/${total}</span>`
+        }
+        ${resetBtn}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Grade bar
+  const bar = document.getElementById('gradeBar');
+  if(anyData) {
+    const rounded = Math.round(totalAvg);
+    const mark = calcGrade(rounded);
+    document.getElementById('gradeSum').textContent = rounded + ' / 10';
+    document.getElementById('gradeMark').textContent = '«' + mark + '»';
+    bar.style.display = 'flex';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+// ════════════ PRACTICE ════════════
+function startPractice(i) {
+  const tasks = taskDb?.tasks[i]||[];
+  if(!tasks.length){ toast('В этом задании пока нет задач','err'); return; }
+  tidx=i; results=[]; pos=0; attempts=0;
+
+  const prog = loadProg(i);
+  // Unseen first (not in progress at all), then shuffle
+  const unseen = shuffle(tasks.filter(t=>!prog.find(p=>p.taskId===t.id)));
+  queue = unseen.length>0 ? unseen : shuffle([...tasks]);
+
+  document.getElementById('pTitle').textContent = META[i].title;
+  document.getElementById('summary').classList.remove('show');
+  document.getElementById('allDone').classList.remove('show');
+  document.getElementById('qCard').style.display='';
+  document.getElementById('qFb').className='qfb';
+  document.getElementById('qActions').innerHTML='';
+  showS('sPractice');
+  renderDots(); renderQ();
+}
+
+function renderDots() {
+  document.getElementById('tdots').innerHTML = queue.map((t,i)=>{
+    const r=results.find(r=>r.taskId===t.id);
+    const cls = i===pos?'cur':r?r.status:'';
+    return `<div class="tdot ${cls}"></div>`;
+  }).join('');
+  const pct = queue.length>0 ? Math.round(results.length/queue.length*100) : 0;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('pProg').textContent=`${results.length} / ${queue.length}`;
+}
+
+function renderQ() {
+  if(pos>=queue.length){ finishSession(); return; }
+  const task=queue[pos];
+  attempts=0;
+  document.getElementById('qNum').textContent=tidx+1;
+  document.getElementById('qTag').textContent=META[tidx].desc;
+  const pts=META[tidx].pts;
+  document.getElementById('qPts').textContent=pts===2?'2 балла':'1 балл';
+  document.getElementById('qFb').className='qfb';
+  document.getElementById('qActions').innerHTML='';
+  // Reset self-assessment panel
+  const saPanel=document.getElementById('saPanel');
+  saPanel.classList.remove('open'); saPanel.innerHTML='';
+  saTree=null; saNodeId=null;
+  // Hide fmlBar (not used in geometry)
+  const bar=document.getElementById('fmlBar');
+  bar.classList.remove('visible'); bar.innerHTML='';
+  document.getElementById('qBody').innerHTML=buildQ(task);
+  renderDots();
+  setTimeout(()=>{
+    renderMathInElement(document.getElementById('qCard'),{
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+    if(tidx===6||tidx===7) {
+      document.getElementById('qActions').innerHTML=
+        `<button class="btn-act primary" onclick="openSelfAssess()">Посмотреть ответ и оценить решение →</button>`;
+    } else {
+      document.getElementById('c0')?.focus();
+    }
+  }, 80);
+}
+
+// ════════════ QUESTION BUILDERS ════════════
+function buildQ(t) {
+  switch(tidx) {
+    case 0: return q1(t); case 1: return q2(t); case 2: return q3(t);
+    case 3: return q4(t); case 4: return q5(t); case 5: return q6(t);
+    case 6: return q7(t); case 7: return q8(t);
+    default: return '';
+  }
+}
+
+// ── Cell-based answer input ──────────────────────────────────
+function cellsHtml(n, groupLabel, idPrefix) {
+  const cells = Array.from({length:n}, (_,i) =>
+    `<input class="cell${n===1?' cell-wide':''}" id="${idPrefix}${i}" maxlength="1"
+      inputmode="decimal"
+      onkeydown="cellKey(event,'${idPrefix}',${i},${n})"
+      oninput="cellInput(event,'${idPrefix}',${i},${n})">`
+  ).join('');
+  const lbl = groupLabel ? `<div class="cell-group-label">${groupLabel}</div>` : '';
+  return `<div class="cell-group">${lbl}<div class="cells">${cells}</div></div>`;
+}
+
+function cellAnswerBlock(label, n, prefix='c') {
+  return `<div>
+    <div class="ans-label">${label}</div>
+    <div class="ans-row">
+      ${cellsHtml(n, '', prefix)}
+      <button class="btn-check" id="btnCheck" onclick="checkAns()" disabled>Проверить</button>
+    </div>
+  </div>`;
+}
+
+// Г1 — Теорема Пифагора
+function q1(t) {
+  return `<div class="qcond">${esc(t.condition)}</div>
+    ${cellAnswerBlock('Ответ', 17)}`;
+}
+
+// Г2 — Тригонометрия
+function q2(t) {
+  return `<div class="qcond">${esc(t.condition)}</div>
+    ${cellAnswerBlock('Ответ', 17)}`;
+}
+
+// Г3 — Площади фигур
+function q3(t) {
+  return `<div class="qcond">${esc(t.condition)}</div>
+    ${cellAnswerBlock('Ответ', 17)}`;
+}
+
+// Г4 — Площадь трапеции
+function q4(t) {
+  return `
+    <div class="qcond">${esc(t.condition)}</div>
+    ${t.key_step ? `<div class="qcond" style="font-size:.82rem;color:var(--muted);margin-top:.25rem">💡 Подсказка по ключевому шагу: $${t.key_step}$</div>` : ''}
+    ${cellAnswerBlock('Ответ', 17)}`;
+}
+
+// Г5 — Центральные и вписанные углы
+function q5(t) {
+  return `<div class="qcond">${esc(t.condition)}</div>
+    <div class="qcond" style="font-size:.85rem;color:var(--muted)">Ответ дайте в градусах — целым числом.</div>
+    ${cellAnswerBlock('Ответ (градусы)', 17)}`;
+}
+
+// Г6 — Верные/неверные утверждения (порядок цифр не важен)
+function q6(t) {
+  const stmts = [t.stmt1, t.stmt2, t.stmt3, t.stmt4];
+  const stmtsHtml = stmts.map((s,i) => s
+    ? `<div style="display:flex;gap:.6rem;margin-bottom:.6rem">
+        <span style="font-weight:600;flex-shrink:0">${i+1})</span>
+        <span>${esc(s)}</span>
+       </div>` : ''
+  ).join('');
+  return `
+    <div class="qcond" style="margin-bottom:.75rem">Какие из следующих утверждений верны?</div>
+    <div style="margin-bottom:1rem;font-size:.9rem;line-height:1.6">${stmtsHtml}</div>
+    <div class="qcond" style="font-size:.82rem;color:var(--muted);margin-bottom:.5rem">
+      Введите номера верных утверждений без пробелов (например: 3 или 13). Порядок цифр не важен.
+    </div>
+    ${cellAnswerBlock('Верные утверждения', 4)}`;
+}
+
+// Г7 — Задача с развёрнутым решением
+function q7(t) {
+  return `
+    <div class="qcond">${esc(t.condition)}</div>
+    <div class="qcond" style="font-size:.85rem;color:var(--muted);margin-top:.4rem;line-height:1.6">
+      Запишите полное решение на бумаге. Затем нажмите кнопку ниже, чтобы посмотреть ответ и оценить своё решение.
+    </div>`;
+}
+
+// Г8 — Доказательство
+function q8(t) {
+  return `
+    <div class="qcond">${esc(t.condition)}</div>
+    ${t.what ? `<div class="qcond" style="margin-top:.5rem"><strong>Доказать:</strong> $${t.what}$</div>` : ''}
+    <div class="qcond" style="font-size:.85rem;color:var(--muted);margin-top:.4rem;line-height:1.6">
+      Запишите полное доказательство на бумаге. Затем нажмите кнопку ниже, чтобы посмотреть эталонное доказательство и оценить своё решение.
+    </div>`;
+}
+
+// ════════════ SELF-ASSESSMENT ENGINE ════════════
+
+// Decision trees: each node has {q, hint?, yes→nodeId|result, no→nodeId|result}
+// result: {score:0|1|2, reason:'...'}
+const SA_TREES = {
+  // Г7 — задача с развёрнутым решением
+  g7: {
+    start: 'q1',
+    nodes: {
+      q1: {
+        q: 'Ты понял, какое геометрическое свойство или теорему нужно применить, и использовал его в решении?',
+        hint: 'Сравни свой подход с эталонным решением.',
+        yes: 'q2',
+        no:  {score:0, reason:'Ключевое геометрическое свойство не применено. Посмотри решение учителя внимательно.'}
+      },
+      q2: {
+        q: 'Все шаги решения обоснованы — ты ссылаешься на теоремы, свойства фигур или признаки (пусть даже своими словами)?',
+        yes: 'q3',
+        no:  'q2a'
+      },
+      q2a: {
+        q: 'Вычисления и ответ верные, но обоснований нет или они неполные?',
+        yes: {score:1, reason:'Ответ верный, но решение не обосновано. В геометрии обязательно нужно указывать, на каком свойстве или теореме основан каждый шаг.'},
+        no:  {score:0, reason:'Ни обоснований, ни верного ответа. Разбери решение учителя по шагам.'}
+      },
+      q3: {
+        q: 'Вычисления выполнены верно и получен правильный ответ?',
+        yes: {score:2, reason:'Отлично! Решение полное, обоснованное и верное.'},
+        no:  {score:1, reason:'Ход решения верный и обоснования есть, но допущена вычислительная ошибка.'}
+      }
+    }
+  },
+
+  // Г8 — доказательство
+  g8: {
+    start: 'q1',
+    nodes: {
+      q1: {
+        q: 'Ты установил хотя бы одно из необходимых условий признака (равенство углов или пропорциональность сторон)?',
+        yes: 'q2',
+        no:  {score:0, reason:'Ни одного необходимого условия не установлено. Доказательство не начато по существу.'}
+      },
+      q2: {
+        q: 'Ты установил все необходимые условия признака — для 1-го признака два угла, для 2-го признака две стороны и угол между ними?',
+        hint: 'Сравни с эталонным доказательством — сколько условий нужно для выбранного признака.',
+        yes: 'q3',
+        no:  {score:1, reason:'Частичное доказательство: одно из необходимых условий установлено, но не все.'}
+      },
+      q3: {
+        q: 'Ты явно назвал признак подобия (или другой используемый факт) и сформулировал вывод?',
+        yes: {score:2, reason:'Отлично! Доказательство полное и верное.'},
+        no:  'q3a'
+      },
+      q3a: {
+        q: 'Из твоего решения понятно, какой признак используется, даже если он не назван явно?',
+        yes: {score:2, reason:'Доказательство по сути верное. Для строгого оформления стоит явно указывать название признака.'},
+        no:  {score:1, reason:'Все условия установлены, но вывод не сформулирован и признак не назван. Доказательство незавершённое.'}
+      }
+    }
+  }
+};
+
+// Current SA state
+let saTree   = null;
+let saNodeId = null;
+
+function openSelfAssess() {
+  const task = queue[pos];
+  const tree = tidx === 6 ? SA_TREES.g7 : SA_TREES.g8;
+  saTree   = tree;
+  saNodeId = tree.start;
+
+  const panel = document.getElementById('saPanel');
+  panel.classList.add('open');
+
+  // Build solution block — Г7 shows solution+answer, Г8 shows proof
+  const label7 = 'Решение учителя';
+  const label8 = 'Эталонное доказательство';
+  const sLabel = tidx === 6 ? label7 : label8;
+
+  const solutionHtml = task.solution
+    ? `<div class="sa-solution">
+        <div class="sa-solution-label">${sLabel}</div>
+        <div class="sa-solution-text">${fmtSolution(task.solution)}</div>
+        ${tidx === 6 ? `<div class="sa-answer-pill">Ответ: ${esc(task.answer)}</div>` : ''}
+       </div>`
+    : `<div class="sa-solution">
+        <div class="sa-solution-label">Ответ</div>
+        <div class="sa-answer-pill">${esc(task.answer)}</div>
+       </div>`;
+
+  panel.innerHTML = solutionHtml + `<div class="sa-qblock" id="saQblock"></div>`;
+
+  // Render solution KaTeX
+  setTimeout(() => {
+    renderMathInElement(panel, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  }, 60);
+
+  // Hide the "open" button
+  document.getElementById('qActions').innerHTML = '';
+  renderSANode();
+}
+
+function renderSANode() {
+  const node = saTree.nodes[saNodeId];
+  if (!node) return;
+
+  const qblock = document.getElementById('saQblock');
+  qblock.innerHTML = `
+    <div class="sa-question">${ node.q }</div>
+    ${ node.hint ? `<div class="sa-hint">💡 ${node.hint}</div>` : '' }
+    <div class="sa-btns">
+      <button class="sa-btn yes" onclick="saAnswer(true)">Да</button>
+      <button class="sa-btn no"  onclick="saAnswer(false)">Нет</button>
+    </div>`;
+
+  setTimeout(() => {
+    renderMathInElement(qblock, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  }, 40);
+}
+
+function saAnswer(yes) {
+  const node = saTree.nodes[saNodeId];
+  const next = yes ? node.yes : node.no;
+
+  if (typeof next === 'object' && 'score' in next) {
+    // Terminal node — show verdict
+    showSAVerdict(next.score, next.reason);
+  } else {
+    // Continue to next node
+    saNodeId = next;
+    renderSANode();
+  }
+}
+
+function showSAVerdict(score, reason) {
+  const status = score === 2 ? 'green' : score === 1 ? 'yellow' : 'red';
+  const scoreLabel = score === 2 ? '2 / 2 балла' : score === 1 ? '1 / 2 балла' : '0 / 2 баллов';
+  const scoreClass = `s${score}`;
+
+  const qblock = document.getElementById('saQblock');
+  qblock.innerHTML = `
+    <div class="sa-verdict">
+      <div class="sa-verdict-score ${scoreClass}">${scoreLabel}</div>
+      <div class="sa-verdict-reason">${reason}</div>
+    </div>`;
+
+  setTimeout(() => {
+    renderMathInElement(qblock, {
+      delimiters:[{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  }, 40);
+
+  // Record result
+  record(queue[pos].id, status);
+
+  // Show next action
+  const last = pos >= queue.length - 1;
+  document.getElementById('qActions').innerHTML = last
+    ? `<button class="btn-act primary" onclick="finishSession()">Завершить сессию</button>`
+    : `<button class="btn-act primary" onclick="nextQ()">Следующее задание →</button>`;
+}
+const ALLOWED = new Set(['0','1','2','3','4','5','6','7','8','9',',','-']);
+
+function cellKey(e, prefix, idx, total) {
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft') {
+    e.preventDefault();
+    focusCell(prefix, e.key==='ArrowRight' ? idx+1 : idx-1, total); return;
+  }
+  if(e.key==='Backspace') {
+    const cell=document.getElementById(prefix+idx);
+    if(cell&&cell.value==='') { e.preventDefault(); focusCell(prefix,idx-1,total); }
+    return;
+  }
+  if(e.key==='Enter'){checkAns();return;}
+  if(e.key==='Tab'||e.ctrlKey||e.metaKey) return;
+  if(!ALLOWED.has(e.key)){e.preventDefault();return;}
+  // If cell full, move to next first
+  const cell=document.getElementById(prefix+idx);
+  if(cell&&cell.value.length>=1){e.preventDefault();focusCell(prefix,idx+1,total);}
+}
+
+function cellInput(e, prefix, idx, total) {
+  const cell=document.getElementById(prefix+idx);
+  if(!cell) return;
+  let v=cell.value.replace(/[^0-9,\-]/g,'');
+  if(v.length>1) v=v.slice(-1);
+  cell.value=v;
+  if(v) focusCell(prefix,idx+1,total);
+  updateCheckBtn();
+}
+
+function focusCell(prefix, idx, total) {
+  if(idx<0||idx>=total) return;
+  document.getElementById(prefix+idx)?.focus();
+}
+
+function updateCheckBtn() {
+  const btn=document.getElementById('btnCheck');
+  if(!btn) return;
+  let any=false;
+  for(let i=0;i<17;i++){if(document.getElementById('c'+i)?.value){any=true;break;}}
+  btn.disabled=!any;
+}
+
+// ── Read answer from cells ───────────────────────────────────
+function readCells() {
+  let s='';
+  for(let i=0;i<17;i++) s+=(document.getElementById('c'+i)?.value||'');
+  return s;
+}
+
+// ── Lock / shake cells ───────────────────────────────────────
+function lockCells(ok) {
+  for(let i=0;i<17;i++){
+    const el=document.getElementById('c'+i);
+    if(!el) continue;
+    el.readOnly=ok;
+    if(ok) el.classList.add('ok');
+  }
+}
+function shakeCells() {
+  for(let i=0;i<17;i++){
+    const el=document.getElementById('c'+i);
+    if(el?.value){el.classList.add('shake');setTimeout(()=>el.classList.remove('shake'),400);}
+  }
+}
+
+// ── А5 cell keyboard navigation ─────────────────────────────
+function checkAns() {
+  const given = norm(readCells());
+  if(!given) return;
+  const task=queue[pos];
+  const isRight = checkAnsNorm(given, task.answer);
+  const fb=document.getElementById('qFb');
+  const isFirst = attempts === 0;
+  attempts++;
+
+  if(isRight) {
+    const status = isFirst ? 'green' : 'green';
+    lockCells(true);
+    document.getElementById('btnCheck').disabled=true;
+    fb.className='qfb ok show';
+    fb.textContent = isFirst ? '✓ Верно! Отлично!' : '✓ Верно!';
+    // Only record if not already recorded (first wrong attempt records red)
+    if(!results.find(r=>r.taskId===task.id)) record(task.id,'green');
+    showNext();
+  } else {
+    shakeCells();
+    // Record red on first wrong attempt
+    if(isFirst) record(task.id,'red');
+    fb.className='qfb err show';
+    fb.textContent=`✗ Неверно. Попробуйте ещё раз.`;
+    showExitAction();
+  }
+}
+
+function showNext() {
+  const last=pos>=queue.length-1;
+  document.getElementById('qActions').innerHTML=last
+    ? `<button class="btn-act primary" onclick="finishSession()">Завершить сессию</button>`
+    : `<button class="btn-act primary" onclick="nextQ()">Следующее задание →</button>`;
+}
+
+function showExitAction() {
+  // After wrong answer: can only exit, not skip to next
+  document.getElementById('qActions').innerHTML=
+    `<button class="btn-act" onclick="confirmExit()">Выйти из сессии</button>`;
+}
+
+function confirmExit() {
+  if(confirm('Выйти из сессии? Текущий прогресс сохранится.')) {
+    finishSession();
+  }
+}
+
+function nextQ() {
+  pos++;
+  document.getElementById('qFb').className='qfb';
+  document.getElementById('qActions').innerHTML='';
+  renderQ();
+}
+
+// ════════════ RECORD ════════════
+function record(taskId, status) {
+  // Session results
+  const ex=results.find(r=>r.taskId===taskId);
+  if(ex) { ex.status=status; } else { results.push({taskId,status}); }
+
+  // Persist — status is fixed on first record (no upgrade/downgrade)
+  const prog=loadProg(tidx);
+  const idx=prog.findIndex(p=>p.taskId===taskId);
+  if(idx===-1) prog.push({taskId,status});
+  else prog[idx].status=status; // overwrite with latest self-assessed score
+  saveProg(tidx,prog);
+  renderDots();
+}
+
+// ════════════ FINISH ════════════
+function finishSession() {
+  document.getElementById('qCard').style.display='none';
+  document.getElementById('qFb').className='qfb';
+  document.getElementById('qActions').innerHTML='';
+  document.getElementById('tdots').innerHTML='';
+  document.getElementById('allDone').classList.remove('show');
+  document.getElementById('progFill').style.width='100%';
+  document.getElementById('pProg').textContent=`${results.length} / ${queue.length}`;
+  // Hide auxiliary panels
+  const sa=document.getElementById('saPanel'); sa.classList.remove('open'); sa.innerHTML='';
+  const bar=document.getElementById('fmlBar'); bar.classList.remove('visible'); bar.innerHTML='';
+
+  const g=results.filter(r=>r.status==='green').length;
+  const y=results.filter(r=>r.status==='yellow').length;
+  const r=results.filter(r=>r.status==='red').length;
+  document.getElementById('sumG').textContent=g;
+  document.getElementById('sumY').textContent=y;
+  document.getElementById('sumR').textContent=r;
+  document.getElementById('summary').classList.add('show');
+}
+
+function resetRestart() {
+  localStorage.removeItem(pk(tidx));
+  startPractice(tidx);
+}
+
+// ════════════ RESET PROGRESS ════════════
+const TEACHER_PIN = '10951538';
+let pendingResetIdx = -1;
+
+function askReset(i) {
+  pendingResetIdx = i;
+  document.getElementById('pinDesc').textContent =
+    `Введите PIN учителя для сброса прогресса по заданию ${i+1}.`;
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinInput').className = 'pin-input';
+  document.getElementById('pinOverlay').classList.add('active');
+  setTimeout(() => document.getElementById('pinInput').focus(), 80);
+}
+
+function closePinModal() {
+  pendingResetIdx = -1;
+  document.getElementById('pinOverlay').classList.remove('active');
+}
+
+function confirmReset() {
+  const val = document.getElementById('pinInput').value;
+  if(val !== TEACHER_PIN) {
+    const inp = document.getElementById('pinInput');
+    inp.className = 'pin-input err-shake';
+    inp.value = '';
+    setTimeout(() => { inp.className = 'pin-input'; inp.focus(); }, 350);
+    return;
+  }
+  // PIN correct
+  if(pendingResetIdx >= 0) {
+    localStorage.removeItem(pk(pendingResetIdx));
+    closePinModal();
+    renderMenu();
+    toast(`Прогресс по заданию ${pendingResetIdx+1} сброшен`, 'ok');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pinOverlay').addEventListener('click', function(e){
+    if(e.target===this) closePinModal();
+  });
+});
+
+function goMenu() { showS('sMenu'); renderMenu(); }
+
+// ════════════ UTILS ════════════
+function norm(s) {
+  if(!s) return '';
+  return String(s).trim().toLowerCase()
+    .replace(/\s+/g,'').replace(/,/g,'.').replace(/−/g,'-').replace(/\.$/,'');
+}
+
+// For Г6: sort digits so order doesn't matter (123 == 321)
+function normG6(s) {
+  if(!s) return '';
+  return String(s).trim().replace(/\s+/g,'').split('').sort().join('');
+}
+
+function checkAnsNorm(given, correct) {
+  if(tidx === 5) { // Г6
+    return normG6(given) === normG6(correct);
+  }
+  return norm(given) === norm(correct);
+}
+function esc(s) {
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Format solution text: split by newlines, each line becomes a <span> block.
+// Empty lines become a small gap. LaTeX ($..$ and $$..$$) is left intact for KaTeX.
+function fmtSolution(s) {
+  if(!s) return '';
+  return s.split('\n').map(line => {
+    const trimmed = line.trim();
+    if(!trimmed) return '<span class="sol-line sol-gap"></span>';
+    // Escape HTML but preserve $ for KaTeX (don't escape dollar signs)
+    const safe = trimmed
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;');
+    return `<span class="sol-line">${safe}</span>`;
+  }).join('');
+}
+function shuffle(a) {
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+function ipSrc(v) {
+  if(!v) return '';
+  try{const p=JSON.parse(v);return p?.src||'';}catch{return '';}
+}
+function toast(msg,type='') {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show '+type;
+  setTimeout(()=>el.className='toast',3000);
+}
+</script>
+</body>
+</html>
