@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Панель учителя — КР 8 класс</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root {
+  --ink: #1a1a2e;
+  --paper: #f5f0e8;
+  --accent-a: #c84b31;
+  --accent-g: #2d6a4f;
+  --muted: #8a8070;
+  --border: #d4ccc0;
+  --card-bg: #faf7f2;
+  --success: #2d6a4f;
+  --danger: #c84b31;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: 'Golos Text', sans-serif; min-height: 100vh; }
+
+/* ── HEADER ── */
+header {
+  padding: 1.1rem 2rem; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+  position: sticky; top: 0; background: var(--paper); z-index: 50;
+}
+.back-link { font-size: .8rem; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: .35rem; transition: color .15s; }
+.back-link:hover { color: var(--ink); }
+.header-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+.badge { font-size: .7rem; padding: .2rem .6rem; border-radius: 2px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.badge-admin { background: var(--ink); color: #fff; }
+.save-status { margin-left: auto; font-size: .78rem; color: var(--muted); }
+.save-status.saving { color: var(--accent-a); }
+.save-status.saved  { color: var(--success); }
+
+/* ── LAYOUT ── */
+.layout { display: grid; grid-template-columns: 234px 1fr; min-height: calc(100vh - 58px); }
+
+/* ── SIDEBAR ── */
+.sidebar { border-right: 1px solid var(--border); background: var(--card-bg); position: sticky; top: 58px; height: calc(100vh - 58px); overflow-y: auto; padding: 1.25rem 0; }
+.sidebar-label { font-size: .67rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: .25rem 1.25rem .6rem; }
+.subject-tabs { display: flex; gap: .25rem; padding: 0 1rem 1rem; border-bottom: 1px solid var(--border); margin-bottom: .5rem; }
+.tab-btn { flex: 1; padding: .45rem .25rem; font-family: 'Golos Text', sans-serif; font-size: .8rem; font-weight: 500; border: 1px solid var(--border); background: none; cursor: pointer; border-radius: 2px; color: var(--muted); transition: all .15s; }
+.tab-btn.active-a { background: var(--accent-a); color: #fff; border-color: var(--accent-a); }
+.tab-btn.active-g { background: var(--accent-g); color: #fff; border-color: var(--accent-g); }
+.nav-item { display: flex; align-items: center; gap: .6rem; padding: .5rem 1.25rem; cursor: pointer; font-size: .84rem; transition: background .12s; border-left: 2px solid transparent; }
+.nav-item:hover { background: rgba(0,0,0,.04); }
+.nav-item.active-a { border-left-color: var(--accent-a); background: rgba(200,75,49,.06); font-weight: 600; }
+.nav-item.active-g { border-left-color: var(--accent-g); background: rgba(45,106,79,.06); font-weight: 600; }
+.nav-num { width: 22px; height: 22px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: .71rem; font-weight: 700; flex-shrink: 0; }
+.na { background: #fce8e4; color: var(--accent-a); }
+.ng { background: #e4f0eb; color: var(--accent-g); }
+.nav-info { flex: 1; min-width: 0; }
+.nav-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-pts { font-size: .7rem; color: var(--muted); }
+.nav-count { font-size: .7rem; color: var(--muted); background: rgba(0,0,0,.07); padding: .1rem .45rem; border-radius: 10px; flex-shrink: 0; }
+
+/* ── CONTENT ── */
+.content { padding: 2rem 2.5rem; max-width: 920px; }
+.content-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.75rem; }
+.content-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.content-meta { font-size: .82rem; color: var(--muted); margin-top: .3rem; line-height: 1.5; }
+.btn-add { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem 1.1rem; font-family: 'Golos Text', sans-serif; font-size: .84rem; font-weight: 500; border: none; border-radius: 2px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: filter .15s; }
+.btn-add-a { background: var(--accent-a); color: #fff; }
+.btn-add-g { background: var(--accent-g); color: #fff; }
+.btn-add:hover { filter: brightness(.88); }
+
+/* ── TASK CARDS ── */
+.tasks-list { display: flex; flex-direction: column; gap: .75rem; }
+.task-card { background: #fff; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; transition: box-shadow .15s; }
+.task-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.card-head { display: flex; align-items: center; gap: .75rem; padding: .7rem 1.1rem; background: var(--card-bg); border-bottom: 1px solid var(--border); }
+.card-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.card-pts { margin-left: auto; font-size: .72rem; color: var(--muted); background: rgba(0,0,0,.06); padding: .12rem .45rem; border-radius: 10px; }
+.card-actions { display: flex; gap: .2rem; }
+.btn-icon { width: 28px; height: 28px; border: 1px solid var(--border); background: none; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; color: var(--muted); }
+.btn-icon:hover { border-color: var(--ink); color: var(--ink); }
+.btn-icon.del:hover { border-color: var(--danger); color: var(--danger); }
+.card-preview { padding: 1rem 1.1rem; }
+.preview-row { display: flex; gap: 1rem 2rem; flex-wrap: wrap; align-items: flex-start; }
+.preview-field { display: flex; flex-direction: column; gap: .15rem; min-width: 100px; }
+.preview-field.full { width: 100%; }
+.pf-label { font-size: .67rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.pf-value { font-size: .875rem; line-height: 1.55; }
+.pf-ans-a { font-size: .875rem; font-weight: 600; color: var(--accent-a); }
+.pf-ans-g { font-size: .875rem; font-weight: 600; color: var(--accent-g); }
+.pf-img { max-height: 90px; max-width: 200px; border: 1px solid var(--border); border-radius: 2px; object-fit: contain; display: block; margin-top: .2rem; }
+
+/* ── FORMS ── */
+.card-form { display: none; border-top: 1px solid var(--border); background: var(--card-bg); }
+.card-form.open { display: block; }
+.form-body { padding: 1.1rem; display: flex; flex-direction: column; gap: .75rem; }
+.form-group { display: flex; flex-direction: column; gap: .35rem; }
+.form-group label { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.form-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: .75rem; }
+textarea, input[type="text"], select {
+  font-family: 'Golos Text', sans-serif; font-size: .875rem;
+  padding: .55rem .7rem; border: 1px solid var(--border);
+  background: #fff; border-radius: 2px; outline: none;
+  transition: border-color .15s; color: var(--ink); width: 100%;
+}
+textarea:focus, input[type="text"]:focus, select:focus { border-color: var(--ink); }
+textarea { resize: vertical; }
+.hint { font-size: .72rem; color: var(--muted); line-height: 1.4; }
+.form-actions { display: flex; gap: .5rem; padding: .75rem 1.1rem; border-top: 1px solid var(--border); }
+.btn-save { padding: .5rem 1.1rem; font-family: 'Golos Text', sans-serif; font-size: .84rem; font-weight: 500; border: none; border-radius: 2px; background: var(--ink); color: #fff; cursor: pointer; transition: background .15s; }
+.btn-save:hover { background: #2d2d4e; }
+.btn-cancel { padding: .5rem 1rem; font-family: 'Golos Text', sans-serif; font-size: .84rem; border: 1px solid var(--border); border-radius: 2px; background: none; cursor: pointer; color: var(--ink); transition: border-color .15s; }
+.btn-cancel:hover { border-color: var(--ink); }
+
+/* ── NEW PANEL ── */
+.new-panel { display: none; background: #fff; border: 2px dashed var(--border); border-radius: 2px; margin-top: .75rem; }
+.new-panel.open { display: block; }
+.new-panel-head { padding: .85rem 1.1rem; border-bottom: 1px solid var(--border); font-weight: 600; font-size: .875rem; background: var(--card-bg); }
+
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 3.5rem 2rem; color: var(--muted); border: 1px dashed var(--border); border-radius: 2px; }
+.empty p { font-size: .875rem; line-height: 1.6; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--ink); color: #fff; padding: .7rem 1.4rem; border-radius: 2px; font-size: .84rem; z-index: 200; transform: translateY(80px); opacity: 0; transition: all .25s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok  { background: var(--success); }
+.toast.err { background: var(--danger); }
+
+/* ── CONFIRM ── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(26,26,46,.5); z-index: 100; align-items: center; justify-content: center; }
+.overlay.active { display: flex; }
+.confirm-box { background: var(--paper); border: 1px solid var(--border); padding: 2rem; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 1rem; }
+.confirm-box h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+.confirm-box p { font-size: .84rem; color: var(--muted); line-height: 1.5; }
+.confirm-btns { display: flex; gap: .5rem; }
+.btn-del-ok { flex: 1; padding: .6rem; background: var(--danger); color: #fff; border: none; border-radius: 2px; font-family: 'Golos Text', sans-serif; font-size: .875rem; cursor: pointer; }
+.btn-del-no { flex: 1; padding: .6rem; background: none; border: 1px solid var(--border); border-radius: 2px; font-family: 'Golos Text', sans-serif; font-size: .875rem; cursor: pointer; color: var(--ink); }
+
+/* ── COEFF WIDGET ── */
+.coeff-widget { display: flex; flex-direction: column; gap: .75rem; padding: .85rem 1rem; background: #fff; border: 1px solid var(--border); border-radius: 2px; }
+.coeff-inputs { display: flex; align-items: flex-end; gap: .6rem; flex-wrap: wrap; }
+.coeff-sep { font-size: 1.05rem; color: var(--muted); padding-bottom: .6rem; }
+.coeff-field { display: flex; flex-direction: column; gap: .25rem; align-items: center; }
+.coeff-field span { font-size: .67rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.coeff-field input { width: 76px; text-align: center; font-weight: 600; }
+.coeff-eq-preview { background: var(--card-bg); border: 1px solid var(--border); border-radius: 2px; padding: .55rem 1rem; min-height: 2.4rem; display: flex; align-items: center; gap: .75rem; }
+.coeff-eq-label { font-size: .67rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.coeff-eq-val { font-size: .95rem; }
+.coeff-calc-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.coeff-calc-btn { padding: .4rem .9rem; font-family: 'Golos Text', sans-serif; font-size: .8rem; font-weight: 500; background: var(--ink); color: #fff; border: none; border-radius: 2px; cursor: pointer; transition: background .15s; white-space: nowrap; }
+.coeff-calc-btn:hover { background: #2d2d4e; }
+.coeff-result { font-size: .82rem; padding: .35rem .75rem; border-radius: 2px; display: none; }
+.coeff-result.ok  { display: block; background: #e4f0eb; color: var(--success); }
+.coeff-result.err { display: block; background: #fce8e4; color: var(--danger); }
+
+/* ── IMAGE PICKER ── */
+.img-picker { display: flex; flex-direction: column; gap: .5rem; padding: .85rem 1rem; background: #fff; border: 1px solid var(--border); border-radius: 2px; }
+.img-tabs { display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; width: fit-content; }
+.img-tab { padding: .3rem .85rem; font-family: 'Golos Text', sans-serif; font-size: .75rem; font-weight: 500; background: none; border: none; border-right: 1px solid var(--border); cursor: pointer; color: var(--muted); transition: all .15s; }
+.img-tab:last-child { border-right: none; }
+.img-tab.active { background: var(--ink); color: #fff; }
+.img-tab-panel { display: none; flex-direction: column; gap: .4rem; }
+.img-tab-panel.active { display: flex; }
+.img-drop { border: 1.5px dashed var(--border); border-radius: 2px; padding: 1.1rem; text-align: center; cursor: pointer; font-size: .8rem; color: var(--muted); position: relative; transition: border-color .15s; }
+.img-drop:hover { border-color: var(--ink); color: var(--ink); }
+.img-drop.has-img { border-style: solid; border-color: var(--success); }
+.img-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.img-preview-wrap { position: relative; display: inline-flex; margin-top: .25rem; }
+.img-preview { max-width: 100%; max-height: 130px; border: 1px solid var(--border); border-radius: 2px; object-fit: contain; display: block; }
+.img-clear { position: absolute; top: -7px; right: -7px; width: 20px; height: 20px; border-radius: 50%; background: var(--danger); color: #fff; border: none; cursor: pointer; font-size: .75rem; display: flex; align-items: center; justify-content: center; }
+.img-badge { font-size: .71rem; font-weight: 500; margin-top: .1rem; }
+.img-badge.file { color: var(--success); }
+.img-badge.url  { color: var(--accent-g); }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M7 1.5L3.5 5.5L7 9.5" stroke="currentColor" stroke-width="1.4"/></svg>
+    Главная
+  </a>
+  <div class="header-title">Панель учителя</div>
+  <span class="badge badge-admin">Администратор</span>
+  <div class="save-status" id="saveStatus">Все изменения сохранены</div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-label">Предмет</div>
+    <div class="subject-tabs">
+      <button class="tab-btn active-a" id="tabA" onclick="switchSubject('algebra')">Алгебра</button>
+      <button class="tab-btn" id="tabG" onclick="switchSubject('geometry')">Геометрия</button>
+    </div>
+    <div class="sidebar-label">Задания</div>
+    <div id="taskNav"></div>
+  </aside>
+
+  <div class="content">
+    <div class="content-head">
+      <div>
+        <div class="content-title" id="ctitle">—</div>
+        <div class="content-meta" id="cmeta">—</div>
+      </div>
+      <button class="btn-add btn-add-a" id="btnAdd" onclick="openNew()">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.5"/></svg>
+        Добавить
+      </button>
+    </div>
+    <div class="tasks-list" id="tasksList"></div>
+    <div class="new-panel" id="newPanel">
+      <div class="new-panel-head">Новая задача</div>
+      <div id="newFormBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="delOverlay">
+  <div class="confirm-box">
+    <h3>Удалить задачу?</h3>
+    <p>Это действие нельзя отменить.</p>
+    <div class="confirm-btns">
+      <button class="btn-del-no" onclick="closeConfirm()">Отмена</button>
+      <button class="btn-del-ok" onclick="doDelete()">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════
+const JSONBIN_BASE = 'https://api.jsonbin.io/v3/b';
+const API_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const BINS     = { algebra: '69de56e6856a6821893298a0', geometry: '69de571c36566621a8b1abcb' };
+
+// ════════════════════════════════════════════════════════════
+// TASK DEFINITIONS
+// ════════════════════════════════════════════════════════════
+const TASKS = {
+algebra: [
+  // ── А1 ──────────────────────────────────────────────────
+  { title:'Задание 1', desc:'Степени — выбор из 4 вариантов', pts:1,
+    fields:[
+      { key:'expression', label:'Выражение', type:'text',
+        ph:'3^8 \\cdot (3^{-3})^2',
+        hint:'LaTeX без $. Вставляется в: «значением выражения [...]»' },
+      { key:'opt1', label:'Вариант 1', type:'text', ph:'3' },
+      { key:'opt2', label:'Вариант 2', type:'text', ph:'\\tfrac{1}{3}' },
+      { key:'opt3', label:'Вариант 3', type:'text', ph:'-3' },
+      { key:'opt4', label:'Вариант 4', type:'text', ph:'9' },
+      { key:'answer', label:'Правильный вариант (номер)', type:'text', ph:'4',
+        hint:'Одна цифра: 1, 2, 3 или 4' },
+    ],
+    layout:['expression:full','opt1 opt2 opt3 opt4','answer'],
+    preview(t){ return [
+      { label:'Выражение', val:`$${t.expression}$`, full:true },
+      { label:'1)', val:`$${t.opt1}$` }, { label:'2)', val:`$${t.opt2}$` },
+      { label:'3)', val:`$${t.opt3}$` }, { label:'4)', val:`$${t.opt4}$` },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── А2 ──────────────────────────────────────────────────
+  { title:'Задание 2', desc:'Рациональные дроби — вычисление при заданном значении', pts:1,
+    fields:[
+      { key:'variable', label:'Переменная и значение', type:'text',
+        ph:'a = -3', hint:'LaTeX без $. Например: a = -3' },
+      { key:'expression', label:'Выражение', type:'text',
+        ph:'\\dfrac{9}{a-a^2} - \\dfrac{9}{a}',
+        hint:'LaTeX без $. Вставляется в: «найдите значение выражения [...]»' },
+      { key:'answer', label:'Ответ', type:'text', ph:'2,25' },
+    ],
+    layout:['variable','expression:full','answer'],
+    preview(t){ return [
+      { label:'При', val:`$${t.variable}$` },
+      { label:'Выражение', val:`$$${t.expression}$$`, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── А3 ──────────────────────────────────────────────────
+  { title:'Задание 3', desc:'Квадратные корни — упрощение выражения', pts:1,
+    fields:[
+      { key:'expression', label:'Выражение', type:'text',
+        ph:'(\\sqrt{27} - \\sqrt{3}) \\cdot \\sqrt{3}',
+        hint:'LaTeX без $. Вставляется в: «найдите значение выражения [...]»' },
+      { key:'answer', label:'Ответ', type:'text', ph:'6' },
+    ],
+    layout:['expression:full','answer'],
+    preview(t){ return [
+      { label:'Выражение', val:`$${t.expression}$`, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── А4 ──────────────────────────────────────────────────
+  { title:'Задание 4', desc:'Квадратные уравнения', pts:1,
+    fields:[
+      { key:'_cq4', type:'coeff_quadratic' },
+      { key:'question', label:'Что указать в ответе', type:'select',
+        options:['наименьший корень','наибольший корень','сумму корней'],
+        onchange:'a4QuestionChange' },
+      { key:'answer', label:'Ответ', type:'text', ph:'-8',
+        hint:'Заполняется автоматически. Можно скорректировать.' },
+    ],
+    layout:['_cq4:full','question:full','answer'],
+    preview(t){ return [
+      { label:'Уравнение', val: t.equation ? `$${t.equation}$` : '—', full:true },
+      { label:'Вопрос', val:'В ответе укажите ' + (t.question||'наименьший корень'), full:true },
+      { label:'Ответ', val:t.answer||'—', ans:true },
+    ];}
+  },
+
+  // ── А5 ──────────────────────────────────────────────────
+  { title:'Задание 5', desc:'Соответствие графиков линейных функций и формул', pts:1,
+    fields:[
+      { key:'f1', label:'Формула 1', type:'text', ph:'y = 2x - 4' },
+      { key:'f2', label:'Формула 2', type:'text', ph:'y = -2x - 4' },
+      { key:'f3', label:'Формула 3', type:'text', ph:'y = -2x + 4' },
+      { key:'f4', label:'Формула 4', type:'text', ph:'y = 2x + 4' },
+      { key:'imgA', label:'График А — картинка', type:'imagepicker' },
+      { key:'imgB', label:'График Б — картинка', type:'imagepicker' },
+      { key:'imgV', label:'График В — картинка', type:'imagepicker' },
+      { key:'descA', label:'График А — подпись / описание', type:'text',
+        ph:'Возрастающая, y-пересечение −4',
+        hint:'Показывается под картинкой или вместо неё' },
+      { key:'descB', label:'График Б — подпись / описание', type:'text', ph:'Возрастающая, y-пересечение +4' },
+      { key:'descV', label:'График В — подпись / описание', type:'text', ph:'Убывающая, y-пересечение +4' },
+      { key:'answer', label:'Ответ (цифры для А, Б, В)', type:'text', ph:'143',
+        hint:'Три цифры без пробелов: позиция формулы для А, Б, В' },
+    ],
+    layout:['f1 f2 f3 f4','imgA:full','imgB:full','imgV:full','descA:full','descB:full','descV:full','answer'],
+    preview(t){ return [
+      { label:'1)', val:`$${t.f1}$` }, { label:'2)', val:`$${t.f2}$` },
+      { label:'3)', val:`$${t.f3}$` }, { label:'4)', val:`$${t.f4}$` },
+      { label:'График А', val:t.descA||'', img:ipSrc(t.imgA), full:true },
+      { label:'График Б', val:t.descB||'', img:ipSrc(t.imgB), full:true },
+      { label:'График В', val:t.descV||'', img:ipSrc(t.imgV), full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── А6 ──────────────────────────────────────────────────
+  { title:'Задание 6', desc:'Системы неравенств', pts:1,
+    fields:[
+      { key:'ineq1', label:'Неравенство 1', type:'text',
+        ph:'x^2 - (x+5) \\geq x(x+1) - 2', hint:'LaTeX без $' },
+      { key:'ineq2', label:'Неравенство 2', type:'text',
+        ph:'\\dfrac{x+1}{3} - \\dfrac{x+4}{5} \\geq x - 3' },
+      { key:'question', label:'Вопрос', type:'select',
+        options:['наибольшее целое решение','наименьшее целое решение','сколько целых чисел являются решениями'] },
+      { key:'answer', label:'Ответ', type:'text', ph:'-2' },
+    ],
+    layout:['ineq1:full','ineq2:full','question:full','answer'],
+    preview(t){ return [
+      { label:'Неравенство 1', val:`$${t.ineq1}$`, full:true },
+      { label:'Неравенство 2', val:`$${t.ineq2}$`, full:true },
+      { label:'Вопрос', val:'Укажите ' + (t.question||''), full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── А7 ──────────────────────────────────────────────────
+  { title:'Задание 7', desc:'Биквадратное уравнение — развёрнутый ответ', pts:2,
+    fields:[
+      { key:'_cq7', type:'coeff_biquadratic' },
+      { key:'answer', label:'Ответ', type:'text',
+        ph:'\\pm 3;\\;\\pm 2', hint:'Заполняется автоматически. LaTeX без $. Можно скорректировать.' },
+      { key:'solution', label:'Полное решение (показывается ученику)', type:'textarea',
+        ph:'Замена t = x²: ...', hint:'Можно использовать LaTeX в $...$' },
+    ],
+    layout:['_cq7:full','answer','solution:full'],
+    preview(t){ return [
+      { label:'Уравнение', val: t.equation ? `$${t.equation}$` : '—', full:true },
+      { label:'Ответ', val: t.answer ? `$${t.answer}$` : '—', ans:true },
+      { label:'Решение', val:t.solution||'—', full:true },
+    ];}
+  },
+
+  // ── А8 ──────────────────────────────────────────────────
+  { title:'Задание 8', desc:'Текстовая задача — развёрнутый ответ', pts:2,
+    fields:[
+      { key:'condition', label:'Условие задачи', type:'textarea',
+        ph:'Железнодорожный состав длиной в 1 км...', hint:'Свободный текст, можно LaTeX в $...$' },
+      { key:'answer', label:'Ответ (с единицами измерения)', type:'text', ph:'2 км' },
+      { key:'solution', label:'Полное решение (показывается ученику)', type:'textarea',
+        ph:'Пусть длина туннеля x км...', hint:'Можно использовать LaTeX в $...$' },
+    ],
+    layout:['condition:full','answer','solution:full'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+      { label:'Решение', val:t.solution||'—', full:true },
+    ];}
+  },
+],
+
+geometry: [
+  // ── Г1 ──────────────────────────────────────────────────
+  { title:'Задание 1', desc:'Теорема Пифагора', pts:1,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'Два катета прямоугольного треугольника равны 7 и 24. Найдите гипотенузу.',
+        hint:'Свободный текст с LaTeX.' },
+      { key:'answer', label:'Ответ', type:'text', ph:'25' },
+    ],
+    layout:['condition:full','answer'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── Г2 ──────────────────────────────────────────────────
+  { title:'Задание 2', desc:'Тригонометрия в прямоугольном треугольнике', pts:1,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'В треугольнике ABC угол C равен 90°, AC = 8, AB = 40. Найдите sin B.',
+        hint:'Свободный текст с LaTeX.' },
+      { key:'answer', label:'Ответ', type:'text', ph:'0,2' },
+    ],
+    layout:['condition:full','answer'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── Г3 ──────────────────────────────────────────────────
+  { title:'Задание 3', desc:'Площади фигур', pts:1,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'Площадь параллелограмма равна 48, а две его стороны равны 8 и 16. Найдите его высоты.',
+        hint:'Свободный текст с LaTeX.' },
+      { key:'answer', label:'Ответ', type:'text', ph:'6 и 3' },
+    ],
+    layout:['condition:full','answer'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── Г4 ──────────────────────────────────────────────────
+  { title:'Задание 4', desc:'Площадь трапеции с нахождением высоты', pts:1,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'В равнобедренной трапеции основания равны 2 и 6, угол при основании 45°. Найдите площадь трапеции.' },
+      { key:'key_step', label:'Ключевой шаг (необязательно)', type:'text',
+        ph:'h = 2', hint:'Как находится высота — для разбора задачи' },
+      { key:'answer', label:'Ответ', type:'text', ph:'8' },
+    ],
+    layout:['condition:full','key_step','answer'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      ...(t.key_step ? [{ label:'Ключевой шаг', val:`$${t.key_step}$` }] : []),
+      { label:'Ответ', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── Г5 ──────────────────────────────────────────────────
+  { title:'Задание 5', desc:'Центральные и вписанные углы', pts:1,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'В окружности с центром O, AC и BD — диаметры. Угол ACB равен 26°. Найдите угол COD. Ответ дайте в градусах.' },
+      { key:'answer', label:'Ответ (целое число, градусы)', type:'text', ph:'52' },
+    ],
+    layout:['condition:full','answer'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Ответ', val:(t.answer||'') + '°', ans:true },
+    ];}
+  },
+
+  // ── Г6 ──────────────────────────────────────────────────
+  { title:'Задание 6', desc:'Верные/неверные утверждения', pts:1,
+    fields:[
+      { key:'stmt1', label:'Утверждение 1', type:'textarea', ph:'Если площади фигур равны, то равны и сами фигуры.' },
+      { key:'stmt2', label:'Утверждение 2', type:'textarea', ph:'Площадь трапеции равна произведению суммы оснований на высоту.' },
+      { key:'stmt3', label:'Утверждение 3', type:'textarea', ph:'Если катет и гипотенуза прямоугольного треугольника равны 6 и 10, то второй катет равен 8.' },
+      { key:'stmt4', label:'Утверждение 4', type:'textarea', ph:'Если вписанный угол равен 30°, то дуга, на которую он опирается, равна 30°.' },
+      { key:'answer', label:'Верные утверждения (номера без пробелов)', type:'text', ph:'3',
+        hint:'Например: 3 или 13 или 24. Цифры без пробелов.' },
+    ],
+    layout:['stmt1:full','stmt2:full','stmt3:full','stmt4:full','answer'],
+    preview(t){ return [
+      { label:'1)', val:t.stmt1, full:true }, { label:'2)', val:t.stmt2, full:true },
+      { label:'3)', val:t.stmt3, full:true }, { label:'4)', val:t.stmt4, full:true },
+      { label:'Верные', val:t.answer, ans:true },
+    ];}
+  },
+
+  // ── Г7 ──────────────────────────────────────────────────
+  { title:'Задание 7', desc:'Задача с развёрнутым решением (2 балла)', pts:2,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'Биссектрисы углов A и D параллелограмма ABCD пересекаются в точке на стороне BC. Найдите AB, если BC = 32.',
+        hint:'Свободный текст с LaTeX.' },
+      { key:'answer', label:'Ответ (кратко)', type:'text', ph:'16' },
+      { key:'solution', label:'Полное решение (показывается ученику)', type:'textarea',
+        ph:'Пусть биссектрисы пересекаются в точке K...', hint:'Можно LaTeX в $...$' },
+    ],
+    layout:['condition:full','answer','solution:full'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Ответ', val:t.answer, ans:true },
+      { label:'Решение', val:t.solution||'—', full:true },
+    ];}
+  },
+
+  // ── Г8 ──────────────────────────────────────────────────
+  { title:'Задание 8', desc:'Доказательство — развёрнутый ответ (2 балла)', pts:2,
+    fields:[
+      { key:'condition', label:'Условие', type:'textarea',
+        ph:'Основания BC и AD трапеции ABCD равны соответственно 7 и 28, BD = 14.',
+        hint:'Свободный текст с LaTeX.' },
+      { key:'what', label:'Что доказать', type:'text',
+        ph:'\\triangle CBD \\sim \\triangle BDA',
+        hint:'LaTeX без $. Вставляется в: «Докажите, что [...]»' },
+      { key:'solution', label:'Эталонное доказательство (показывается ученику)', type:'textarea',
+        ph:'Рассмотрим треугольники CBD и BDA...', hint:'Можно LaTeX в $...$' },
+    ],
+    layout:['condition:full','what:full','solution:full'],
+    preview(t){ return [
+      { label:'Условие', val:t.condition, full:true },
+      { label:'Доказать', val: t.what ? `$${t.what}$` : '—', full:true },
+      { label:'Доказательство', val:t.solution||'—', full:true },
+    ];}
+  },
+]
+};
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let subj = 'algebra';
+let tidx = 0;
+let db   = { algebra: null, geometry: null };
+let pendingDel = null;
+
+// ════════════════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  db.algebra  = loadLocal('algebra');
+  db.geometry = loadLocal('geometry');
+  render();
+});
+
+function loadLocal(s) {
+  try {
+    const raw = localStorage.getItem('kr8_' + s);
+    return raw ? JSON.parse(raw) : emptyDb();
+  } catch(e) { return emptyDb(); }
+}
+function emptyDb() { return { tasks: Array.from({length:8}, () => []) }; }
+
+async function persist() {
+  setSS('saving');
+  localStorage.setItem('kr8_' + subj, JSON.stringify(db[subj]));
+  const binId = BINS[subj];
+  if (binId && !binId.includes('BIN_ID') && !API_KEY.includes('YOUR_KEY')) {
+    try {
+      await fetch(`${JSONBIN_BASE}/${binId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type':'application/json', 'X-Master-Key':API_KEY },
+        body: JSON.stringify(db[subj])
+      });
+    } catch(e) { toast('Ошибка облака, сохранено локально', 'err'); }
+  }
+  setSS('saved');
+}
+
+function setSS(s) {
+  const el = document.getElementById('saveStatus');
+  el.className = 'save-status ' + s;
+  el.textContent = s==='saving' ? 'Сохранение…' : s==='saved' ? 'Сохранено ✓' : 'Все изменения сохранены';
+  if (s==='saved') setTimeout(() => setSS(''), 2000);
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function switchSubject(s) {
+  subj = s; tidx = 0; closeNew();
+  document.getElementById('tabA').className = 'tab-btn' + (s==='algebra'  ? ' active-a' : '');
+  document.getElementById('tabG').className = 'tab-btn' + (s==='geometry' ? ' active-g' : '');
+  document.getElementById('btnAdd').className = 'btn-add btn-add-' + (s==='algebra' ? 'a' : 'g');
+  render();
+}
+function selectTask(i) { tidx = i; closeNew(); render(); }
+
+// ════════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════════
+function render() { renderNav(); renderMain(); doKatex(); }
+
+function renderNav() {
+  const na = subj==='algebra' ? 'na' : 'ng';
+  const ac = subj==='algebra' ? 'active-a' : 'active-g';
+  document.getElementById('taskNav').innerHTML = TASKS[subj].map((m,i) => `
+    <div class="nav-item ${i===tidx ? ac : ''}" onclick="selectTask(${i})">
+      <div class="nav-num ${na}">${i+1}</div>
+      <div class="nav-info">
+        <div class="nav-name">${m.title}</div>
+        <div class="nav-pts">${m.pts} ${m.pts===1?'балл':'балла'}</div>
+      </div>
+      <div class="nav-count">${(db[subj].tasks[i]||[]).length}</div>
+    </div>`).join('');
+}
+
+function renderMain() {
+  const m = TASKS[subj][tidx];
+  document.getElementById('ctitle').textContent = m.title;
+  document.getElementById('cmeta').textContent = m.desc + ' · ' + m.pts + (m.pts===1?' балл':' балла');
+  const tasks = db[subj].tasks[tidx] || [];
+  const ac = subj==='algebra' ? 'pf-ans-a' : 'pf-ans-g';
+
+  if (!tasks.length) {
+    document.getElementById('tasksList').innerHTML =
+      '<div class="empty"><p>Задачи ещё не добавлены.<br>Нажмите «Добавить», чтобы создать первую.</p></div>';
+    return;
+  }
+
+  document.getElementById('tasksList').innerHTML = tasks.map((t,i) => {
+    const preview = m.preview(t);
+    const previewHtml = preview.map(p => {
+      const imgTag = p.img ? `<img class="pf-img" src="${escA(p.img)}" alt="График">` : '';
+      const valTag = p.val ? `<div class="${p.ans ? ac : 'pf-value'}">${esc(p.val)}</div>` : '';
+      return `<div class="preview-field ${p.full?'full':''}">
+        <div class="pf-label">${p.label}</div>${imgTag}${valTag}</div>`;
+    }).join('');
+
+    return `
+    <div class="task-card" id="card-${t.id}">
+      <div class="card-head">
+        <span class="card-label">Вариант ${i+1}</span>
+        <span class="card-pts">${m.pts} ${m.pts===1?'балл':'балла'}</span>
+        <div class="card-actions">
+          <button class="btn-icon" onclick="toggleEdit('${t.id}')" title="Редактировать">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5l2 2-6 6H2.5v-2l6-6z" stroke="currentColor" stroke-width="1.2"/></svg>
+          </button>
+          <button class="btn-icon del" onclick="askDel('${t.id}')" title="Удалить">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1.5 3h9M4 3V2h4v1M3.5 3l.5 7h4l.5-7" stroke="currentColor" stroke-width="1.2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="card-preview"><div class="preview-row">${previewHtml}</div></div>
+      <div class="card-form" id="form-${t.id}">
+        <div class="form-body">${buildFormHtml(m, t, t.id)}</div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="saveEdit('${t.id}')">Сохранить</button>
+          <button class="btn-cancel" onclick="cancelEdit('${t.id}')">Отмена</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+// FORM BUILDER
+// ════════════════════════════════════════════════════════════
+function buildFormHtml(meta, task, prefix) {
+  const fm = {};
+  meta.fields.forEach(f => fm[f.key] = f);
+
+  return meta.layout.map(row => {
+    const parts = row.split(' ');
+    if (parts.length === 1) {
+      const [key, mod] = parts[0].split(':');
+      const f = fm[key];
+      if (!f) return '';
+      return `<div class="form-group">${fieldHtml(f, task, prefix)}</div>`;
+    }
+    const cls = parts.length === 4 ? 'form-row-4' : 'form-row-2';
+    return `<div class="${cls}">` +
+      parts.map(k => `<div class="form-group">${fieldHtml(fm[k], task, prefix)}</div>`).join('') +
+      `</div>`;
+  }).join('');
+}
+
+function fieldHtml(f, task, prefix) {
+  if (!f) return '';
+  const raw = task ? (task[f.key] || '') : '';
+  const fid = `${prefix}_${f.key}`;
+
+  // ── coeff_quadratic ──────────────────────────────────────
+  if (f.type === 'coeff_quadratic') {
+    const a = task ? (task.a || '') : '';
+    const b = task ? (task.b || '') : '';
+    const c = task ? (task.c || '') : '';
+    const eq = task ? (task.equation || '') : '';
+    return `
+    <label>Коэффициенты уравнения ax² + bx + c = 0</label>
+    <div class="coeff-widget" id="cw4-${prefix}">
+      <div class="coeff-inputs">
+        <div class="coeff-field"><span>a</span><input type="text" id="${prefix}_a" value="${escA(a)}" placeholder="1" oninput="cq4Update('${prefix}')"></div>
+        <div class="coeff-sep">·x² +</div>
+        <div class="coeff-field"><span>b</span><input type="text" id="${prefix}_b" value="${escA(b)}" placeholder="5" oninput="cq4Update('${prefix}')"></div>
+        <div class="coeff-sep">·x +</div>
+        <div class="coeff-field"><span>c</span><input type="text" id="${prefix}_c" value="${escA(c)}" placeholder="-14" oninput="cq4Update('${prefix}')"></div>
+        <div class="coeff-sep">= 0</div>
+      </div>
+      <div class="coeff-eq-preview">
+        <span class="coeff-eq-label">Уравнение:</span>
+        <span class="coeff-eq-val" id="${prefix}_eqprev">${eq ? '' : '<span style="color:var(--muted);font-size:.82rem">введите коэффициенты</span>'}</span>
+      </div>
+      <div class="coeff-calc-row">
+        <button type="button" class="coeff-calc-btn" onclick="cq4Calc('${prefix}')">Вычислить корни и заполнить ответ</button>
+        <span class="coeff-result" id="${prefix}_cres"></span>
+      </div>
+      <input type="hidden" id="${prefix}_equation" value="${escA(eq)}">
+    </div>`;
+  }
+
+  // ── coeff_biquadratic ────────────────────────────────────
+  if (f.type === 'coeff_biquadratic') {
+    const a7 = task ? (task.a7 || '') : '';
+    const p  = task ? (task.p  || '') : '';
+    const q  = task ? (task.q  || '') : '';
+    const eq = task ? (task.equation || '') : '';
+    return `
+    <label>Коэффициенты уравнения a·x⁴ + p·x² + q = 0</label>
+    <div class="coeff-widget" id="cw7-${prefix}">
+      <div class="coeff-inputs">
+        <div class="coeff-field"><span>a</span><input type="text" id="${prefix}_a7" value="${escA(a7)}" placeholder="1" oninput="cq7Update('${prefix}')"></div>
+        <div class="coeff-sep">·x⁴ +</div>
+        <div class="coeff-field"><span>p</span><input type="text" id="${prefix}_p" value="${escA(p)}" placeholder="-13" oninput="cq7Update('${prefix}')"></div>
+        <div class="coeff-sep">·x² +</div>
+        <div class="coeff-field"><span>q</span><input type="text" id="${prefix}_q" value="${escA(q)}" placeholder="36" oninput="cq7Update('${prefix}')"></div>
+        <div class="coeff-sep">= 0</div>
+      </div>
+      <div class="coeff-eq-preview">
+        <span class="coeff-eq-label">Уравнение:</span>
+        <span class="coeff-eq-val" id="${prefix}_eqprev">${eq ? '' : '<span style="color:var(--muted);font-size:.82rem">введите коэффициенты</span>'}</span>
+      </div>
+      <div class="coeff-calc-row">
+        <button type="button" class="coeff-calc-btn" onclick="cq7Calc('${prefix}')">Вычислить корни и заполнить ответ</button>
+        <span class="coeff-result" id="${prefix}_cres"></span>
+      </div>
+      <input type="hidden" id="${prefix}_equation" value="${escA(eq)}">
+    </div>`;
+  }
+
+  // ── imagepicker ──────────────────────────────────────────
+  if (f.type === 'imagepicker') {
+    let stored = null;
+    try { if (raw) stored = JSON.parse(raw); } catch(e) {}
+    const hasSrc = stored && stored.src;
+    const srcType = hasSrc ? stored.srcType : 'none';
+    const src = hasSrc ? stored.src : '';
+    const isFile = srcType === 'file';
+    const isUrl  = srcType === 'url';
+    return `
+    <label>${f.label}</label>
+    <div class="img-picker" id="picker-${fid}">
+      <div class="img-tabs">
+        <button type="button" class="img-tab ${!isUrl?'active':''}" onclick="ipTab('${fid}','file')">Загрузить файл</button>
+        <button type="button" class="img-tab ${isUrl?'active':''}"  onclick="ipTab('${fid}','url')">Вставить ссылку</button>
+      </div>
+      <div class="img-tab-panel ${!isUrl?'active':''}" id="ipf-${fid}">
+        <div class="img-drop ${isFile?'has-img':''}" id="ipd-${fid}">
+          <input type="file" accept="image/*" onchange="ipFile(this,'${fid}')">
+          ${isFile
+            ? `<div class="img-preview-wrap"><img class="img-preview" src="${escA(src)}" alt=""><button type="button" class="img-clear" onclick="ipClear('${fid}')">✕</button></div>`
+            : `<span>Нажмите или перетащите файл сюда<br><span style="font-size:.7rem">PNG, JPG, SVG — до 400 КБ</span></span>`}
+        </div>
+      </div>
+      <div class="img-tab-panel ${isUrl?'active':''}" id="ipu-${fid}">
+        <input type="text" id="ipurl-${fid}" value="${isUrl ? escA(src) : ''}"
+          placeholder="https://... или ./img/graph_a.png" oninput="ipUrl('${fid}')">
+        ${isUrl && src ? `<div class="img-preview-wrap"><img class="img-preview" src="${escA(src)}" alt=""><button type="button" class="img-clear" onclick="ipClearUrl('${fid}')">✕</button></div>` : ''}
+        <span class="hint">Для GitHub Pages можно писать ./img/имя.png</span>
+      </div>
+      <input type="hidden" id="${fid}" value="${escA(raw)}">
+      <span class="img-badge ${srcType}" id="ibadge-${fid}">${isFile?'✓ Файл загружен': isUrl?'✓ Ссылка указана':''}</span>
+    </div>`;
+  }
+
+  // ── select ───────────────────────────────────────────────
+  if (f.type === 'select') {
+    const onChange = f.onchange ? ` onchange="${f.onchange}('${prefix}')"` : '';
+    const opts = (f.options||[]).map(o => `<option${raw===o?' selected':''}>${o}</option>`).join('');
+    return `<label>${f.label}</label><select id="${fid}"${onChange}>${opts}</select>${f.hint ? `<span class="hint">${f.hint}</span>` : ''}`;
+  }
+
+  // ── textarea ─────────────────────────────────────────────
+  if (f.type === 'textarea') {
+    return `<label>${f.label}</label><textarea id="${fid}" rows="3" placeholder="${escA(f.ph||'')}">${escH(raw)}</textarea>${f.hint ? `<span class="hint">${f.hint}</span>` : ''}`;
+  }
+
+  // ── text (default) ───────────────────────────────────────
+  return `<label>${f.label}</label><input type="text" id="${fid}" value="${escA(raw)}" placeholder="${escA(f.ph||'')}"> ${f.hint ? `<span class="hint">${f.hint}</span>` : ''}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// GET FORM VALUES
+// ════════════════════════════════════════════════════════════
+function getVals(meta, prefix) {
+  const obj = {};
+  meta.fields.forEach(f => {
+    if (f.type === 'coeff_quadratic') {
+      ['a','b','c','equation'].forEach(k => {
+        const el = document.getElementById(`${prefix}_${k}`);
+        if (el) obj[k] = el.value.trim();
+      });
+    } else if (f.type === 'coeff_biquadratic') {
+      ['a7','p','q','equation'].forEach(k => {
+        const el = document.getElementById(`${prefix}_${k}`);
+        if (el) obj[k] = el.value.trim();
+      });
+    } else {
+      const el = document.getElementById(`${prefix}_${f.key}`);
+      if (el) obj[f.key] = el.value.trim();
+    }
+  });
+  return obj;
+}
+
+function isValid(meta, vals) {
+  const hasCoeff = meta.fields.some(f => f.type==='coeff_quadratic' || f.type==='coeff_biquadratic');
+  if (hasCoeff) return !!(vals.equation && vals.answer);
+  const first = meta.fields.find(f => !['imagepicker','coeff_quadratic','coeff_biquadratic'].includes(f.type));
+  if (first && !vals[first.key]) return false;
+  return !!(vals.answer || vals.what);
+}
+
+// ════════════════════════════════════════════════════════════
+// ADD / EDIT / DELETE
+// ════════════════════════════════════════════════════════════
+function openNew() {
+  const m = TASKS[subj][tidx];
+  document.getElementById('newFormBody').innerHTML = `
+    <div class="form-body">${buildFormHtml(m, null, 'new')}</div>
+    <div class="form-actions">
+      <button class="btn-save" onclick="saveNew()">Сохранить задачу</button>
+      <button class="btn-cancel" onclick="closeNew()">Отмена</button>
+    </div>`;
+  document.getElementById('newPanel').classList.add('open');
+  document.getElementById('newPanel').scrollIntoView({behavior:'smooth'});
+  // Restore equation previews if coeff widget present
+  setTimeout(() => {
+    if (m.fields.some(f=>f.type==='coeff_quadratic')) cq4Update('new');
+    if (m.fields.some(f=>f.type==='coeff_biquadratic')) cq7Update('new');
+  }, 50);
+  setTimeout(() => { const el = document.querySelector('#newPanel input[type=text], #newPanel textarea'); if(el) el.focus(); }, 120);
+}
+
+function closeNew() {
+  document.getElementById('newPanel').classList.remove('open');
+  document.getElementById('newFormBody').innerHTML = '';
+}
+
+async function saveNew() {
+  const m = TASKS[subj][tidx];
+  const vals = getVals(m, 'new');
+  if (!isValid(m, vals)) { toast('Заполните обязательные поля', 'err'); return; }
+  db[subj].tasks[tidx].push({ id:'task_'+Date.now(), ...vals, created: new Date().toISOString() });
+  await persist(); closeNew(); render(); toast('Задача добавлена', 'ok');
+}
+
+function toggleEdit(id) {
+  const form = document.getElementById('form-'+id);
+  const wasOpen = form.classList.contains('open');
+  document.querySelectorAll('.card-form.open').forEach(f => f.classList.remove('open'));
+  if (!wasOpen) {
+    form.classList.add('open');
+    form.scrollIntoView({behavior:'smooth', block:'nearest'});
+    // Restore equation previews
+    const m = TASKS[subj][tidx];
+    setTimeout(() => {
+      if (m.fields.some(f=>f.type==='coeff_quadratic')) cq4Update(id);
+      if (m.fields.some(f=>f.type==='coeff_biquadratic')) cq7Update(id);
+    }, 50);
+  }
+}
+
+function cancelEdit(id) { document.getElementById('form-'+id).classList.remove('open'); }
+
+async function saveEdit(id) {
+  const m = TASKS[subj][tidx];
+  const vals = getVals(m, id);
+  if (!isValid(m, vals)) { toast('Заполните обязательные поля', 'err'); return; }
+  const tasks = db[subj].tasks[tidx];
+  const i = tasks.findIndex(t => t.id===id);
+  if (i !== -1) tasks[i] = { ...tasks[i], ...vals };
+  await persist(); render(); toast('Задача обновлена', 'ok');
+}
+
+function askDel(id) { pendingDel = id; document.getElementById('delOverlay').classList.add('active'); }
+function closeConfirm() { pendingDel = null; document.getElementById('delOverlay').classList.remove('active'); }
+async function doDelete() {
+  if (!pendingDel) return;
+  db[subj].tasks[tidx] = db[subj].tasks[tidx].filter(t => t.id !== pendingDel);
+  closeConfirm(); await persist(); render(); toast('Задача удалена');
+}
+document.getElementById('delOverlay').addEventListener('click', function(e) { if(e.target===this) closeConfirm(); });
+
+// ════════════════════════════════════════════════════════════
+// COEFF WIDGET — А4 (квадратное уравнение)
+// ════════════════════════════════════════════════════════════
+function cq4LatexEq(a, b, c) {
+  let s = '';
+  if (a === 1)       s += 'x^2';
+  else if (a === -1) s += '-x^2';
+  else               s += `${a}x^2`;
+  if (b !== 0) {
+    const absB = Math.abs(b), sign = b < 0 ? ' - ' : ' + ', co = absB===1 ? '' : String(absB);
+    s += `${sign}${co}x`;
+  }
+  if (c !== 0) { s += (c < 0 ? ' - ' : ' + ') + Math.abs(c); }
+  return s + ' = 0';
+}
+
+function cq4Update(prefix) {
+  const a = parseFloat(document.getElementById(`${prefix}_a`)?.value);
+  const b = parseFloat(document.getElementById(`${prefix}_b`)?.value) || 0;
+  const c = parseFloat(document.getElementById(`${prefix}_c`)?.value) || 0;
+  const prev = document.getElementById(`${prefix}_eqprev`);
+  const hidden = document.getElementById(`${prefix}_equation`);
+  if (!prev) return;
+  if (!a || a === 0) {
+    prev.innerHTML = '<span style="color:var(--muted);font-size:.82rem">a ≠ 0</span>';
+    if (hidden) hidden.value = '';
+    return;
+  }
+  const latex = cq4LatexEq(a, b, c);
+  try { katex.render(latex, prev, {throwOnError:false, displayMode:false}); } catch(e) { prev.textContent = latex; }
+  if (hidden) hidden.value = latex;
+}
+
+function cq4Calc(prefix) {
+  const a = parseFloat(document.getElementById(`${prefix}_a`)?.value);
+  const b = parseFloat(document.getElementById(`${prefix}_b`)?.value) || 0;
+  const c = parseFloat(document.getElementById(`${prefix}_c`)?.value) || 0;
+  const res = document.getElementById(`${prefix}_cres`);
+  if (!a || isNaN(a)) { res.className='coeff-result err'; res.textContent='Проверьте коэффициенты (a ≠ 0)'; return; }
+  const D = b*b - 4*a*c;
+  if (D < 0) { res.className='coeff-result err'; res.textContent=`D = ${D} < 0 — действительных корней нет`; return; }
+  if (D === 0) {
+    const x = -b/(2*a);
+    res.className='coeff-result ok'; res.textContent=`D = 0, единственный корень: x = ${fmt4(x)}`;
+    fillA4Answer(prefix, x, x); return;
+  }
+  const sqD = Math.sqrt(D);
+  const x1 = (-b - sqD)/(2*a), x2 = (-b + sqD)/(2*a);
+  const xMin = Math.min(x1,x2), xMax = Math.max(x1,x2);
+  res.className='coeff-result ok'; res.textContent=`D = ${D}, x₁ = ${fmt4(xMin)}, x₂ = ${fmt4(xMax)}`;
+  fillA4Answer(prefix, xMin, xMax);
+}
+
+function fillA4Answer(prefix, xMin, xMax) {
+  const qSel = document.getElementById(`${prefix}_question`);
+  const ansEl = document.getElementById(`${prefix}_answer`);
+  if (!ansEl) return;
+  const q = qSel ? qSel.value : 'наименьший корень';
+  const val = q==='наименьший корень' ? fmt4(xMin) : q==='наибольший корень' ? fmt4(xMax) : fmt4(xMin+xMax);
+  ansEl.value = val;
+  ansEl.style.borderColor = 'var(--accent-g)';
+  setTimeout(() => ansEl.style.borderColor = '', 1500);
+}
+
+function a4QuestionChange(prefix) {
+  const a = parseFloat(document.getElementById(`${prefix}_a`)?.value);
+  const b = parseFloat(document.getElementById(`${prefix}_b`)?.value) || 0;
+  const c = parseFloat(document.getElementById(`${prefix}_c`)?.value) || 0;
+  if (!a || isNaN(a)) return;
+  const D = b*b - 4*a*c;
+  if (D < 0) return;
+  const sqD = Math.sqrt(D);
+  const x1 = (-b - sqD)/(2*a), x2 = (-b + sqD)/(2*a);
+  fillA4Answer(prefix, Math.min(x1,x2), Math.max(x1,x2));
+}
+
+function fmt4(v) {
+  if (Number.isInteger(v)) return String(v);
+  return String(parseFloat(v.toFixed(4)));
+}
+
+// ════════════════════════════════════════════════════════════
+// COEFF WIDGET — А7 (биквадратное уравнение)
+// ════════════════════════════════════════════════════════════
+function cq7LatexEq(a, p, q) {
+  // a·x⁴ + p·x² + q = 0
+  let s = '';
+  // x⁴ term
+  if (a === 1)       s = 'x^4';
+  else if (a === -1) s = '-x^4';
+  else               s = `${a}x^4`;
+  // x² term
+  if (p !== 0) {
+    const abs = Math.abs(p), sign = p < 0 ? ' - ' : ' + ';
+    const co = abs === 1 ? '' : String(abs);
+    s += `${sign}${co}x^2`;
+  }
+  // constant
+  if (q !== 0) { s += (q < 0 ? ' - ' : ' + ') + Math.abs(q); }
+  return s + ' = 0';
+}
+
+function cq7Update(prefix) {
+  const a = parseFloat(document.getElementById(`${prefix}_a7`)?.value) || 1;
+  const p = parseFloat(document.getElementById(`${prefix}_p`)?.value)  || 0;
+  const q = parseFloat(document.getElementById(`${prefix}_q`)?.value)  || 0;
+  const prev   = document.getElementById(`${prefix}_eqprev`);
+  const hidden = document.getElementById(`${prefix}_equation`);
+  if (!prev) return;
+  if (a === 0) { prev.innerHTML = '<span style="color:var(--muted);font-size:.82rem">a ≠ 0</span>'; return; }
+  const latex = cq7LatexEq(a, p, q);
+  try { katex.render(latex, prev, {throwOnError:false, displayMode:false}); } catch(e) { prev.textContent = latex; }
+  if (hidden) hidden.value = latex;
+}
+
+function cq7Calc(prefix) {
+  const a  = parseFloat(document.getElementById(`${prefix}_a7`)?.value);
+  const p  = parseFloat(document.getElementById(`${prefix}_p`)?.value);
+  const q  = parseFloat(document.getElementById(`${prefix}_q`)?.value);
+  const res   = document.getElementById(`${prefix}_cres`);
+  const ansEl = document.getElementById(`${prefix}_answer`);
+
+  if (isNaN(a) || isNaN(p) || isNaN(q)) {
+    res.className='coeff-result err'; res.textContent='Введите все коэффициенты a, p, q'; return;
+  }
+  if (a === 0) {
+    res.className='coeff-result err'; res.textContent='Коэффициент a ≠ 0'; return;
+  }
+
+  // Сводим к квадратному: a·t² + p·t + q = 0, где t = x²
+  const D = p*p - 4*a*q;
+  if (D < 0) {
+    res.className='coeff-result err'; res.textContent=`D = ${D} < 0 — нет действительных корней`; return;
+  }
+  const sqD = Math.sqrt(D);
+  const t1 = (-p - sqD) / (2*a);
+  const t2 = (-p + sqD) / (2*a);
+
+  const parts = [], roots = [];
+  [t1, t2].forEach(t => {
+    const tr = +t.toFixed(10);
+    if (tr < 0) return;
+    if (tr === 0) { roots.push(0); parts.push('0'); return; }
+    const sq = Math.sqrt(tr);
+    const isq = Math.round(sq);
+    if (Math.abs(sq - isq) < 1e-9) {
+      roots.push(isq, -isq); parts.push(`\\pm ${isq}`);
+    } else if (Number.isInteger(tr)) {
+      roots.push(sq, -sq); parts.push(`\\pm\\sqrt{${tr}}`);
+    } else {
+      roots.push(sq, -sq); parts.push(`\\pm\\sqrt{${+tr.toFixed(4)}}`);
+    }
+  });
+
+  if (!parts.length) {
+    res.className='coeff-result err'; res.textContent='Нет вещественных корней (t₁ < 0 и t₂ < 0)'; return;
+  }
+  const answerLatex = parts.join(';\\;');
+  res.className='coeff-result ok';
+  res.textContent = `D = ${+D.toFixed(6)}, t₁ = ${+t1.toFixed(6)}, t₂ = ${+t2.toFixed(6)} → корни: ${roots.map(r=>+r.toFixed(6)).join(', ')}`;
+  if (ansEl) {
+    ansEl.value = answerLatex;
+    ansEl.style.borderColor = 'var(--accent-g)';
+    setTimeout(() => ansEl.style.borderColor = '', 1500);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// IMAGE PICKER
+// ════════════════════════════════════════════════════════════
+function ipSrc(val) {
+  if (!val) return '';
+  try { const p = JSON.parse(val); return p && p.src ? p.src : ''; } catch(e) { return ''; }
+}
+function ipTab(fid, tab) {
+  const isFile = tab==='file';
+  document.querySelectorAll(`#picker-${fid} .img-tab`).forEach((b,i) => b.classList.toggle('active', isFile ? i===0 : i===1));
+  document.getElementById('ipf-'+fid).classList.toggle('active', isFile);
+  document.getElementById('ipu-'+fid).classList.toggle('active', !isFile);
+}
+function ipFile(input, fid) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 400*1024) { toast('Файл > 400 КБ. Сожмите или используйте ссылку.', 'err'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    ipStore(fid, src, 'file');
+    const drop = document.getElementById('ipd-'+fid);
+    drop.classList.add('has-img');
+    drop.innerHTML = `<input type="file" accept="image/*" onchange="ipFile(this,'${fid}')">`
+      + `<div class="img-preview-wrap"><img class="img-preview" src="${src}" alt=""><button type="button" class="img-clear" onclick="ipClear('${fid}')">✕</button></div>`;
+    ipBadge(fid, 'file');
+  };
+  reader.readAsDataURL(file);
+}
+function ipUrl(fid) {
+  const inp = document.getElementById('ipurl-'+fid);
+  const src = inp ? inp.value.trim() : '';
+  const panel = document.getElementById('ipu-'+fid);
+  const existing = panel ? panel.querySelector('.img-preview-wrap') : null;
+  if (existing) existing.remove();
+  if (!src) { ipStore(fid,'','none'); ipBadge(fid,'none'); return; }
+  ipStore(fid, src, 'url');
+  if (inp) {
+    const wrap = document.createElement('div');
+    wrap.className = 'img-preview-wrap';
+    wrap.innerHTML = `<img class="img-preview" src="${escA(src)}" alt="" onerror="this.style.opacity='.3'" onload="this.style.opacity='1'">`
+      + `<button type="button" class="img-clear" onclick="ipClearUrl('${fid}')">✕</button>`;
+    inp.insertAdjacentElement('afterend', wrap);
+  }
+  ipBadge(fid, 'url');
+}
+function ipClear(fid) {
+  ipStore(fid,'','none');
+  const drop = document.getElementById('ipd-'+fid);
+  if (drop) { drop.classList.remove('has-img'); drop.innerHTML = `<input type="file" accept="image/*" onchange="ipFile(this,'${fid}')"><span>Нажмите или перетащите файл сюда<br><span style="font-size:.7rem">PNG, JPG, SVG — до 400 КБ</span></span>`; }
+  ipBadge(fid,'none');
+}
+function ipClearUrl(fid) {
+  const inp = document.getElementById('ipurl-'+fid);
+  if (inp) inp.value = '';
+  const panel = document.getElementById('ipu-'+fid);
+  const wrap = panel ? panel.querySelector('.img-preview-wrap') : null;
+  if (wrap) wrap.remove();
+  ipStore(fid,'','none'); ipBadge(fid,'none');
+}
+function ipStore(fid, src, srcType) {
+  const el = document.getElementById(fid);
+  if (el) el.value = src ? JSON.stringify({src, srcType}) : '';
+}
+function ipBadge(fid, srcType) {
+  const el = document.getElementById('ibadge-'+fid);
+  if (!el) return;
+  el.className = 'img-badge ' + srcType;
+  el.textContent = srcType==='file' ? '✓ Файл загружен' : srcType==='url' ? '✓ Ссылка указана' : '';
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function doKatex() {
+  setTimeout(() => {
+    renderMathInElement(document.getElementById('tasksList'), {
+      delimiters: [{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError: false
+    });
+  }, 80);
+}
+function esc(s)  { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escH(s) { return esc(s); }
+function escA(s) { if(!s) return ''; return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show ' + type;
+  setTimeout(() => el.className = 'toast', 3000);
+}
+</script>
+</body>
+</html>

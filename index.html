@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Математика 8 класс — Контрольные работы</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #f5f0e8;
+    --accent-a: #c84b31;
+    --accent-g: #2d6a4f;
+    --muted: #8a8070;
+    --border: #d4ccc0;
+    --card-bg: #faf7f2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Golos Text', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    padding: 2rem 3rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .site-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .site-subtitle {
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .teacher-btn {
+    margin-left: auto;
+    font-family: 'Golos Text', sans-serif;
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .teacher-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .hero p {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .subjects {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    width: 100%;
+    max-width: 800px;
+    border: 1px solid var(--border);
+  }
+
+  .subject-card {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    border: none;
+    transition: background 0.2s;
+  }
+  .subject-card:first-child { border-right: 1px solid var(--border); }
+  .subject-card:hover { background: #fff; }
+
+  .subject-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .subject-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    flex-shrink: 0;
+  }
+  .icon-a { background: #fce8e4; color: var(--accent-a); }
+  .icon-g { background: #e4f0eb; color: var(--accent-g); }
+
+  .subject-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .subject-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .subject-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+  }
+
+  .btn {
+    display: block;
+    padding: 0.75rem 1.25rem;
+    font-family: 'Golos Text', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.15s;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary-a {
+    background: var(--accent-a);
+    color: #fff;
+  }
+  .btn-primary-a:hover { background: #b03d26; }
+
+  .btn-primary-g {
+    background: var(--accent-g);
+    color: #fff;
+  }
+  .btn-primary-g:hover { background: #235a40; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink);
+  }
+  .btn-secondary:hover { border-color: var(--ink); background: #fff; }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 3rem 0 2rem;
+    width: 100%;
+    max-width: 800px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .info-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    width: 100%;
+    max-width: 800px;
+    border: 1px solid var(--border);
+    background: var(--border);
+  }
+
+  .info-item {
+    background: var(--card-bg);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .info-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .info-num.red { color: var(--accent-a); }
+  .info-num.green { color: var(--accent-g); }
+
+  .info-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  footer {
+    padding: 1.5rem 3rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--muted);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* PIN modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,26,46,0.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .modal p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .pin-input {
+    font-family: 'Golos Text', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    text-align: center;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    background: #fff;
+    width: 100%;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .pin-input:focus { border-color: var(--ink); }
+  .pin-input.error { border-color: var(--accent-a); animation: shake 0.3s; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-modal-cancel {
+    flex: 1;
+    padding: 0.7rem;
+    background: none;
+    border: 1px solid var(--border);
+    font-family: 'Golos Text', sans-serif;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    color: var(--ink);
+  }
+  .btn-modal-cancel:hover { border-color: var(--ink); }
+
+  .btn-modal-confirm {
+    flex: 2;
+    padding: 0.7rem;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    font-family: 'Golos Text', sans-serif;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.15s;
+  }
+  .btn-modal-confirm:hover { background: #2d2d4e; }
+
+  .error-msg {
+    font-size: 0.8rem;
+    color: var(--accent-a);
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="site-title">КР · 8 класс</div>
+  <div class="site-subtitle">Алгебра и геометрия</div>
+  <button class="teacher-btn" onclick="openPinModal()">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <rect x="1" y="5" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      <path d="M3.5 5V3.5a2.5 2.5 0 015 0V5" stroke="currentColor" stroke-width="1.2"/>
+    </svg>
+    Панель учителя
+  </button>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Итоговые<br><em>контрольные</em><br>работы</h1>
+    <p>Тренировочные задания и контрольные варианты по всем темам курса алгебры и геометрии 8 класса, 3 триместр.</p>
+  </div>
+
+  <div class="subjects">
+    <div class="subject-card">
+      <div class="subject-label">
+        <div class="subject-icon icon-a">A</div>
+        <div class="subject-name">Алгебра</div>
+      </div>
+      <div class="subject-desc">
+        Рациональные дроби, квадратные корни, уравнения, неравенства, функции. 8 заданий, 90 минут.
+      </div>
+      <div class="subject-actions">
+        <a href="algebra-practice.html" class="btn btn-primary-a">Режим практики</a>
+        <a href="algebra-test.html" class="btn btn-secondary">Контрольная работа</a>
+      </div>
+    </div>
+
+    <div class="subject-card">
+      <div class="subject-label">
+        <div class="subject-icon icon-g">Г</div>
+        <div class="subject-name">Геометрия</div>
+      </div>
+      <div class="subject-desc">
+        Четырёхугольники, площади, теорема Пифагора, подобие, окружность. 8 заданий, 90 минут.
+      </div>
+      <div class="subject-actions">
+        <a href="geometry-practice.html" class="btn btn-primary-g">Режим практики</a>
+        <a href="geometry-test.html" class="btn btn-secondary">Контрольная работа</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"><span>Структура работы</span></div>
+
+  <div class="info-strip">
+    <div class="info-item">
+      <div class="info-num red">8</div>
+      <div class="info-label">заданий в каждой контрольной работе</div>
+    </div>
+    <div class="info-item">
+      <div class="info-num green">10</div>
+      <div class="info-label">максимальных баллов за работу</div>
+    </div>
+    <div class="info-item">
+      <div class="info-num" style="color:var(--muted)">90</div>
+      <div class="info-label">минут на выполнение работы</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Алгебра и геометрия · 8 класс · 3 триместр 2025–2026</span>
+  <span>Задания 7–8: развёрнутый ответ · проверяется учителем</span>
+</footer>
+
+<!-- PIN modal -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <h2>Панель учителя</h2>
+    <p>Введите PIN-код для доступа к редактированию заданий.</p>
+    <input
+      type="password"
+      class="pin-input"
+      id="pinInput"
+      maxlength="8"
+      placeholder="••••••••"
+      onkeydown="if(event.key==='Enter') checkPin()"
+    >
+    <div class="error-msg" id="pinError">Неверный PIN-код. Попробуйте снова.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closePinModal()">Отмена</button>
+      <button class="btn-modal-confirm" onclick="checkPin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PIN = '10951538';
+
+  function openPinModal() {
+    document.getElementById('pinModal').classList.add('active');
+    setTimeout(() => document.getElementById('pinInput').focus(), 100);
+  }
+
+  function closePinModal() {
+    document.getElementById('pinModal').classList.remove('active');
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinError').classList.remove('visible');
+  }
+
+  function checkPin() {
+    const val = document.getElementById('pinInput').value;
+    if (val === PIN) {
+      closePinModal();
+      window.location.href = 'admin.html';
+    } else {
+      const input = document.getElementById('pinInput');
+      const err = document.getElementById('pinError');
+      input.classList.add('error');
+      err.classList.add('visible');
+      input.value = '';
+      setTimeout(() => input.classList.remove('error'), 300);
+      setTimeout(() => input.focus(), 50);
+    }
+  }
+
+  document.getElementById('pinModal').addEventListener('click', function(e) {
+    if (e.target === this) closePinModal();
+  });
+</script>
+</body>
+</html>
