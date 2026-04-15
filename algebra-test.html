@@ -550,56 +550,57 @@ function buildExamTask(task, i) {
 
 function buildExamInput(task, i) {
   switch(i) {
-    case 0: return examA1(task);
-    case 1: return examA2(task);
-    case 2: return examA3(task);
-    case 3: return examA4(task);
-    case 4: return examA5(task);
-    case 5: return examA6(task);
+    case 0: return examA1(task,i);
+    case 1: return examA2(task,i);
+    case 2: return examA3(task,i);
+    case 3: return examA4(task,i);
+    case 4: return examA5(task,i);
+    case 5: return examA6(task,i);
     default: return '';
   }
 }
 
-function examCells(n, prefix='c') {
+function examCells(n, taskI, prefix='c') {
+  const pid=`t${taskI}_${prefix}`;
   return Array.from({length:n},(_,j)=>
-    `<input class="cell" id="exam_${prefix}${j}" maxlength="1" inputmode="decimal"
-      onkeydown="examKey(event,'${prefix}',${j},${n})"
-      oninput="examInput('${prefix}',${j},${n})">`
+    `<input class="cell" id="exam_${pid}${j}" maxlength="1" inputmode="decimal"
+      onkeydown="examKey(event,'${pid}',${j},${n})"
+      oninput="examInput('${pid}',${j},${n})">`
   ).join('');
 }
 
-function examCellBlock(label, n, prefix='c') {
+function examCellBlock(label, n, taskI, prefix='c') {
   return `<div>
     <div class="ans-label">${label}</div>
-    <div class="ans-row"><div class="cells">${examCells(n,prefix)}</div></div>
+    <div class="ans-row"><div class="cells">${examCells(n,taskI,prefix)}</div></div>
   </div>`;
 }
 
-function examA1(t) {
+function examA1(t, i) {
   const opts=[t.opt1,t.opt2,t.opt3,t.opt4].map((o,j)=>
-    `<button class="q-opt" id="exam_opt${j+1}" onclick="examPickOpt(${j+1})">
+    `<button class="q-opt" id="exam_t${i}_opt${j+1}" onclick="examPickOpt(${i},${j+1})">
       <span class="opt-lbl">${j+1}</span><span>$${o}$</span>
     </button>`).join('');
   return `<div class="econd">Какое из данных ниже чисел является значением выражения $${t.expression}$?</div>
     <div class="q-options">${opts}</div>
-    ${examCellBlock('Введите номер ответа',1,'opt')}`;
+    ${examCellBlock('Введите номер ответа',1,i,'opt')}`;
 }
-function examA2(t) {
+function examA2(t, i) {
   return `<div class="econd">Найдите значение выражения при $${t.variable}$.</div>
     <div class="econd">$$${t.expression}$$</div>
-    ${examCellBlock('Ответ',17)}`;
+    ${examCellBlock('Ответ',17,i)}`;
 }
-function examA3(t) {
+function examA3(t, i) {
   return `<div class="econd">Найдите значение выражения $${t.expression}$.</div>
-    ${examCellBlock('Ответ',17)}`;
+    ${examCellBlock('Ответ',17,i)}`;
 }
-function examA4(t) {
+function examA4(t, i) {
   const q=t.question||'наименьший корень';
   return `<div class="econd">Решите уравнение: $${t.equation}$</div>
     <div class="econd" style="font-size:.85rem;color:var(--muted)">В ответе укажите ${q}.</div>
-    ${examCellBlock('Ответ',17)}`;
+    ${examCellBlock('Ответ',17,i)}`;
 }
-function examA5(t) {
+function examA5(t, i) {
   const fmls=[t.f1,t.f2,t.f3,t.f4].map((f,j)=>
     `<span style="margin-right:1.5rem"><strong>${j+1})</strong> $${f}$</span>`).join('');
   const gr=(lbl,imgRaw,desc)=>{
@@ -618,17 +619,17 @@ function examA5(t) {
       <div class="a5-wrap">
         ${['А','Б','В'].map((l,j)=>`
           <div class="a5-cw"><div class="a5-lbl">${l}</div>
-          <input class="a5-cell" id="exam_a5${j}" maxlength="1" inputmode="numeric"
-            onkeydown="examA5Key(event,${j})" oninput="examA5Input(${j})">
+          <input class="a5-cell" id="exam_t${i}_a5${j}" maxlength="1" inputmode="numeric"
+            onkeydown="examA5Key(event,${i},${j})" oninput="examA5Input(${i},${j})">
           </div>`).join('')}
       </div>
     </div>`;
 }
-function examA6(t) {
+function examA6(t, i) {
   const q=t.question||'наибольшее целое решение';
   return `<div class="econd">Решите систему неравенств. В ответе укажите ${q}.</div>
     <div class="econd">$$\\begin{cases}${t.ineq1}\\\\${t.ineq2}\\end{cases}$$</div>
-    ${examCellBlock('Ответ',17)}`;
+    ${examCellBlock('Ответ',17,i)}`;
 }
 
 // ── Exam cell interaction ────────────────────────────────────
@@ -650,38 +651,40 @@ function focusExam(prefix, idx, total) {
   if(idx<0||idx>=total) return;
   document.getElementById(`exam_${prefix}${idx}`)?.focus();
 }
-function examPickOpt(n) {
-  document.querySelectorAll('[id^="exam_opt"]').forEach(b=>b.classList.remove('sel'));
-  document.getElementById(`exam_opt${n}`)?.classList.add('sel');
-  const inp=document.getElementById('exam_opt0');
+function examPickOpt(taskI, n) {
+  for(let k=1;k<=4;k++) document.getElementById(`exam_t${taskI}_opt${k}`)?.classList.remove('sel');
+  document.getElementById(`exam_t${taskI}_opt${n}`)?.classList.add('sel');
+  const inp=document.getElementById(`exam_t${taskI}_opt0`);
   if(inp){inp.value=String(n);inp.classList.add('filled');}
 }
-function examA5Key(e,j) {
-  if(e.key==='ArrowRight'||e.key==='Tab'){e.preventDefault();document.getElementById(`exam_a5${Math.min(2,j+1)}`)?.focus();return;}
-  if(e.key==='ArrowLeft'){e.preventDefault();document.getElementById(`exam_a5${Math.max(0,j-1)}`)?.focus();return;}
-  if(e.key==='Backspace'){const el=document.getElementById(`exam_a5${j}`);if(el&&el.value===''){e.preventDefault();document.getElementById(`exam_a5${Math.max(0,j-1)}`)?.focus();}return;}
+function examA5Key(e,taskI,j) {
+  if(e.key==='ArrowRight'||e.key==='Tab'){e.preventDefault();document.getElementById(`exam_t${taskI}_a5${Math.min(2,j+1)}`)?.focus();return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();document.getElementById(`exam_t${taskI}_a5${Math.max(0,j-1)}`)?.focus();return;}
+  if(e.key==='Backspace'){const el=document.getElementById(`exam_t${taskI}_a5${j}`);if(el&&el.value===''){e.preventDefault();document.getElementById(`exam_t${taskI}_a5${Math.max(0,j-1)}`)?.focus();}return;}
   if(!/^[1-4]$/.test(e.key)&&e.key.length===1) e.preventDefault();
 }
-function examA5Input(j) {
-  const el=document.getElementById(`exam_a5${j}`);
+function examA5Input(taskI,j) {
+  const el=document.getElementById(`exam_t${taskI}_a5${j}`);
   if(!el) return;
   el.value=el.value.replace(/[^1-4]/g,'').slice(-1);
-  if(el.value&&j<2) document.getElementById(`exam_a5${j+1}`)?.focus();
+  if(el.value&&j<2) document.getElementById(`exam_t${taskI}_a5${j+1}`)?.focus();
 }
 
-// ── Read exam answers ────────────────────────────────────────
 function readExamAnswers() {
   const answers = [];
   for(let i=0;i<6;i++){
     let val='';
     if(i===0){
-      val=document.getElementById('exam_opt0')?.value||'';
+      // A1: single opt cell
+      val=document.getElementById(`exam_t${i}_opt0`)?.value||'';
     } else if(i===4){
-      val=(document.getElementById('exam_a50')?.value||'')
-         +(document.getElementById('exam_a51')?.value||'')
-         +(document.getElementById('exam_a52')?.value||'');
+      // A5: three a5 cells
+      val=(document.getElementById(`exam_t${i}_a50`)?.value||'')
+         +(document.getElementById(`exam_t${i}_a51`)?.value||'')
+         +(document.getElementById(`exam_t${i}_a52`)?.value||'');
     } else {
-      for(let j=0;j<17;j++) val+=(document.getElementById(`exam_c${j}`)?.value||'');
+      // A2,A3,A4,A6: 17 cells with task-specific prefix
+      for(let j=0;j<17;j++) val+=(document.getElementById(`exam_t${i}_c${j}`)?.value||'');
     }
     answers.push(val.trim());
   }
@@ -727,9 +730,12 @@ async function submitTest() {
   let autoScore = 0;
   const taskRecords = examTasks.map((task, i) => {
     const m = TASK_META[i];
+    // Full snapshot for display in result
+    const snap = buildTaskSnapshot(task, i);
     if(i>=6) {
-      return {taskIdx:i, taskId:task.id, title:m.title, condition:getCondition(task,i),
-              correctAnswer:task.answer, studentAnswer:null, pts:null, maxPts:m.pts,
+      return {taskIdx:i, taskId:task.id, title:m.title,
+              snap, correctAnswer:task.answer,
+              studentAnswer:null, pts:null, maxPts:m.pts,
               solution:task.solution||null};
     }
     const given   = normAns(studentAnswers[i]);
@@ -737,8 +743,8 @@ async function submitTest() {
     const pts     = given===correct ? m.pts : 0;
     autoScore += pts;
     return {taskIdx:i, taskId:task.id, title:m.title,
-            condition:getCondition(task,i),
-            correctAnswer:task.answer, studentAnswer:studentAnswers[i],
+            snap, correctAnswer:task.answer,
+            studentAnswer:studentAnswers[i],
             pts, maxPts:m.pts};
   });
 
@@ -768,10 +774,23 @@ async function submitTest() {
   showSubmitConfirmation(testObj);
 }
 
-function getCondition(task, i) {
-  if(i===6) return task.equation || '';
-  if(i===7) return task.condition || '';
-  return '';
+// Build a display snapshot of the task (saved in test record for result view)
+function buildTaskSnapshot(task, i) {
+  switch(i) {
+    case 0: return {type:'a1', expression:task.expression,
+              opts:[task.opt1,task.opt2,task.opt3,task.opt4]};
+    case 1: return {type:'a2', variable:task.variable, expression:task.expression};
+    case 2: return {type:'a3', expression:task.expression};
+    case 3: return {type:'a4', equation:task.equation, question:task.question||'наименьший корень'};
+    case 4: return {type:'a5', f1:task.f1, f2:task.f2, f3:task.f3, f4:task.f4,
+              descA:task.descA, descB:task.descB, descV:task.descV,
+              imgA:task.imgA, imgB:task.imgB, imgV:task.imgV};
+    case 5: return {type:'a6', ineq1:task.ineq1, ineq2:task.ineq2,
+              question:task.question||'наибольшее целое решение'};
+    case 6: return {type:'a7', equation:task.equation, solution:task.solution||''};
+    case 7: return {type:'a8', condition:task.condition, solution:task.solution||''};
+    default: return {};
+  }
 }
 
 function showSubmitConfirmation(testObj) {
@@ -817,23 +836,68 @@ function openResult(id) {
   const tasksHtml = test.tasks.map(t => {
     const scoreClass = t.pts===t.maxPts?'full':t.pts>0?'part':'zero';
     const ptsLabel = t.pts===null?'—':`${t.pts}/${t.maxPts}`;
+    const snap = t.snap || {};
 
+    // Render condition from snapshot
+    let condHtml = '';
+    if(snap.type==='a1'){
+      const optsHtml=snap.opts.map((o,j)=>
+        `<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;border:1px solid var(--border);border-radius:2px;font-size:.875rem">
+          <span style="font-size:.72rem;font-weight:700;background:rgba(0,0,0,.07);width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:2px">${j+1}</span>
+          $${o}$
+        </div>`).join('');
+      condHtml=`<div style="font-size:.9rem;margin-bottom:.5rem">Значение выражения $${snap.expression}$?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.5rem">${optsHtml}</div>`;
+    } else if(snap.type==='a2'){
+      condHtml=`<div style="font-size:.9rem">Найдите значение выражения при $${snap.variable}$.</div>
+        <div style="margin:.25rem 0">$$${snap.expression}$$</div>`;
+    } else if(snap.type==='a3'){
+      condHtml=`<div style="font-size:.9rem">Найдите значение выражения $${snap.expression}$.</div>`;
+    } else if(snap.type==='a4'){
+      condHtml=`<div style="font-size:.9rem">Решите уравнение: $${snap.equation}$</div>
+        <div style="font-size:.82rem;color:var(--muted)">В ответе укажите ${snap.question}.</div>`;
+    } else if(snap.type==='a5'){
+      const fmls=[snap.f1,snap.f2,snap.f3,snap.f4].map((f,j)=>
+        `<span style="margin-right:1rem"><strong>${j+1})</strong> $${f}$</span>`).join('');
+      condHtml=`<div style="font-size:.9rem;margin-bottom:.4rem">Соответствие графиков и формул:</div>
+        <div style="line-height:2;margin-bottom:.5rem">${fmls}</div>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.84rem">
+          ${['А','Б','В'].map((l,j)=>{
+            const desc=[snap.descA,snap.descB,snap.descV][j];
+            const img=[snap.imgA,snap.imgB,snap.imgV][j];
+            const src=ipSrc(img);
+            return `<div><strong>${l}:</strong> ${src?`<img src="${src}" style="max-height:80px;max-width:180px;display:block;margin:.2rem 0;border:1px solid var(--border);border-radius:2px;object-fit:contain">`:''} ${esc(desc||'')} </div>`;
+          }).join('')}
+        </div>`;
+    } else if(snap.type==='a6'){
+      condHtml=`<div style="font-size:.9rem">Система неравенств. Укажите ${snap.question}.</div>
+        <div>$$\\begin{cases}${snap.ineq1}\\\\${snap.ineq2}\\end{cases}$$</div>`;
+    } else if(snap.type==='a7'){
+      condHtml=`<div style="font-size:.9rem">Решите уравнение: $${snap.equation}$</div>`;
+    } else if(snap.type==='a8'){
+      condHtml=`<div style="font-size:.9rem;line-height:1.7">${esc(snap.condition)}</div>`;
+    }
+
+    // Answers and solution
     let body='';
     if(t.taskIdx<6){
       const ok=normAns(t.studentAnswer)===normAns(t.correctAnswer);
-      body=`<div class="answer-row">
-        <div class="answer-item">
-          <div class="answer-label">Ваш ответ</div>
-          <div class="answer-val ${ok?'correct':'wrong'}">${esc(t.studentAnswer)||'—'}</div>
-        </div>
-        <div class="answer-item">
-          <div class="answer-label">Верный ответ</div>
-          <div class="answer-val correct">${esc(t.correctAnswer)}</div>
-        </div>
-      </div>`;
+      body=`${condHtml}
+        <div class="answer-row" style="margin-top:.75rem">
+          <div class="answer-item">
+            <div class="answer-label">Ваш ответ</div>
+            <div class="answer-val ${ok?'correct':'wrong'}">${esc(t.studentAnswer)||'—'}</div>
+          </div>
+          <div class="answer-item">
+            <div class="answer-label">Верный ответ</div>
+            <div class="answer-val correct">${esc(t.correctAnswer)}</div>
+          </div>
+        </div>`;
     } else {
-      body=`<div style="font-size:.85rem;color:var(--muted)">Задание выполнялось на бумаге.</div>`;
-      if(t.solution) body+=`<div class="solution-block" id="sol-${t.taskIdx}">${esc(t.solution)}</div>`;
+      const sol = snap.solution || t.solution || '';
+      body=`${condHtml}
+        <div style="font-size:.84rem;color:var(--muted);margin-top:.5rem">Задание выполнялось на бумаге.</div>
+        ${sol?`<div class="solution-block" style="margin-top:.75rem">${esc(sol)}</div>`:''}`;
     }
 
     return `<div class="rtask">
