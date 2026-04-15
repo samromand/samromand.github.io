@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Алгебра — Контрольная работа</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  --ink:#1a1a2e;--paper:#f5f0e8;--accent:#c84b31;--accent-dark:#a03825;
+  --muted:#8a8070;--border:#d4ccc0;--card:#faf7f2;
+  --green:#2d6a4f;--green-bg:#e4f0eb;
+  --yellow:#b08000;--yellow-bg:#fef3cd;
+  --red:#c84b31;--red-bg:#fce8e4;
+  --blue:#185fa5;--blue-bg:#e6f1fb;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'Golos Text',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
+
+/* ── HEADER ── */
+header{padding:1rem 2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;background:var(--paper);position:sticky;top:0;z-index:50;}
+.back-link{font-size:.8rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:.35rem;transition:color .15s;}
+.back-link:hover{color:var(--ink);}
+.hdr-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;}
+.badge{font-size:.7rem;padding:.2rem .6rem;border-radius:2px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;background:#fce8e4;color:var(--accent);}
+.badge-teacher{background:var(--ink);color:#fff;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:.75rem;}
+.hdr-name{font-size:.84rem;color:var(--muted);}
+.btn-sm{font-size:.75rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:2px;padding:.25rem .65rem;cursor:pointer;transition:all .15s;}
+.btn-sm:hover{border-color:var(--ink);color:var(--ink);}
+
+/* ── SCREENS ── */
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;}
+#sLogin{min-height:calc(100vh - 58px);display:none;align-items:center;justify-content:center;padding:2rem;}
+#sLogin.active{display:flex;}
+
+/* ── LOGIN ── */
+.login-card{background:#fff;border:1px solid var(--border);border-radius:2px;padding:2.5rem;width:100%;max-width:400px;display:flex;flex-direction:column;gap:1.25rem;}
+.login-card h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;}
+.login-card p{font-size:.85rem;color:var(--muted);line-height:1.6;}
+.fg{display:flex;flex-direction:column;gap:.4rem;}
+.fg label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.fg input{font-family:'Golos Text',sans-serif;font-size:1rem;padding:.65rem .8rem;border:1px solid var(--border);background:#fff;border-radius:2px;outline:none;transition:border-color .15s;color:var(--ink);width:100%;}
+.fg input:focus{border-color:var(--ink);}
+.btn-primary{padding:.7rem;font-family:'Golos Text',sans-serif;font-size:.9rem;font-weight:500;border:none;border-radius:2px;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s;width:100%;}
+.btn-primary:hover{background:var(--accent-dark);}
+.btn-primary:disabled{background:var(--muted);cursor:not-allowed;}
+
+/* ── DASHBOARD ── */
+#sDash{padding:2rem;max-width:860px;margin:0 auto;}
+.dash-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:1rem;}
+.dash-head h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;}
+.btn-new{padding:.6rem 1.4rem;font-family:'Golos Text',sans-serif;font-size:.875rem;font-weight:500;border:none;border-radius:2px;background:var(--accent);color:#fff;cursor:pointer;transition:background .15s;}
+.btn-new:hover{background:var(--accent-dark);}
+
+/* test cards */
+.section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);}
+.tests-list{display:flex;flex-direction:column;gap:.6rem;margin-bottom:2rem;}
+.tcard{background:#fff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:box-shadow .15s;}
+.tcard:hover{box-shadow:0 2px 10px rgba(0,0,0,.06);}
+.tcard-date{font-size:.82rem;color:var(--muted);white-space:nowrap;}
+.tcard-name{font-size:.9rem;font-weight:500;}
+.tcard-sub{font-size:.78rem;color:var(--muted);}
+.tcard-right{margin-left:auto;display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
+.status-pill{font-size:.7rem;padding:.2rem .65rem;border-radius:10px;font-weight:600;letter-spacing:.03em;white-space:nowrap;}
+.sp-pending{background:var(--yellow-bg);color:var(--yellow);}
+.sp-reviewed{background:var(--green-bg);color:var(--green);}
+.sp-active{background:var(--blue-bg);color:var(--blue);}
+.score-badge{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ink);}
+.empty-state{text-align:center;padding:2.5rem;color:var(--muted);border:1px dashed var(--border);border-radius:2px;font-size:.875rem;}
+
+/* ── EXAM ── */
+#sExam{padding:0;}
+.exam-hdr{display:flex;align-items:center;gap:1.25rem;padding:1rem 2rem;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:58px;z-index:30;}
+.exam-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+.timer{font-family:'Golos Text',sans-serif;font-size:1.1rem;font-weight:600;color:var(--accent);min-width:56px;}
+.timer.warn{color:var(--red);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+.exam-prog{font-size:.78rem;color:var(--muted);margin-left:auto;}
+.btn-submit{padding:.5rem 1.25rem;font-family:'Golos Text',sans-serif;font-size:.84rem;font-weight:500;border:none;border-radius:2px;background:var(--ink);color:#fff;cursor:pointer;}
+
+.exam-body{padding:2rem;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem;}
+.etask{background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.etask-head{padding:.7rem 1.25rem;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;}
+.etask-num{width:24px;height:24px;border-radius:2px;background:#fce8e4;color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;}
+.etask-desc{font-size:.78rem;color:var(--muted);}
+.etask-pts{margin-left:auto;font-size:.72rem;color:var(--muted);background:rgba(0,0,0,.06);padding:.1rem .45rem;border-radius:10px;}
+.etask-body{padding:1.25rem;display:flex;flex-direction:column;gap:.9rem;}
+.econd{font-size:.95rem;line-height:1.75;}
+.epaper-note{font-size:.85rem;color:var(--muted);line-height:1.6;padding:.75rem 1rem;background:var(--card);border-radius:2px;border-left:3px solid var(--border);}
+
+/* answer cells */
+.ans-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;}
+.ans-row{display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap;}
+.cells{display:flex;gap:2px;}
+.cell{width:28px;height:38px;border:1.5px solid var(--border);border-radius:2px;font-family:'Golos Text',sans-serif;font-size:1rem;font-weight:500;text-align:center;outline:none;background:#fff;color:var(--ink);transition:border-color .15s;caret-color:var(--accent);}
+.cell:focus{border-color:var(--accent);position:relative;z-index:1;}
+.cell.filled{border-color:#aaa;}
+
+/* А1 options */
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.q-opt{padding:.65rem 1rem;border:1.5px solid var(--border);border-radius:2px;cursor:pointer;font-size:.9rem;transition:all .15s;background:#fff;text-align:left;display:flex;align-items:center;gap:.6rem;font-family:'Golos Text',sans-serif;width:100%;}
+.q-opt:hover{border-color:var(--accent);background:#fef9f8;}
+.q-opt.sel{border-color:var(--accent);background:#fce8e4;}
+.opt-lbl{width:20px;height:20px;border-radius:2px;background:rgba(0,0,0,.07);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;}
+
+/* А5 cells */
+.a5-wrap{display:flex;align-items:flex-end;gap:1.25rem;flex-wrap:wrap;}
+.a5-cw{display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.a5-lbl{font-size:.8rem;font-weight:600;color:var(--muted);}
+.a5-cell{width:44px;height:44px;border:1.5px solid var(--border);border-radius:2px;font-family:'Golos Text',sans-serif;font-size:1.3rem;font-weight:600;text-align:center;outline:none;background:#fff;color:var(--ink);transition:border-color .15s;caret-color:var(--accent);}
+.a5-cell:focus{border-color:var(--accent);}
+
+/* ── RESULT ── */
+#sResult{padding:2rem;max-width:760px;margin:0 auto;}
+.result-head{margin-bottom:1.5rem;}
+.result-head h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;}
+.result-meta{font-size:.82rem;color:var(--muted);margin-top:.3rem;}
+.score-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.75rem;}
+.sbox{background:#fff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;display:flex;flex-direction:column;gap:.2rem;}
+.sbox-n{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.sbox-l{font-size:.75rem;color:var(--muted);}
+.sbox-mark{font-size:2.5rem;font-weight:900;font-family:'Playfair Display',serif;color:var(--accent);}
+.rtask{background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:.75rem;}
+.rtask-head{padding:.7rem 1.25rem;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;}
+.rtask-score{margin-left:auto;font-weight:600;font-size:.9rem;}
+.rtask-score.full{color:var(--green);}
+.rtask-score.part{color:var(--yellow);}
+.rtask-score.zero{color:var(--red);}
+.rtask-body{padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;font-size:.9rem;line-height:1.65;}
+.answer-row{display:flex;gap:2rem;flex-wrap:wrap;}
+.answer-item{display:flex;flex-direction:column;gap:.2rem;}
+.answer-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.answer-val{font-size:.95rem;font-weight:500;}
+.answer-val.correct{color:var(--green);}
+.answer-val.wrong{color:var(--red);}
+.solution-block{background:var(--card);border-radius:2px;padding:1rem;font-size:.875rem;line-height:1.8;}
+
+/* ── TEACHER REVIEW ── */
+#sReview{padding:2rem;max-width:860px;margin:0 auto;}
+.review-head{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.review-head h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;}
+.review-student{font-size:.875rem;color:var(--muted);}
+.review-tasks{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.5rem;}
+.rtask-ext{background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.rtask-ext-head{padding:.75rem 1.25rem;background:var(--card);border-bottom:1px solid var(--border);font-weight:600;font-size:.9rem;display:flex;align-items:center;gap:.75rem;}
+.rtask-ext-body{padding:1.25rem;font-size:.9rem;line-height:1.7;}
+.score-input-row{display:flex;align-items:center;gap:.75rem;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);}
+.score-input-row label{font-size:.78rem;color:var(--muted);}
+.score-select{font-family:'Golos Text',sans-serif;font-size:.9rem;padding:.4rem .7rem;border:1px solid var(--border);border-radius:2px;outline:none;background:#fff;cursor:pointer;}
+.score-select:focus{border-color:var(--ink);}
+.btn-publish{padding:.65rem 1.5rem;font-family:'Golos Text',sans-serif;font-size:.9rem;font-weight:500;border:none;border-radius:2px;background:var(--green);color:#fff;cursor:pointer;transition:background .15s;}
+.btn-publish:hover{background:#235a40;}
+.btn-publish:disabled{background:var(--muted);cursor:not-allowed;}
+
+/* ── MODALS ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.5);z-index:100;align-items:center;justify-content:center;}
+.overlay.active{display:flex;}
+.modal{background:var(--paper);border:1px solid var(--border);padding:2rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1rem;}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.15rem;}
+.modal p{font-size:.85rem;color:var(--muted);line-height:1.6;}
+.modal-btns{display:flex;gap:.5rem;}
+.mbtn{flex:1;padding:.65rem;font-family:'Golos Text',sans-serif;font-size:.875rem;border-radius:2px;cursor:pointer;}
+.mbtn-ok{background:var(--ink);color:#fff;border:none;}
+.mbtn-no{background:none;border:1px solid var(--border);color:var(--ink);}
+.mbtn-danger{background:var(--accent);color:#fff;border:none;}
+.pin-input{font-family:'Golos Text',sans-serif;font-size:1.3rem;letter-spacing:.2em;text-align:center;padding:.65rem;border:1.5px solid var(--border);border-radius:2px;outline:none;width:100%;transition:border-color .15s;}
+.pin-input:focus{border-color:var(--ink);}
+.pin-input.shake{animation:shake .3s;border-color:var(--red);}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ── toast ── */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:#fff;padding:.7rem 1.4rem;border-radius:2px;font-size:.84rem;z-index:200;transform:translateY(80px);opacity:0;transition:all .25s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
+
+.loading{text-align:center;padding:3rem;color:var(--muted);font-size:.875rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="back-link">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M7 1.5L3.5 5.5L7 9.5" stroke="currentColor" stroke-width="1.4"/></svg>
+    Главная
+  </a>
+  <div class="hdr-title">Алгебра</div>
+  <span class="badge" id="hdrBadge">Контрольная</span>
+  <div class="hdr-right">
+    <span class="hdr-name" id="hdrName" style="display:none"></span>
+    <button class="btn-sm" id="btnLogout" style="display:none" onclick="logout()">Выйти</button>
+    <button class="btn-sm" onclick="openTeacherPin()">Учитель</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div class="screen active" id="sLogin">
+  <div class="login-card">
+    <h2>Контрольная работа</h2>
+    <p>Введите фамилию и имя. Система сохранит ваши работы и результаты.</p>
+    <div class="fg"><label>Фамилия</label>
+      <input type="text" id="inLast" placeholder="Иванов" autocomplete="off" oninput="loginCheck()"></div>
+    <div class="fg"><label>Имя</label>
+      <input type="text" id="inFirst" placeholder="Иван" autocomplete="off" oninput="loginCheck()"
+        onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-primary" id="btnLogin" onclick="doLogin()" disabled>Войти</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="screen" id="sDash">
+  <div class="dash-head">
+    <h2 id="dashGreet">Мои контрольные</h2>
+    <button class="btn-new" onclick="startNewTest()">+ Написать контрольную</button>
+  </div>
+  <div id="dashContent"><div class="loading">Загрузка...</div></div>
+</div>
+
+<!-- EXAM -->
+<div class="screen" id="sExam">
+  <div class="exam-hdr">
+    <div class="exam-title">Контрольная работа · Алгебра 8</div>
+    <div class="timer" id="timer">90:00</div>
+    <div class="exam-prog" id="examProg"></div>
+    <button class="btn-submit" onclick="confirmSubmit()">Завершить</button>
+  </div>
+  <div class="exam-body" id="examBody"></div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="sResult">
+  <div class="result-head">
+    <h2 id="resultTitle">Результат контрольной</h2>
+    <div class="result-meta" id="resultMeta"></div>
+  </div>
+  <div class="score-summary" id="scoreSummary"></div>
+  <div id="resultTasks"></div>
+  <div style="margin-top:1rem">
+    <button class="btn-sm" onclick="showS('sDash');loadDash()">← Назад к списку</button>
+  </div>
+</div>
+
+<!-- TEACHER REVIEW -->
+<div class="screen" id="sReview">
+  <div class="review-head">
+    <h2>Проверка работы</h2>
+    <div class="review-student" id="reviewStudent"></div>
+    <button class="btn-sm" style="margin-left:auto" onclick="showS('sDash');loadDash()">← Назад</button>
+  </div>
+  <div class="review-tasks" id="reviewTasks"></div>
+  <button class="btn-publish" id="btnPublish" onclick="publishResult()" disabled>Опубликовать результат</button>
+</div>
+
+<!-- MODALS -->
+<!-- Submit confirm -->
+<div class="overlay" id="submitOverlay">
+  <div class="modal">
+    <h3>Завершить контрольную?</h3>
+    <p>После завершения изменить ответы будет невозможно. Работа будет отправлена на проверку.</p>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-no" onclick="closeOverlay('submitOverlay')">Отмена</button>
+      <button class="mbtn mbtn-ok" onclick="submitTest()">Завершить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Teacher PIN -->
+<div class="overlay" id="pinOverlay">
+  <div class="modal">
+    <h3>Вход для учителя</h3>
+    <p>Введите PIN-код для доступа к режиму проверки.</p>
+    <input type="password" class="pin-input" id="pinInput" maxlength="8" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')checkPin()">
+    <div class="modal-btns">
+      <button class="mbtn mbtn-no" onclick="closeOverlay('pinOverlay')">Отмена</button>
+      <button class="mbtn mbtn-ok" onclick="checkPin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<!-- New test confirm -->
+<div class="overlay" id="newTestOverlay">
+  <div class="modal">
+    <h3>Начать контрольную?</h3>
+    <p>Время выполнения — <strong>90 минут</strong>. Если вы закроете страницу во время выполнения, работа не сохранится.<br><br>
+    Задания 7 и 8 нужно решить на бумаге и отправить фото учителю после завершения.</p>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-no" onclick="closeOverlay('newTestOverlay')">Отмена</button>
+      <button class="mbtn mbtn-danger" onclick="launchExam()">Начать</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════════
+const API_KEY   = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const BIN_TASKS = '69de56e6856a6821893298a0';   // задачи алгебры
+const BIN_TESTS = '69df446eaaba882197ff0626';   // контрольные
+const JSONBIN   = 'https://api.jsonbin.io/v3/b';
+const PIN       = '10951538';
+const CONTACT_TG   = 'https://t.me/samromand';
+const CONTACT_MAIL = 'samoyloff_2003@inbox.ru';
+
+const TASK_META = [
+  {title:'Задание 1', desc:'Степени',                  pts:1},
+  {title:'Задание 2', desc:'Рациональные дроби',        pts:1},
+  {title:'Задание 3', desc:'Квадратные корни',          pts:1},
+  {title:'Задание 4', desc:'Квадратные уравнения',      pts:1},
+  {title:'Задание 5', desc:'Соответствие графиков',     pts:1},
+  {title:'Задание 6', desc:'Системы неравенств',        pts:1},
+  {title:'Задание 7', desc:'Биквадратное уравнение',    pts:2},
+  {title:'Задание 8', desc:'Текстовая задача',          pts:2},
+];
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+let studentName = '';
+let studentKey  = '';
+let isTeacher   = false;
+let taskDb      = null;   // {tasks: [[], [], ...]}
+let testsDb     = null;   // {tests: [...]}
+let examTasks   = [];     // задания текущей контрольной
+let timerInterval = null;
+let secondsLeft   = 90 * 60;
+let reviewTestId  = null; // ID контрольной на проверке
+
+// ════════════════════════════════════════════════════════════
+// API
+// ════════════════════════════════════════════════════════════
+const hdrs = {'Content-Type':'application/json','X-Master-Key':API_KEY};
+
+async function apiGet(bin) {
+  const r = await fetch(`${JSONBIN}/${bin}/latest`, {headers:{'X-Master-Key':API_KEY}});
+  const j = await r.json();
+  return j.record;
+}
+async function apiPut(bin, data) {
+  await fetch(`${JSONBIN}/${bin}`, {method:'PUT', headers:hdrs, body:JSON.stringify(data)});
+}
+
+// ════════════════════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════════════════════
+function loginCheck() {
+  const l=document.getElementById('inLast').value.trim();
+  const f=document.getElementById('inFirst').value.trim();
+  document.getElementById('btnLogin').disabled=!(l&&f);
+}
+
+async function doLogin() {
+  const last  = document.getElementById('inLast').value.trim();
+  const first = document.getElementById('inFirst').value.trim();
+  if(!last||!first) return;
+  studentName = `${last} ${first}`;
+  studentKey  = `${last}_${first}`.toLowerCase().replace(/\s+/g,'_');
+  const btn = document.getElementById('btnLogin');
+  btn.disabled=true; btn.textContent='Загрузка…';
+
+  try {
+    [taskDb, testsDb] = await Promise.all([apiGet(BIN_TASKS), apiGet(BIN_TESTS)]);
+    if(!testsDb) testsDb = {tests:[]};
+  } catch(e) {
+    toast('Ошибка загрузки данных','err'); btn.disabled=false; btn.textContent='Войти'; return;
+  }
+
+  document.getElementById('hdrName').textContent = studentName;
+  document.getElementById('hdrName').style.display='';
+  document.getElementById('btnLogout').style.display='';
+  document.getElementById('dashGreet').textContent = `Контрольные — ${first}`;
+  btn.textContent='Войти';
+  showS('sDash'); loadDash();
+}
+
+function logout() {
+  studentName=''; studentKey=''; isTeacher=false;
+  document.getElementById('hdrName').style.display='none';
+  document.getElementById('btnLogout').style.display='none';
+  document.getElementById('hdrBadge').className='badge';
+  document.getElementById('hdrBadge').textContent='Контрольная';
+  document.getElementById('inLast').value='';
+  document.getElementById('inFirst').value='';
+  document.getElementById('btnLogin').disabled=true;
+  showS('sLogin');
+}
+
+// ════════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════════
+function loadDash() {
+  if(!testsDb) return;
+  const mine = testsDb.tests.filter(t => t.studentKey === studentKey);
+  const pending  = mine.filter(t => t.status === 'pending');
+  const reviewed = mine.filter(t => t.status === 'reviewed');
+
+  let html = '';
+
+  if(isTeacher) {
+    // Teacher sees ALL pending tests
+    const allPending = testsDb.tests.filter(t => t.status === 'pending');
+    html += `<div class="section-label">На проверке (${allPending.length})</div>`;
+    if(!allPending.length) html += `<div class="empty-state">Нет работ на проверке</div>`;
+    else html += `<div class="tests-list">${allPending.map(t=>testCard(t, true)).join('')}</div>`;
+
+    const allReviewed = testsDb.tests.filter(t => t.status === 'reviewed');
+    html += `<div class="section-label" style="margin-top:1.5rem">Проверенные (${allReviewed.length})</div>`;
+    if(!allReviewed.length) html += `<div class="empty-state">Нет проверенных работ</div>`;
+    else html += `<div class="tests-list">${allReviewed.map(t=>testCard(t, true)).join('')}</div>`;
+  } else {
+    html += `<div class="section-label">На проверке (${pending.length})</div>`;
+    if(!pending.length) html += `<div class="empty-state">Нет работ на проверке</div>`;
+    else html += `<div class="tests-list">${pending.map(t=>testCard(t, false)).join('')}</div>`;
+
+    html += `<div class="section-label" style="margin-top:1.5rem">Проверенные (${reviewed.length})</div>`;
+    if(!reviewed.length) html += `<div class="empty-state">Нет проверенных работ</div>`;
+    else html += `<div class="tests-list">${reviewed.map(t=>testCard(t, false)).join('')}</div>`;
+  }
+
+  document.getElementById('dashContent').innerHTML = html;
+  // Hide "write test" button for teacher
+  document.querySelector('.btn-new').style.display = isTeacher ? 'none' : '';
+}
+
+function testCard(t, teacher) {
+  const d = new Date(t.createdAt);
+  const dateStr = d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const timeStr = d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  const pill = t.status==='pending'
+    ? `<span class="status-pill sp-pending">На проверке</span>`
+    : `<span class="status-pill sp-reviewed">Проверена</span>`;
+  const score = t.status==='reviewed'
+    ? `<span class="score-badge">${t.totalScore}/10</span>`
+    : '';
+  const nameHtml = teacher
+    ? `<div class="tcard-name">${esc(t.student)}</div>`
+    : `<div class="tcard-name">Контрольная от ${dateStr}</div>`;
+  const action = teacher && t.status==='pending'
+    ? `openReview('${t.id}')`
+    : t.status==='reviewed' ? `openResult('${t.id}')` : '';
+  const cursor = action ? 'cursor:pointer' : 'cursor:default';
+
+  return `<div class="tcard" style="${cursor}" onclick="${action}">
+    <div>
+      ${nameHtml}
+      <div class="tcard-sub">${dateStr} в ${timeStr}</div>
+    </div>
+    <div class="tcard-right">${pill}${score}</div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// START NEW TEST
+// ════════════════════════════════════════════════════════════
+function startNewTest() {
+  openOverlay('newTestOverlay');
+}
+
+async function launchExam() {
+  closeOverlay('newTestOverlay');
+  // Select tasks
+  examTasks = selectTasks();
+  if(!examTasks) { toast('Недостаточно задач в базе','err'); return; }
+  // Build exam UI
+  buildExamUI();
+  showS('sExam');
+  startTimer();
+}
+
+function selectTasks() {
+  const tasks = [];
+  // Load practice progress for this student
+  const practiceProg = {};
+  for(let i=0;i<8;i++){
+    const raw = localStorage.getItem(`prog_${studentKey}_alg_${i}`);
+    practiceProg[i] = raw ? JSON.parse(raw) : [];
+  }
+
+  for(let i=0;i<8;i++){
+    const pool = taskDb?.tasks[i] || [];
+    if(!pool.length) return null;
+    const prog = practiceProg[i];
+    const solvedIds = new Set(prog.map(p=>p.taskId));
+    const redIds    = new Set(prog.filter(p=>p.status==='red').map(p=>p.taskId));
+    const greenIds  = new Set(prog.filter(p=>p.status==='green').map(p=>p.taskId));
+
+    // Priority 1: unseen
+    const unseen = pool.filter(t => !solvedIds.has(t.id));
+    if(unseen.length) { tasks.push(pick(unseen)); continue; }
+    // Priority 2: red
+    const red = pool.filter(t => redIds.has(t.id));
+    if(red.length) { tasks.push(pick(red)); continue; }
+    // Priority 3: any
+    tasks.push(pick(pool));
+  }
+  return tasks;
+}
+
+function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ════════════════════════════════════════════════════════════
+// EXAM UI
+// ════════════════════════════════════════════════════════════
+function buildExamUI() {
+  const body = document.getElementById('examBody');
+  body.innerHTML = examTasks.map((task, i) => buildExamTask(task, i)).join('');
+  document.getElementById('examProg').textContent = `${examTasks.length} заданий`;
+  setTimeout(()=>{
+    renderMathInElement(body,{
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  }, 80);
+}
+
+function buildExamTask(task, i) {
+  const m = TASK_META[i];
+  let inner = '';
+  if(i===6||i===7) {
+    // Tasks 7/8 — paper only
+    const cond = i===6 ? `Решите уравнение: $${task.equation}$` : esc(task.condition);
+    inner = `<div class="econd">${cond}</div>
+      <div class="epaper-note">
+        ✏️ Решите на бумаге и запишите развёрнутый ответ. После завершения контрольной отправьте фото учителю:<br>
+        <strong>Telegram:</strong> <a href="${CONTACT_TG}" target="_blank">@samromand</a> &nbsp;|&nbsp;
+        <strong>Email:</strong> ${CONTACT_MAIL}
+      </div>`;
+  } else {
+    inner = buildExamInput(task, i);
+  }
+
+  return `<div class="etask" id="etask-${i}">
+    <div class="etask-head">
+      <div class="etask-num">${i+1}</div>
+      <div class="etask-desc">${m.desc}</div>
+      <div class="etask-pts">${m.pts} ${m.pts===1?'балл':'балла'}</div>
+    </div>
+    <div class="etask-body">${inner}</div>
+  </div>`;
+}
+
+function buildExamInput(task, i) {
+  switch(i) {
+    case 0: return examA1(task);
+    case 1: return examA2(task);
+    case 2: return examA3(task);
+    case 3: return examA4(task);
+    case 4: return examA5(task);
+    case 5: return examA6(task);
+    default: return '';
+  }
+}
+
+function examCells(n, prefix='c') {
+  return Array.from({length:n},(_,j)=>
+    `<input class="cell" id="exam_${prefix}${j}" maxlength="1" inputmode="decimal"
+      onkeydown="examKey(event,'${prefix}',${j},${n})"
+      oninput="examInput('${prefix}',${j},${n})">`
+  ).join('');
+}
+
+function examCellBlock(label, n, prefix='c') {
+  return `<div>
+    <div class="ans-label">${label}</div>
+    <div class="ans-row"><div class="cells">${examCells(n,prefix)}</div></div>
+  </div>`;
+}
+
+function examA1(t) {
+  const opts=[t.opt1,t.opt2,t.opt3,t.opt4].map((o,j)=>
+    `<button class="q-opt" id="exam_opt${j+1}" onclick="examPickOpt(${j+1})">
+      <span class="opt-lbl">${j+1}</span><span>$${o}$</span>
+    </button>`).join('');
+  return `<div class="econd">Какое из данных ниже чисел является значением выражения $${t.expression}$?</div>
+    <div class="q-options">${opts}</div>
+    ${examCellBlock('Введите номер ответа',1,'opt')}`;
+}
+function examA2(t) {
+  return `<div class="econd">Найдите значение выражения при $${t.variable}$.</div>
+    <div class="econd">$$${t.expression}$$</div>
+    ${examCellBlock('Ответ',17)}`;
+}
+function examA3(t) {
+  return `<div class="econd">Найдите значение выражения $${t.expression}$.</div>
+    ${examCellBlock('Ответ',17)}`;
+}
+function examA4(t) {
+  const q=t.question||'наименьший корень';
+  return `<div class="econd">Решите уравнение: $${t.equation}$</div>
+    <div class="econd" style="font-size:.85rem;color:var(--muted)">В ответе укажите ${q}.</div>
+    ${examCellBlock('Ответ',17)}`;
+}
+function examA5(t) {
+  const fmls=[t.f1,t.f2,t.f3,t.f4].map((f,j)=>
+    `<span style="margin-right:1.5rem"><strong>${j+1})</strong> $${f}$</span>`).join('');
+  const gr=(lbl,imgRaw,desc)=>{
+    const src=ipSrc(imgRaw);
+    return `<div style="margin-bottom:1.25rem">
+      <div style="font-size:.88rem;font-weight:600;margin-bottom:.4rem;color:var(--accent)">${lbl}</div>
+      ${src?`<img src="${src}" style="display:block;max-height:200px;max-width:100%;border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;object-fit:contain">`:''}
+      ${desc?`<div style="font-size:.84rem;color:var(--muted)">${desc}</div>`:''}
+    </div>`;
+  };
+  return `<div class="econd">Установите соответствие между графиками функций и формулами:</div>
+    <div class="econd" style="margin:.5rem 0;line-height:2">${fmls}</div>
+    <div style="margin:.75rem 0">${gr('А',t.imgA,t.descA)}${gr('Б',t.imgB,t.descB)}${gr('В',t.imgV,t.descV)}</div>
+    <div>
+      <div class="ans-label">Номер формулы для каждого графика</div>
+      <div class="a5-wrap">
+        ${['А','Б','В'].map((l,j)=>`
+          <div class="a5-cw"><div class="a5-lbl">${l}</div>
+          <input class="a5-cell" id="exam_a5${j}" maxlength="1" inputmode="numeric"
+            onkeydown="examA5Key(event,${j})" oninput="examA5Input(${j})">
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+function examA6(t) {
+  const q=t.question||'наибольшее целое решение';
+  return `<div class="econd">Решите систему неравенств. В ответе укажите ${q}.</div>
+    <div class="econd">$$\\begin{cases}${t.ineq1}\\\\${t.ineq2}\\end{cases}$$</div>
+    ${examCellBlock('Ответ',17)}`;
+}
+
+// ── Exam cell interaction ────────────────────────────────────
+const ALLOWED = new Set('0123456789,.-');
+function examKey(e, prefix, idx, total) {
+  if(e.key==='ArrowRight'||e.key==='Tab'){e.preventDefault();focusExam(prefix,idx+1,total);return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();focusExam(prefix,idx-1,total);return;}
+  if(e.key==='Backspace'){const el=document.getElementById(`exam_${prefix}${idx}`);if(el&&el.value===''){e.preventDefault();focusExam(prefix,idx-1,total);}return;}
+  if(e.key.length===1&&!ALLOWED.has(e.key)&&!e.ctrlKey&&!e.metaKey) e.preventDefault();
+}
+function examInput(prefix, idx, total) {
+  const el=document.getElementById(`exam_${prefix}${idx}`);
+  if(!el) return;
+  if(el.value.length>1) el.value=el.value.slice(-1);
+  if(el.value) { el.classList.add('filled'); focusExam(prefix,idx+1,total); }
+  else el.classList.remove('filled');
+}
+function focusExam(prefix, idx, total) {
+  if(idx<0||idx>=total) return;
+  document.getElementById(`exam_${prefix}${idx}`)?.focus();
+}
+function examPickOpt(n) {
+  document.querySelectorAll('[id^="exam_opt"]').forEach(b=>b.classList.remove('sel'));
+  document.getElementById(`exam_opt${n}`)?.classList.add('sel');
+  const inp=document.getElementById('exam_opt0');
+  if(inp){inp.value=String(n);inp.classList.add('filled');}
+}
+function examA5Key(e,j) {
+  if(e.key==='ArrowRight'||e.key==='Tab'){e.preventDefault();document.getElementById(`exam_a5${Math.min(2,j+1)}`)?.focus();return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();document.getElementById(`exam_a5${Math.max(0,j-1)}`)?.focus();return;}
+  if(e.key==='Backspace'){const el=document.getElementById(`exam_a5${j}`);if(el&&el.value===''){e.preventDefault();document.getElementById(`exam_a5${Math.max(0,j-1)}`)?.focus();}return;}
+  if(!/^[1-4]$/.test(e.key)&&e.key.length===1) e.preventDefault();
+}
+function examA5Input(j) {
+  const el=document.getElementById(`exam_a5${j}`);
+  if(!el) return;
+  el.value=el.value.replace(/[^1-4]/g,'').slice(-1);
+  if(el.value&&j<2) document.getElementById(`exam_a5${j+1}`)?.focus();
+}
+
+// ── Read exam answers ────────────────────────────────────────
+function readExamAnswers() {
+  const answers = [];
+  for(let i=0;i<6;i++){
+    let val='';
+    if(i===0){
+      val=document.getElementById('exam_opt0')?.value||'';
+    } else if(i===4){
+      val=(document.getElementById('exam_a50')?.value||'')
+         +(document.getElementById('exam_a51')?.value||'')
+         +(document.getElementById('exam_a52')?.value||'');
+    } else {
+      for(let j=0;j<17;j++) val+=(document.getElementById(`exam_c${j}`)?.value||'');
+    }
+    answers.push(val.trim());
+  }
+  return answers;
+}
+
+// ════════════════════════════════════════════════════════════
+// TIMER
+// ════════════════════════════════════════════════════════════
+function startTimer() {
+  secondsLeft = 90*60;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=>{
+    secondsLeft--;
+    updateTimerDisplay();
+    if(secondsLeft<=0){ clearInterval(timerInterval); submitTest(); }
+    if(secondsLeft===300) toast('До конца контрольной 5 минут!');
+  },1000);
+}
+
+function updateTimerDisplay() {
+  const m=Math.floor(secondsLeft/60), s=secondsLeft%60;
+  const str=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const el=document.getElementById('timer');
+  el.textContent=str;
+  el.className='timer'+(secondsLeft<=300?' warn':'');
+}
+
+function stopTimer() { clearInterval(timerInterval); timerInterval=null; }
+
+// ════════════════════════════════════════════════════════════
+// SUBMIT
+// ════════════════════════════════════════════════════════════
+function confirmSubmit() { openOverlay('submitOverlay'); }
+
+async function submitTest() {
+  closeOverlay('submitOverlay');
+  stopTimer();
+
+  const studentAnswers = readExamAnswers();
+
+  // Auto-score tasks 1-6
+  let autoScore = 0;
+  const taskRecords = examTasks.map((task, i) => {
+    const m = TASK_META[i];
+    if(i>=6) {
+      return {taskIdx:i, taskId:task.id, title:m.title, condition:getCondition(task,i),
+              correctAnswer:task.answer, studentAnswer:null, pts:null, maxPts:m.pts,
+              solution:task.solution||null};
+    }
+    const given   = normAns(studentAnswers[i]);
+    const correct = normAns(task.answer);
+    const pts     = given===correct ? m.pts : 0;
+    autoScore += pts;
+    return {taskIdx:i, taskId:task.id, title:m.title,
+            condition:getCondition(task,i),
+            correctAnswer:task.answer, studentAnswer:studentAnswers[i],
+            pts, maxPts:m.pts};
+  });
+
+  const testObj = {
+    id: 'test_'+Date.now(),
+    student: studentName,
+    studentKey,
+    createdAt: new Date().toISOString(),
+    finishedAt: new Date().toISOString(),
+    status: 'pending',
+    tasks: taskRecords,
+    autoScore,
+    teacherScore7: null,
+    teacherScore8: null,
+    totalScore: null,
+  };
+
+  try {
+    if(!testsDb) testsDb={tests:[]};
+    testsDb.tests.push(testObj);
+    await apiPut(BIN_TESTS, testsDb);
+    toast('Контрольная сохранена','ok');
+  } catch(e) {
+    toast('Ошибка сохранения!','err');
+  }
+
+  showSubmitConfirmation(testObj);
+}
+
+function getCondition(task, i) {
+  if(i===6) return task.equation || '';
+  if(i===7) return task.condition || '';
+  return '';
+}
+
+function showSubmitConfirmation(testObj) {
+  showS('sDash');
+  testsDb.tests = testsDb.tests.filter(t=>t.id!==testObj.id);
+  testsDb.tests.push(testObj);
+  loadDash();
+  // Show a prompt to send photo
+  setTimeout(()=>{
+    openOverlay('submitOverlay');
+    document.querySelector('#submitOverlay .modal h3').textContent='Работа сохранена!';
+    document.querySelector('#submitOverlay .modal p').innerHTML=
+      `Задания 1–6 приняты. Теперь отправьте фото решений заданий 7 и 8 учителю:<br><br>
+      <strong>Telegram:</strong> <a href="${CONTACT_TG}" target="_blank">@samromand</a><br>
+      <strong>Email:</strong> ${CONTACT_MAIL}`;
+    const btns=document.querySelector('#submitOverlay .modal-btns');
+    btns.innerHTML=`<button class="mbtn mbtn-ok" onclick="closeOverlay('submitOverlay')">Понятно</button>`;
+  },300);
+}
+
+// ════════════════════════════════════════════════════════════
+// VIEW RESULT
+// ════════════════════════════════════════════════════════════
+function openResult(id) {
+  const test = testsDb.tests.find(t=>t.id===id);
+  if(!test||test.status!=='reviewed') return;
+
+  document.getElementById('resultTitle').textContent = `Контрольная — ${test.student}`;
+  const d=new Date(test.createdAt);
+  document.getElementById('resultMeta').textContent =
+    `${d.toLocaleDateString('ru-RU')} в ${d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}`;
+
+  const mark = calcMark(test.totalScore);
+  document.getElementById('scoreSummary').innerHTML=`
+    <div class="sbox"><div class="sbox-n">${test.autoScore}</div><div class="sbox-l">Задания 1–6</div></div>
+    <div class="sbox"><div class="sbox-n">${(test.teacherScore7||0)+(test.teacherScore8||0)}</div><div class="sbox-l">Задания 7–8</div></div>
+    <div class="sbox">
+      <div class="sbox-n">${test.totalScore}/10</div>
+      <div class="sbox-l">Итого</div>
+      <div class="sbox-mark">«${mark}»</div>
+    </div>`;
+
+  const tasksHtml = test.tasks.map(t => {
+    const scoreClass = t.pts===t.maxPts?'full':t.pts>0?'part':'zero';
+    const ptsLabel = t.pts===null?'—':`${t.pts}/${t.maxPts}`;
+
+    let body='';
+    if(t.taskIdx<6){
+      const ok=normAns(t.studentAnswer)===normAns(t.correctAnswer);
+      body=`<div class="answer-row">
+        <div class="answer-item">
+          <div class="answer-label">Ваш ответ</div>
+          <div class="answer-val ${ok?'correct':'wrong'}">${esc(t.studentAnswer)||'—'}</div>
+        </div>
+        <div class="answer-item">
+          <div class="answer-label">Верный ответ</div>
+          <div class="answer-val correct">${esc(t.correctAnswer)}</div>
+        </div>
+      </div>`;
+    } else {
+      body=`<div style="font-size:.85rem;color:var(--muted)">Задание выполнялось на бумаге.</div>`;
+      if(t.solution) body+=`<div class="solution-block" id="sol-${t.taskIdx}">${esc(t.solution)}</div>`;
+    }
+
+    return `<div class="rtask">
+      <div class="rtask-head">
+        <div class="etask-num">${t.taskIdx+1}</div>
+        <div style="font-size:.84rem">${esc(t.title)}</div>
+        <div class="rtask-score ${scoreClass}" style="margin-left:auto">${ptsLabel} б.</div>
+      </div>
+      <div class="rtask-body">${body}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('resultTasks').innerHTML=tasksHtml;
+
+  showS('sResult');
+  setTimeout(()=>{
+    renderMathInElement(document.getElementById('sResult'),{
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  },80);
+}
+
+// ════════════════════════════════════════════════════════════
+// TEACHER REVIEW
+// ════════════════════════════════════════════════════════════
+function openReview(id) {
+  reviewTestId = id;
+  const test = testsDb.tests.find(t=>t.id===id);
+  if(!test) return;
+
+  document.getElementById('reviewStudent').textContent =
+    `${test.student} · ${new Date(test.createdAt).toLocaleDateString('ru-RU')}`;
+
+  // Show only tasks 7 and 8
+  const t7 = test.tasks.find(t=>t.taskIdx===6);
+  const t8 = test.tasks.find(t=>t.taskIdx===7);
+
+  let html='';
+  [t7,t8].filter(Boolean).forEach(t=>{
+    const condHtml = t.taskIdx===6
+      ? `<div style="font-size:.9rem">Уравнение: $${esc(t.condition)}$</div>`
+      : `<div style="font-size:.9rem;line-height:1.7">${esc(t.condition)}</div>`;
+    const solHtml = t.solution
+      ? `<div class="solution-block" style="margin-top:.75rem" id="tsol-${t.taskIdx}">${esc(t.solution)}</div>`
+      : '';
+    html+=`<div class="rtask-ext">
+      <div class="rtask-ext-head">
+        <div class="etask-num">${t.taskIdx+1}</div>
+        ${TASK_META[t.taskIdx].title} — решение на бумаге (ученик отправил фото)
+      </div>
+      <div class="rtask-ext-body">
+        ${condHtml}
+        ${solHtml}
+        <div class="score-input-row">
+          <label>Балл за задание ${t.taskIdx+1}:</label>
+          <select class="score-select" id="score_${t.taskIdx}" onchange="checkPublishReady()">
+            <option value="">— не оценено —</option>
+            <option value="0">0 баллов</option>
+            <option value="1">1 балл</option>
+            <option value="2">2 балла</option>
+          </select>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('reviewTasks').innerHTML=html;
+  document.getElementById('btnPublish').disabled=true;
+
+  showS('sReview');
+  setTimeout(()=>{
+    renderMathInElement(document.getElementById('sReview'),{
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  },80);
+}
+
+function checkPublishReady() {
+  const s7=document.getElementById('score_6')?.value;
+  const s8=document.getElementById('score_7')?.value;
+  document.getElementById('btnPublish').disabled=!(s7!==''&&s8!=='');
+}
+
+async function publishResult() {
+  const test = testsDb.tests.find(t=>t.id===reviewTestId);
+  if(!test) return;
+  const s7=parseInt(document.getElementById('score_6')?.value)||0;
+  const s8=parseInt(document.getElementById('score_7')?.value)||0;
+  test.teacherScore7=s7;
+  test.teacherScore8=s8;
+  test.totalScore=test.autoScore+s7+s8;
+  test.status='reviewed';
+  test.reviewedAt=new Date().toISOString();
+  // Store scores in task records too
+  test.tasks.forEach(t=>{
+    if(t.taskIdx===6) t.pts=s7;
+    if(t.taskIdx===7) t.pts=s8;
+  });
+  try {
+    await apiPut(BIN_TESTS, testsDb);
+    toast('Результат опубликован','ok');
+    showS('sDash'); loadDash();
+  } catch(e){toast('Ошибка сохранения','err');}
+}
+
+// ════════════════════════════════════════════════════════════
+// TEACHER PIN
+// ════════════════════════════════════════════════════════════
+function openTeacherPin() {
+  document.getElementById('pinInput').value='';
+  document.getElementById('pinInput').className='pin-input';
+  openOverlay('pinOverlay');
+  setTimeout(()=>document.getElementById('pinInput').focus(),80);
+}
+
+async function checkPin() {
+  const val=document.getElementById('pinInput').value;
+  if(val!==PIN){
+    const inp=document.getElementById('pinInput');
+    inp.className='pin-input shake'; inp.value='';
+    setTimeout(()=>{inp.className='pin-input';inp.focus();},350);
+    return;
+  }
+  closeOverlay('pinOverlay');
+  isTeacher=true;
+  studentName='Учитель'; studentKey='teacher';
+  document.getElementById('hdrBadge').className='badge badge-teacher';
+  document.getElementById('hdrBadge').textContent='Учитель';
+  document.getElementById('hdrName').textContent='Режим учителя';
+  document.getElementById('hdrName').style.display='';
+  document.getElementById('btnLogout').style.display='';
+  if(!testsDb){
+    try{ testsDb=await apiGet(BIN_TESTS); if(!testsDb)testsDb={tests:[]};}
+    catch{testsDb={tests:[]};}
+  }
+  showS('sDash'); loadDash();
+}
+
+// ════════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════════
+function calcMark(score) {
+  if(score>=9) return '5';
+  if(score>=6) return '4';
+  if(score>=4) return '3';
+  return '2';
+}
+function normAns(s){
+  if(!s) return '';
+  return String(s).trim().toLowerCase().replace(/\s+/g,'').replace(/,/g,'.').replace(/−/g,'-');
+}
+function ipSrc(v){if(!v)return '';try{const p=JSON.parse(v);return p?.src||'';}catch{return '';}}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showS(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  if(id==='sLogin') el.style.display='flex';
+}
+function openOverlay(id){document.getElementById(id).classList.add('active');}
+function closeOverlay(id){document.getElementById(id).classList.remove('active');}
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show '+type;
+  setTimeout(()=>el.className='toast',3500);
+}
+// Close overlays on bg click
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',function(e){if(e.target===this)closeOverlay(this.id);});
+});
+</script>
+</body>
+</html>
