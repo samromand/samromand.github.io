@@ -491,15 +491,15 @@ function selectTasks() {
     const prog = practiceProg[i];
     const solvedIds = new Set(prog.map(p=>p.taskId));
     const redIds    = new Set(prog.filter(p=>p.status==='red').map(p=>p.taskId));
-    const greenIds  = new Set(prog.filter(p=>p.status==='green').map(p=>p.taskId));
 
-    // Priority 1: unseen
+    // Priority 1: unseen (never appeared in practice OR test)
+    // 'pending' counts as seen — exclude from unseen pool
     const unseen = pool.filter(t => !solvedIds.has(t.id));
     if(unseen.length) { tasks.push(pick(unseen)); continue; }
-    // Priority 2: red
+    // Priority 2: red (wrong in practice or test)
     const red = pool.filter(t => redIds.has(t.id));
     if(red.length) { tasks.push(pick(red)); continue; }
-    // Priority 3: any
+    // Priority 3: any (green, yellow, pending — all solved)
     tasks.push(pick(pool));
   }
   return tasks;
@@ -730,7 +730,6 @@ async function submitTest() {
   let autoScore = 0;
   const taskRecords = examTasks.map((task, i) => {
     const m = TASK_META[i];
-    // Full snapshot for display in result
     const snap = buildTaskSnapshot(task, i);
     if(i>=6) {
       return {taskIdx:i, taskId:task.id, title:m.title,
@@ -747,6 +746,9 @@ async function submitTest() {
             studentAnswer:studentAnswers[i],
             pts, maxPts:m.pts};
   });
+
+  // ── Practice sync happens after teacher publishes result, not here ──
+  // But mark all 8 tasks as 'pending' immediately so they won't repeat in next test.
 
   const testObj = {
     id: 'test_'+Date.now(),
@@ -770,6 +772,19 @@ async function submitTest() {
   } catch(e) {
     toast('Ошибка сохранения!','err');
   }
+
+  // Mark all 8 tasks as 'pending' in practice progress so they won't repeat.
+  // 'pending' is lower priority than any real status — will be overwritten on publish.
+  taskRecords.forEach(rec => {
+    const key = `prog_${studentKey}_alg_${rec.taskIdx}`;
+    const raw = localStorage.getItem(key);
+    const prog = raw ? JSON.parse(raw) : [];
+    if(!prog.find(p => p.taskId === rec.taskId)){
+      prog.push({taskId: rec.taskId, status: 'pending'});
+      localStorage.setItem(key, JSON.stringify(prog));
+    }
+    // If already exists with a real status — don't touch it
+  });
 
   showSubmitConfirmation(testObj);
 }
@@ -993,11 +1008,36 @@ async function publishResult() {
   test.totalScore=test.autoScore+s7+s8;
   test.status='reviewed';
   test.reviewedAt=new Date().toISOString();
-  // Store scores in task records too
   test.tasks.forEach(t=>{
     if(t.taskIdx===6) t.pts=s7;
     if(t.taskIdx===7) t.pts=s8;
   });
+
+  // ── Sync all 8 tasks into student's practice progress ──
+  // Overwrites 'pending' with real status. Never downgrades real statuses.
+  const ORD = ['red','yellow','green'];
+  test.tasks.forEach(rec => {
+    const i = rec.taskIdx;
+    if(rec.pts === null || rec.pts === undefined) return;
+    const newStatus = rec.pts === rec.maxPts ? 'green'
+                    : rec.pts > 0            ? 'yellow'
+                    :                          'red';
+    const key = `prog_${test.studentKey}_alg_${i}`;
+    const raw = localStorage.getItem(key);
+    const prog = raw ? JSON.parse(raw) : [];
+    const idx = prog.findIndex(p => p.taskId === rec.taskId);
+    if(idx !== -1){
+      const cur = prog[idx].status;
+      // Always overwrite 'pending'; for real statuses only upgrade
+      if(cur === 'pending' || ORD.indexOf(newStatus) > ORD.indexOf(cur)){
+        prog[idx].status = newStatus;
+      }
+    } else {
+      prog.push({taskId: rec.taskId, status: newStatus});
+    }
+    localStorage.setItem(key, JSON.stringify(prog));
+  });
+
   try {
     await apiPut(BIN_TESTS, testsDb);
     toast('Результат опубликован','ok');
