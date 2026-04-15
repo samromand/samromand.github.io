@@ -68,6 +68,7 @@ header{padding:1.1rem 2rem;border-bottom:1px solid var(--border);display:flex;al
 .dot-yellow{background:var(--yellow);}
 .dot-red{background:var(--red);}
 .dot-empty{background:var(--border);}
+.dot-pending{background:var(--border);border:1.5px solid var(--muted);}
 .tile-lock-badge{position:absolute;top:.75rem;right:.75rem;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:rgba(0,0,0,.06);padding:.2rem .45rem;border-radius:2px;}
 .tile-count{margin-left:auto;font-size:.75rem;color:var(--muted);}
 
@@ -84,6 +85,7 @@ header{padding:1.1rem 2rem;border-bottom:1px solid var(--border);display:flex;al
 .tdot.green{border-color:var(--green);background:var(--green);}
 .tdot.yellow{border-color:var(--yellow);background:var(--yellow);}
 .tdot.red{border-color:var(--red);background:var(--red);}
+.tdot.pending{border-color:var(--muted);background:var(--border);}
 
 /* question card */
 .qcard{background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:1rem;}
@@ -484,17 +486,14 @@ function taskScore(status, taskIdx) {
   return 0;
 }
 
-// Weighted average: last 10 solved have double weight
-// Returns null if no solved tasks
 function weightedAvg(prog, taskIdx) {
-  if(!prog.length) return null;
-  const scores = prog.map(p => taskScore(p.status, taskIdx));
+  const real = prog.filter(p => p.status !== 'pending');
+  if(!real.length) return null;
+  const scores = real.map(p => taskScore(p.status, taskIdx));
   const n = scores.length;
-  if(n === 0) return null;
-  // Split into older and last 10
   const cutoff = Math.max(0, n - 10);
-  const older = scores.slice(0, cutoff);   // weight 1 each
-  const recent = scores.slice(cutoff);      // weight 2 each
+  const older  = scores.slice(0, cutoff);
+  const recent = scores.slice(cutoff);
   const sum = older.reduce((a,b)=>a+b,0) + recent.reduce((a,b)=>a+b*2,0);
   const cnt = older.length + recent.length * 2;
   return sum / cnt;
@@ -516,10 +515,11 @@ function renderMenu() {
   document.getElementById('taskGrid').innerHTML = META.map((m,i) => {
     const tasks  = taskDb?.tasks[i]||[];
     const prog   = loadProg(i);
-    const green  = prog.filter(p=>p.status==='green').length;
-    const yellow = prog.filter(p=>p.status==='yellow').length;
-    const red    = prog.filter(p=>p.status==='red').length;
-    const done   = green+yellow+red;
+    const green   = prog.filter(p=>p.status==='green').length;
+    const yellow  = prog.filter(p=>p.status==='yellow').length;
+    const red     = prog.filter(p=>p.status==='red').length;
+    const pending = prog.filter(p=>p.status==='pending').length;
+    const done    = green+yellow+red+pending;
     const total  = tasks.length;
 
     // Avg score
