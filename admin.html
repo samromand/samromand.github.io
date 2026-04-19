@@ -34,9 +34,14 @@ header {
 .header-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
 .badge { font-size: .7rem; padding: .2rem .6rem; border-radius: 2px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
 .badge-admin { background: var(--ink); color: #fff; }
-.save-status { margin-left: auto; font-size: .78rem; color: var(--muted); }
+.save-status { margin-left: auto; font-size: .78rem; color: var(--muted); display:flex; align-items:center; gap:.75rem; }
 .save-status.saving { color: var(--accent-a); }
 .save-status.saved  { color: var(--success); }
+.btn-sync { padding: .3rem .8rem; font-family: 'Golos Text', sans-serif; font-size: .75rem; font-weight: 500; border: 1px solid var(--border); border-radius: 2px; background: none; cursor: pointer; color: var(--muted); transition: all .15s; white-space: nowrap; display:flex; align-items:center; gap:.35rem; }
+.btn-sync:hover { border-color: var(--ink); color: var(--ink); }
+.btn-sync:disabled { opacity: .5; cursor: not-allowed; }
+.btn-sync.syncing svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── LAYOUT ── */
 .layout { display: grid; grid-template-columns: 234px 1fr; min-height: calc(100vh - 58px); }
@@ -155,6 +160,22 @@ textarea { resize: vertical; }
 .coeff-result { font-size: .82rem; padding: .35rem .75rem; border-radius: 2px; display: none; }
 .coeff-result.ok  { display: block; background: #e4f0eb; color: var(--success); }
 .coeff-result.err { display: block; background: #fce8e4; color: var(--danger); }
+/* mode toggle for A4 */
+.eq-mode-toggle { display: flex; gap: .35rem; margin-bottom: .4rem; }
+.eq-mode-btn { padding: .3rem .75rem; font-family: 'Golos Text', sans-serif; font-size: .76rem; font-weight: 500; border: 1px solid var(--border); background: none; border-radius: 2px; cursor: pointer; color: var(--muted); transition: all .15s; }
+.eq-mode-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+/* level badge selector */
+.level-sel-row { display: flex; gap: .35rem; align-items: center; margin-top: .35rem; flex-wrap: wrap; }
+.level-sel-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.level-btn { padding: .28rem .7rem; font-family: 'Golos Text', sans-serif; font-size: .74rem; font-weight: 600; border: 1.5px solid var(--border); background: none; border-radius: 2px; cursor: pointer; transition: all .15s; color: var(--muted); }
+.level-btn.sel-base  { background: #e8f4fd; color: #1565c0; border-color: #1565c0; }
+.level-btn.sel-adv   { background: #fff8e1; color: #e65100; border-color: #e65100; }
+.level-btn.sel-high  { background: #fce4ec; color: #880e4f; border-color: #880e4f; }
+/* level badge in card */
+.lvl-badge { display: inline-block; font-size: .65rem; font-weight: 700; padding: .1rem .45rem; border-radius: 2px; text-transform: uppercase; letter-spacing: .05em; }
+.lvl-badge.base { background: #e8f4fd; color: #1565c0; }
+.lvl-badge.adv  { background: #fff8e1; color: #e65100; }
+.lvl-badge.high { background: #fce4ec; color: #880e4f; }
 
 /* ── IMAGE PICKER ── */
 .img-picker { display: flex; flex-direction: column; gap: .5rem; padding: .85rem 1rem; background: #fff; border: 1px solid var(--border); border-radius: 2px; }
@@ -185,7 +206,15 @@ textarea { resize: vertical; }
   </a>
   <div class="header-title">Панель учителя</div>
   <span class="badge badge-admin">Администратор</span>
-  <div class="save-status" id="saveStatus">Все изменения сохранены</div>
+  <div class="save-status" id="saveStatus">
+    <button class="btn-sync" id="btnSync" onclick="syncFromBin()" title="Принудительно загрузить задачи из JSONBin (облако → браузер)">
+      <svg id="syncIcon" width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M11 6.5A4.5 4.5 0 1 1 6.5 2M6.5 2 8.5 4M6.5 2 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Загрузить из базы
+    </button>
+    <span id="saveText">Все изменения сохранены</span>
+  </div>
 </header>
 
 <div class="layout">
@@ -240,6 +269,13 @@ const API_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
 const BINS     = { algebra: '69de56e6856a6821893298a0', geometry: '69de571c36566621a8b1abcb' };
 
 // ════════════════════════════════════════════════════════════
+// LEVEL HELPERS
+// ════════════════════════════════════════════════════════════
+function lvlLabel(l) {
+  return l==='adv'?'Повышенный':l==='high'?'Высокий':'Базовый';
+}
+
+// ════════════════════════════════════════════════════════════
 // TASK DEFINITIONS
 // ════════════════════════════════════════════════════════════
 const TASKS = {
@@ -256,13 +292,15 @@ algebra: [
       { key:'opt4', label:'Вариант 4', type:'text', ph:'9' },
       { key:'answer', label:'Правильный вариант (номер)', type:'text', ph:'4',
         hint:'Одна цифра: 1, 2, 3 или 4' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['expression:full','opt1 opt2 opt3 opt4','answer'],
+    layout:['expression:full','opt1 opt2 opt3 opt4','answer','level'],
     preview(t){ return [
       { label:'Выражение', val:`$${t.expression}$`, full:true },
       { label:'1)', val:`$${t.opt1}$` }, { label:'2)', val:`$${t.opt2}$` },
       { label:'3)', val:`$${t.opt3}$` }, { label:'4)', val:`$${t.opt4}$` },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -275,12 +313,14 @@ algebra: [
         ph:'\\dfrac{9}{a-a^2} - \\dfrac{9}{a}',
         hint:'LaTeX без $. Вставляется в: «найдите значение выражения [...]»' },
       { key:'answer', label:'Ответ', type:'text', ph:'2,25' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['variable','expression:full','answer'],
+    layout:['variable','expression:full','answer','level'],
     preview(t){ return [
       { label:'При', val:`$${t.variable}$` },
       { label:'Выражение', val:`$$${t.expression}$$`, full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -291,11 +331,13 @@ algebra: [
         ph:'(\\sqrt{27} - \\sqrt{3}) \\cdot \\sqrt{3}',
         hint:'LaTeX без $. Вставляется в: «найдите значение выражения [...]»' },
       { key:'answer', label:'Ответ', type:'text', ph:'6' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['expression:full','answer'],
+    layout:['expression:full','answer','level'],
     preview(t){ return [
       { label:'Выражение', val:`$${t.expression}$`, full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -304,16 +346,18 @@ algebra: [
     fields:[
       { key:'_cq4', type:'coeff_quadratic' },
       { key:'question', label:'Что указать в ответе', type:'select',
-        options:['наименьший корень','наибольший корень','сумму корней'],
+        options:['наименьший корень','наибольший корень','сумму корней','произведение корней','найдите корень'],
         onchange:'a4QuestionChange' },
       { key:'answer', label:'Ответ', type:'text', ph:'-8',
         hint:'Заполняется автоматически. Можно скорректировать.' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['_cq4:full','question:full','answer'],
+    layout:['_cq4:full','question:full','answer','level'],
     preview(t){ return [
       { label:'Уравнение', val: t.equation ? `$${t.equation}$` : '—', full:true },
       { label:'Вопрос', val:'В ответе укажите ' + (t.question||'наименьший корень'), full:true },
       { label:'Ответ', val:t.answer||'—', ans:true },
+      { label:'Уровень', val: lvlLabel(t.level), full:false },
     ];}
   },
 
@@ -334,8 +378,9 @@ algebra: [
       { key:'descV', label:'График В — подпись / описание', type:'text', ph:'Убывающая, y-пересечение +4' },
       { key:'answer', label:'Ответ (цифры для А, Б, В)', type:'text', ph:'143',
         hint:'Три цифры без пробелов: позиция формулы для А, Б, В' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['f1 f2 f3 f4','imgA:full','imgB:full','imgV:full','descA:full','descB:full','descV:full','answer'],
+    layout:['f1 f2 f3 f4','imgA:full','imgB:full','imgV:full','descA:full','descB:full','descV:full','answer','level'],
     preview(t){ return [
       { label:'1)', val:`$${t.f1}$` }, { label:'2)', val:`$${t.f2}$` },
       { label:'3)', val:`$${t.f3}$` }, { label:'4)', val:`$${t.f4}$` },
@@ -343,6 +388,7 @@ algebra: [
       { label:'График Б', val:t.descB||'', img:ipSrc(t.imgB), full:true },
       { label:'График В', val:t.descV||'', img:ipSrc(t.imgV), full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -356,13 +402,15 @@ algebra: [
       { key:'question', label:'Вопрос', type:'select',
         options:['наибольшее целое решение','наименьшее целое решение','сколько целых чисел являются решениями'] },
       { key:'answer', label:'Ответ', type:'text', ph:'-2' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['ineq1:full','ineq2:full','question:full','answer'],
+    layout:['ineq1:full','ineq2:full','question:full','answer','level'],
     preview(t){ return [
       { label:'Неравенство 1', val:`$${t.ineq1}$`, full:true },
       { label:'Неравенство 2', val:`$${t.ineq2}$`, full:true },
       { label:'Вопрос', val:'Укажите ' + (t.question||''), full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -374,12 +422,14 @@ algebra: [
         ph:'\\pm 3;\\;\\pm 2', hint:'Заполняется автоматически. LaTeX без $. Можно скорректировать.' },
       { key:'solution', label:'Полное решение (показывается ученику)', type:'textarea',
         ph:'Замена t = x²: ...', hint:'Можно использовать LaTeX в $...$' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['_cq7:full','answer','solution:full'],
+    layout:['_cq7:full','answer','solution:full','level'],
     preview(t){ return [
       { label:'Уравнение', val: t.equation ? `$${t.equation}$` : '—', full:true },
       { label:'Ответ', val: t.answer ? `$${t.answer}$` : '—', ans:true },
       { label:'Решение', val:t.solution||'—', full:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -391,12 +441,14 @@ algebra: [
       { key:'answer', label:'Ответ (с единицами измерения)', type:'text', ph:'2 км' },
       { key:'solution', label:'Полное решение (показывается ученику)', type:'textarea',
         ph:'Пусть длина туннеля x км...', hint:'Можно использовать LaTeX в $...$' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','answer','solution:full'],
+    layout:['condition:full','answer','solution:full','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Ответ', val:t.answer, ans:true },
       { label:'Решение', val:t.solution||'—', full:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 ],
@@ -409,11 +461,13 @@ geometry: [
         ph:'Два катета прямоугольного треугольника равны 7 и 24. Найдите гипотенузу.',
         hint:'Свободный текст с LaTeX.' },
       { key:'answer', label:'Ответ', type:'text', ph:'25' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','answer'],
+    layout:['condition:full','answer','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -424,11 +478,13 @@ geometry: [
         ph:'В треугольнике ABC угол C равен 90°, AC = 8, AB = 40. Найдите sin B.',
         hint:'Свободный текст с LaTeX.' },
       { key:'answer', label:'Ответ', type:'text', ph:'0,2' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','answer'],
+    layout:['condition:full','answer','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -439,11 +495,13 @@ geometry: [
         ph:'Площадь параллелограмма равна 48, а две его стороны равны 8 и 16. Найдите его высоты.',
         hint:'Свободный текст с LaTeX.' },
       { key:'answer', label:'Ответ', type:'text', ph:'6 и 3' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','answer'],
+    layout:['condition:full','answer','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -455,12 +513,14 @@ geometry: [
       { key:'key_step', label:'Ключевой шаг (необязательно)', type:'text',
         ph:'h = 2', hint:'Как находится высота — для разбора задачи' },
       { key:'answer', label:'Ответ', type:'text', ph:'8' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','key_step','answer'],
+    layout:['condition:full','key_step','answer','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       ...(t.key_step ? [{ label:'Ключевой шаг', val:`$${t.key_step}$` }] : []),
       { label:'Ответ', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -470,11 +530,13 @@ geometry: [
       { key:'condition', label:'Условие', type:'textarea',
         ph:'В окружности с центром O, AC и BD — диаметры. Угол ACB равен 26°. Найдите угол COD. Ответ дайте в градусах.' },
       { key:'answer', label:'Ответ (целое число, градусы)', type:'text', ph:'52' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','answer'],
+    layout:['condition:full','answer','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Ответ', val:(t.answer||'') + '°', ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -487,12 +549,14 @@ geometry: [
       { key:'stmt4', label:'Утверждение 4', type:'textarea', ph:'Если вписанный угол равен 30°, то дуга, на которую он опирается, равна 30°.' },
       { key:'answer', label:'Верные утверждения (номера без пробелов)', type:'text', ph:'3',
         hint:'Например: 3 или 13 или 24. Цифры без пробелов.' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['stmt1:full','stmt2:full','stmt3:full','stmt4:full','answer'],
+    layout:['stmt1:full','stmt2:full','stmt3:full','stmt4:full','answer','level'],
     preview(t){ return [
       { label:'1)', val:t.stmt1, full:true }, { label:'2)', val:t.stmt2, full:true },
       { label:'3)', val:t.stmt3, full:true }, { label:'4)', val:t.stmt4, full:true },
       { label:'Верные', val:t.answer, ans:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -505,12 +569,14 @@ geometry: [
       { key:'answer', label:'Ответ (кратко)', type:'text', ph:'16' },
       { key:'solution', label:'Полное решение (показывается ученику)', type:'textarea',
         ph:'Пусть биссектрисы пересекаются в точке K...', hint:'Можно LaTeX в $...$' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','answer','solution:full'],
+    layout:['condition:full','answer','solution:full','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Ответ', val:t.answer, ans:true },
       { label:'Решение', val:t.solution||'—', full:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 
@@ -525,12 +591,14 @@ geometry: [
         hint:'LaTeX без $. Вставляется в: «Докажите, что [...]»' },
       { key:'solution', label:'Эталонное доказательство (показывается ученику)', type:'textarea',
         ph:'Рассмотрим треугольники CBD и BDA...', hint:'Можно LaTeX в $...$' },
+      { key:'level', label:'Уровень сложности', type:'level_select' },
     ],
-    layout:['condition:full','what:full','solution:full'],
+    layout:['condition:full','what:full','solution:full','level'],
     preview(t){ return [
       { label:'Условие', val:t.condition, full:true },
       { label:'Доказать', val: t.what ? `$${t.what}$` : '—', full:true },
       { label:'Доказательство', val:t.solution||'—', full:true },
+      { label:'Уровень', val:lvlLabel(t.level) },
     ];}
   },
 ]
@@ -547,9 +615,25 @@ let pendingDel = null;
 // ════════════════════════════════════════════════════════════
 // BOOT
 // ════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   db.algebra  = loadLocal('algebra');
   db.geometry = loadLocal('geometry');
+
+  // Auto-sync from JSONBin if local DB is empty (new device or cleared cache)
+  const algEmpty = !db.algebra.tasks.some(arr => arr.length > 0);
+  const geoEmpty = !db.geometry.tasks.some(arr => arr.length > 0);
+  if (algEmpty || geoEmpty) {
+    setSS('saving');
+    const btn = document.getElementById('btnSync');
+    if (btn) { btn.disabled = true; btn.classList.add('syncing'); }
+    const tx = document.getElementById('saveText');
+    if (tx) tx.textContent = 'Загрузка задач из базы…';
+    await fetchFromBin('algebra');
+    await fetchFromBin('geometry');
+    if (btn) { btn.disabled = false; btn.classList.remove('syncing'); }
+    setSS('saved');
+  }
+
   render();
 });
 
@@ -560,6 +644,53 @@ function loadLocal(s) {
   } catch(e) { return emptyDb(); }
 }
 function emptyDb() { return { tasks: Array.from({length:8}, () => []) }; }
+
+// ── Fetch ONE subject from JSONBin and update local cache ────
+async function fetchFromBin(s) {
+  const binId = BINS[s];
+  if (!binId || binId.includes('BIN_ID') || API_KEY.includes('YOUR_KEY')) return false;
+  try {
+    const resp = await fetch(`${JSONBIN_BASE}/${binId}/latest`, {
+      headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!resp.ok) return false;
+    const data = await resp.json();
+    // JSONBin returns {record: {...}} or the object directly depending on meta setting
+    const record = data.record || data;
+    if (record && record.tasks) {
+      db[s] = record;
+      localStorage.setItem('kr8_' + s, JSON.stringify(record));
+      return true;
+    }
+    return false;
+  } catch(e) { return false; }
+}
+
+// ── Manual sync button handler ───────────────────────────────
+async function syncFromBin() {
+  const btn = document.getElementById('btnSync');
+  const tx  = document.getElementById('saveText');
+  if (btn) { btn.disabled = true; btn.classList.add('syncing'); }
+  if (tx) tx.textContent = 'Загружаю из JSONBin…';
+
+  const okA = await fetchFromBin('algebra');
+  const okG = await fetchFromBin('geometry');
+
+  if (btn) { btn.disabled = false; btn.classList.remove('syncing'); }
+
+  if (okA || okG) {
+    render();
+    const total = db.algebra.tasks.reduce((s,a)=>s+a.length,0)
+                + db.geometry.tasks.reduce((s,a)=>s+a.length,0);
+    toast(`Загружено ${total} задач из базы`, 'ok');
+    if (tx) tx.textContent = 'Синхронизировано ✓';
+    setTimeout(() => setSS(''), 2500);
+  } else {
+    toast('Не удалось подключиться к JSONBin', 'err');
+    if (tx) tx.textContent = 'Ошибка синхронизации';
+    setTimeout(() => setSS(''), 2500);
+  }
+}
 
 async function persist() {
   setSS('saving');
@@ -579,8 +710,9 @@ async function persist() {
 
 function setSS(s) {
   const el = document.getElementById('saveStatus');
+  const tx = document.getElementById('saveText');
   el.className = 'save-status ' + s;
-  el.textContent = s==='saving' ? 'Сохранение…' : s==='saved' ? 'Сохранено ✓' : 'Все изменения сохранены';
+  if (tx) tx.textContent = s==='saving' ? 'Сохранение…' : s==='saved' ? 'Сохранено ✓' : 'Все изменения сохранены';
   if (s==='saved') setTimeout(() => setSS(''), 2000);
 }
 
@@ -642,6 +774,7 @@ function renderMain() {
       <div class="card-head">
         <span class="card-label">Вариант ${i+1}</span>
         <span class="card-pts">${m.pts} ${m.pts===1?'балл':'балла'}</span>
+        ${t.level ? `<span class="lvl-badge ${t.level}">${lvlLabel(t.level)}</span>` : ''}
         <div class="card-actions">
           <button class="btn-icon" onclick="toggleEdit('${t.id}')" title="Редактировать">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5l2 2-6 6H2.5v-2l6-6z" stroke="currentColor" stroke-width="1.2"/></svg>
@@ -696,26 +829,59 @@ function fieldHtml(f, task, prefix) {
     const b = task ? (task.b || '') : '';
     const c = task ? (task.c || '') : '';
     const eq = task ? (task.equation || '') : '';
+    const isLatex = task ? (task.eq_mode === 'latex') : false;
     return `
-    <label>Коэффициенты уравнения ax² + bx + c = 0</label>
+    <label>Уравнение ax² + bx + c = 0</label>
     <div class="coeff-widget" id="cw4-${prefix}">
-      <div class="coeff-inputs">
-        <div class="coeff-field"><span>a</span><input type="text" id="${prefix}_a" value="${escA(a)}" placeholder="1" oninput="cq4Update('${prefix}')"></div>
-        <div class="coeff-sep">·x² +</div>
-        <div class="coeff-field"><span>b</span><input type="text" id="${prefix}_b" value="${escA(b)}" placeholder="5" oninput="cq4Update('${prefix}')"></div>
-        <div class="coeff-sep">·x +</div>
-        <div class="coeff-field"><span>c</span><input type="text" id="${prefix}_c" value="${escA(c)}" placeholder="-14" oninput="cq4Update('${prefix}')"></div>
-        <div class="coeff-sep">= 0</div>
+      <div class="eq-mode-toggle">
+        <button type="button" class="eq-mode-btn ${!isLatex?'active':''}" onclick="cq4SetMode('${prefix}','coeff')">По коэффициентам</button>
+        <button type="button" class="eq-mode-btn ${isLatex?'active':''}" onclick="cq4SetMode('${prefix}','latex')">LaTeX-уравнение</button>
       </div>
-      <div class="coeff-eq-preview">
-        <span class="coeff-eq-label">Уравнение:</span>
-        <span class="coeff-eq-val" id="${prefix}_eqprev">${eq ? '' : '<span style="color:var(--muted);font-size:.82rem">введите коэффициенты</span>'}</span>
+      <div id="cw4-coeff-${prefix}" style="display:${isLatex?'none':'flex'};flex-direction:column;gap:.65rem">
+        <div class="coeff-inputs">
+          <div class="coeff-field"><span>a</span><input type="text" id="${prefix}_a" value="${escA(a)}" placeholder="1" oninput="cq4Update('${prefix}')"></div>
+          <div class="coeff-sep">·x² +</div>
+          <div class="coeff-field"><span>b</span><input type="text" id="${prefix}_b" value="${escA(b)}" placeholder="5" oninput="cq4Update('${prefix}')"></div>
+          <div class="coeff-sep">·x +</div>
+          <div class="coeff-field"><span>c</span><input type="text" id="${prefix}_c" value="${escA(c)}" placeholder="-14" oninput="cq4Update('${prefix}')"></div>
+          <div class="coeff-sep">= 0</div>
+        </div>
+        <div class="coeff-eq-preview">
+          <span class="coeff-eq-label">Уравнение:</span>
+          <span class="coeff-eq-val" id="${prefix}_eqprev">${eq ? '' : '<span style="color:var(--muted);font-size:.82rem">введите коэффициенты</span>'}</span>
+        </div>
+        <div class="coeff-calc-row">
+          <button type="button" class="coeff-calc-btn" onclick="cq4Calc('${prefix}')">Вычислить корни и заполнить ответ</button>
+          <span class="coeff-result" id="${prefix}_cres"></span>
+        </div>
       </div>
-      <div class="coeff-calc-row">
-        <button type="button" class="coeff-calc-btn" onclick="cq4Calc('${prefix}')">Вычислить корни и заполнить ответ</button>
-        <span class="coeff-result" id="${prefix}_cres"></span>
+      <div id="cw4-latex-${prefix}" style="display:${isLatex?'flex':'none'};flex-direction:column;gap:.65rem">
+        <div class="form-group">
+          <label>Уравнение (LaTeX без $)</label>
+          <input type="text" id="${prefix}_latex_input" value="${escA(isLatex ? eq : '')}" placeholder="(x-1)(x+7) = 3(x+3)"
+            oninput="cq4LatexUpdate('${prefix}')" style="font-family:monospace;font-size:.83rem">
+          <span class="hint">Вводите произвольное уравнение. Корни вводите вручную в поле «Ответ».</span>
+        </div>
+        <div class="coeff-eq-preview">
+          <span class="coeff-eq-label">Предпросмотр:</span>
+          <span class="coeff-eq-val" id="${prefix}_latex_prev"></span>
+        </div>
       </div>
       <input type="hidden" id="${prefix}_equation" value="${escA(eq)}">
+      <input type="hidden" id="${prefix}_eq_mode" value="${isLatex?'latex':'coeff'}">
+    </div>`;
+  }
+
+  // ── level_select ─────────────────────────────────────────
+  if (f.type === 'level_select') {
+    const cur = raw || 'base';
+    return `
+    <div class="level-sel-row">
+      <span class="level-sel-label">Уровень:</span>
+      <button type="button" class="level-btn ${cur==='base'?'sel-base':''}" onclick="lvlSet('${fid}','base',this)">Базовый</button>
+      <button type="button" class="level-btn ${cur==='adv'?'sel-adv':''}" onclick="lvlSet('${fid}','adv',this)">Повышенный</button>
+      <button type="button" class="level-btn ${cur==='high'?'sel-high':''}" onclick="lvlSet('${fid}','high',this)">Высокий</button>
+      <input type="hidden" id="${fid}" value="${escA(cur)}">
     </div>`;
   }
 
@@ -806,15 +972,28 @@ function getVals(meta, prefix) {
   const obj = {};
   meta.fields.forEach(f => {
     if (f.type === 'coeff_quadratic') {
-      ['a','b','c','equation'].forEach(k => {
-        const el = document.getElementById(`${prefix}_${k}`);
-        if (el) obj[k] = el.value.trim();
-      });
+      const modeEl = document.getElementById(`${prefix}_eq_mode`);
+      const mode = modeEl ? modeEl.value : 'coeff';
+      obj.eq_mode = mode;
+      if (mode === 'latex') {
+        const latexEl = document.getElementById(`${prefix}_latex_input`);
+        if (latexEl) obj.equation = latexEl.value.trim();
+        // clear coeff fields for latex mode
+        obj.a = ''; obj.b = ''; obj.c = '';
+      } else {
+        ['a','b','c','equation'].forEach(k => {
+          const el = document.getElementById(`${prefix}_${k}`);
+          if (el) obj[k] = el.value.trim();
+        });
+      }
     } else if (f.type === 'coeff_biquadratic') {
       ['a7','p','q','equation'].forEach(k => {
         const el = document.getElementById(`${prefix}_${k}`);
         if (el) obj[k] = el.value.trim();
       });
+    } else if (f.type === 'level_select') {
+      const el = document.getElementById(`${prefix}_${f.key}`);
+      if (el) obj[f.key] = el.value || 'base';
     } else {
       const el = document.getElementById(`${prefix}_${f.key}`);
       if (el) obj[f.key] = el.value.trim();
@@ -826,7 +1005,7 @@ function getVals(meta, prefix) {
 function isValid(meta, vals) {
   const hasCoeff = meta.fields.some(f => f.type==='coeff_quadratic' || f.type==='coeff_biquadratic');
   if (hasCoeff) return !!(vals.equation && vals.answer);
-  const first = meta.fields.find(f => !['imagepicker','coeff_quadratic','coeff_biquadratic'].includes(f.type));
+  const first = meta.fields.find(f => !['imagepicker','coeff_quadratic','coeff_biquadratic','level_select'].includes(f.type));
   if (first && !vals[first.key]) return false;
   return !!(vals.answer || vals.what);
 }
@@ -846,7 +1025,10 @@ function openNew() {
   document.getElementById('newPanel').scrollIntoView({behavior:'smooth'});
   // Restore equation previews if coeff widget present
   setTimeout(() => {
-    if (m.fields.some(f=>f.type==='coeff_quadratic')) cq4Update('new');
+    if (m.fields.some(f=>f.type==='coeff_quadratic')) {
+      cq4Update('new');
+      cq4LatexUpdate('new');
+    }
     if (m.fields.some(f=>f.type==='coeff_biquadratic')) cq7Update('new');
   }, 50);
   setTimeout(() => { const el = document.querySelector('#newPanel input[type=text], #newPanel textarea'); if(el) el.focus(); }, 120);
@@ -875,7 +1057,10 @@ function toggleEdit(id) {
     // Restore equation previews
     const m = TASKS[subj][tidx];
     setTimeout(() => {
-      if (m.fields.some(f=>f.type==='coeff_quadratic')) cq4Update(id);
+      if (m.fields.some(f=>f.type==='coeff_quadratic')) {
+        cq4Update(id);
+        cq4LatexUpdate(id);
+      }
       if (m.fields.some(f=>f.type==='coeff_biquadratic')) cq7Update(id);
     }, 50);
   }
@@ -967,6 +1152,8 @@ function fillA4Answer(prefix, xMin, xMax) {
 }
 
 function a4QuestionChange(prefix) {
+  const modeEl = document.getElementById(`${prefix}_eq_mode`);
+  if (modeEl && modeEl.value === 'latex') return; // no auto-calc in latex mode
   const a = parseFloat(document.getElementById(`${prefix}_a`)?.value);
   const b = parseFloat(document.getElementById(`${prefix}_b`)?.value) || 0;
   const c = parseFloat(document.getElementById(`${prefix}_c`)?.value) || 0;
@@ -976,6 +1163,44 @@ function a4QuestionChange(prefix) {
   const sqD = Math.sqrt(D);
   const x1 = (-b - sqD)/(2*a), x2 = (-b + sqD)/(2*a);
   fillA4Answer(prefix, Math.min(x1,x2), Math.max(x1,x2));
+}
+
+// ── LaTeX mode toggle for А4 ────────────────────────────────
+function cq4SetMode(prefix, mode) {
+  const coeffDiv = document.getElementById(`cw4-coeff-${prefix}`);
+  const latexDiv = document.getElementById(`cw4-latex-${prefix}`);
+  const modeEl   = document.getElementById(`${prefix}_eq_mode`);
+  const btns = document.querySelectorAll(`#cw4-${prefix} .eq-mode-btn`);
+  if (!coeffDiv || !latexDiv) return;
+  const isLatex = mode === 'latex';
+  coeffDiv.style.display = isLatex ? 'none' : 'flex';
+  latexDiv.style.display = isLatex ? 'flex' : 'none';
+  btns.forEach((b,i) => b.classList.toggle('active', isLatex ? i===1 : i===0));
+  if (modeEl) modeEl.value = mode;
+  if (isLatex) {
+    setTimeout(() => document.getElementById(`${prefix}_latex_input`)?.focus(), 50);
+  }
+}
+
+function cq4LatexUpdate(prefix) {
+  const input = document.getElementById(`${prefix}_latex_input`);
+  const prev  = document.getElementById(`${prefix}_latex_prev`);
+  const hidden = document.getElementById(`${prefix}_equation`);
+  if (!input || !prev) return;
+  const val = input.value.trim();
+  if (hidden) hidden.value = val;
+  if (!val) { prev.innerHTML = '<span style="color:var(--muted);font-size:.82rem">введите уравнение</span>'; return; }
+  try { katex.render(val, prev, {throwOnError:false, displayMode:false}); } catch(e) { prev.textContent = val; }
+}
+
+// ── Level selector ───────────────────────────────────────────
+function lvlSet(fid, val, btn) {
+  const hidden = document.getElementById(fid);
+  if (hidden) hidden.value = val;
+  const row = btn.closest('.level-sel-row');
+  if (!row) return;
+  row.querySelectorAll('.level-btn').forEach(b => b.className = 'level-btn');
+  btn.classList.add(val==='adv'?'sel-adv':val==='high'?'sel-high':'sel-base');
 }
 
 function fmt4(v) {
