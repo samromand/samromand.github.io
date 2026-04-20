@@ -978,19 +978,39 @@ function getVals(meta, prefix) {
       if (mode === 'latex') {
         const latexEl = document.getElementById(`${prefix}_latex_input`);
         if (latexEl) obj.equation = latexEl.value.trim();
-        // clear coeff fields for latex mode
         obj.a = ''; obj.b = ''; obj.c = '';
       } else {
-        ['a','b','c','equation'].forEach(k => {
-          const el = document.getElementById(`${prefix}_${k}`);
-          if (el) obj[k] = el.value.trim();
-        });
+        // Read coefficients
+        const aEl = document.getElementById(`${prefix}_a`);
+        const bEl = document.getElementById(`${prefix}_b`);
+        const cEl = document.getElementById(`${prefix}_c`);
+        const aVal = aEl ? aEl.value.trim() : '';
+        const bVal = bEl ? bEl.value.trim() : '';
+        const cVal = cEl ? cEl.value.trim() : '';
+        obj.a = aVal; obj.b = bVal; obj.c = cVal;
+        // Always regenerate equation from coefficients (don't trust hidden field)
+        const a = parseFloat(aVal), b = parseFloat(bVal)||0, c = parseFloat(cVal)||0;
+        if (!isNaN(a) && a !== 0) {
+          obj.equation = cq4LatexEq(a, b, c);
+        } else {
+          // fallback: read hidden field
+          const eqEl = document.getElementById(`${prefix}_equation`);
+          obj.equation = eqEl ? eqEl.value.trim() : '';
+        }
       }
     } else if (f.type === 'coeff_biquadratic') {
-      ['a7','p','q','equation'].forEach(k => {
-        const el = document.getElementById(`${prefix}_${k}`);
-        if (el) obj[k] = el.value.trim();
-      });
+      const a7El = document.getElementById(`${prefix}_a7`);
+      const pEl  = document.getElementById(`${prefix}_p`);
+      const qEl  = document.getElementById(`${prefix}_q`);
+      const a7Val = a7El ? a7El.value.trim() : '';
+      const pVal  = pEl  ? pEl.value.trim()  : '';
+      const qVal  = qEl  ? qEl.value.trim()  : '';
+      obj.a7 = a7Val; obj.p = pVal; obj.q = qVal;
+      const a = parseFloat(a7Val)||1, p = parseFloat(pVal)||0, q = parseFloat(qVal)||0;
+      obj.equation = cq7LatexEq(a, p, q);
+      // also update hidden field
+      const eqEl = document.getElementById(`${prefix}_equation`);
+      if (eqEl) eqEl.value = obj.equation;
     } else if (f.type === 'level_select') {
       const el = document.getElementById(`${prefix}_${f.key}`);
       if (el) obj[f.key] = el.value || 'base';
@@ -1003,8 +1023,19 @@ function getVals(meta, prefix) {
 }
 
 function isValid(meta, vals) {
-  const hasCoeff = meta.fields.some(f => f.type==='coeff_quadratic' || f.type==='coeff_biquadratic');
-  if (hasCoeff) return !!(vals.equation && vals.answer);
+  const hasCoeffQ  = meta.fields.some(f => f.type === 'coeff_quadratic');
+  const hasCoeffBQ = meta.fields.some(f => f.type === 'coeff_biquadratic');
+  if (hasCoeffQ) {
+    // equation must be non-empty; answer must be filled
+    if (!vals.equation) return false;
+    if (!vals.answer) return false;
+    return true;
+  }
+  if (hasCoeffBQ) {
+    if (!vals.equation) return false;
+    if (!vals.answer) return false;
+    return true;
+  }
   const first = meta.fields.find(f => !['imagepicker','coeff_quadratic','coeff_biquadratic','level_select'].includes(f.type));
   if (first && !vals[first.key]) return false;
   return !!(vals.answer || vals.what);

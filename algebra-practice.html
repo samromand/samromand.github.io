@@ -49,9 +49,14 @@ header{padding:1.1rem 2rem;border-bottom:1px solid var(--border);display:flex;al
 
 /* ── MENU ── */
 #sMenu{padding:2.5rem 2rem;max-width:880px;margin:0 auto;}
-.menu-head{margin-bottom:2rem;}
-.menu-head h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;}
-.menu-head p{font-size:.875rem;color:var(--muted);margin-top:.4rem;line-height:1.6;}
+.menu-head{margin-bottom:2rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.menu-head-text h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;}
+.menu-head-text p{font-size:.875rem;color:var(--muted);margin-top:.4rem;line-height:1.6;}
+.btn-sync-tasks{font-size:.75rem;font-weight:500;color:var(--muted);background:none;border:1px solid var(--border);border-radius:2px;padding:.35rem .85rem;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:.35rem;flex-shrink:0;margin-top:.3rem;}
+.btn-sync-tasks:hover{border-color:var(--ink);color:var(--ink);}
+.btn-sync-tasks:disabled{opacity:.5;cursor:not-allowed;}
+.btn-sync-tasks.syncing svg{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 .task-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
 .tile{background:#fff;border:1px solid var(--border);border-radius:2px;padding:1.25rem;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:.75rem;position:relative;overflow:hidden;}
 .tile:hover{box-shadow:0 3px 14px rgba(0,0,0,.08);border-color:#bbb;transform:translateY(-1px);}
@@ -253,6 +258,23 @@ header{padding:1.1rem 2rem;border-bottom:1px solid var(--border);display:flex;al
   white-space:nowrap;flex-shrink:0;margin-left:auto;
 }
 .tile-reset-btn:hover{border-color:var(--red);color:var(--red);}
+/* level filter row on tile */
+.lvl-filter{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.6rem;}
+.lvl-filter-btn{
+  font-size:.69rem;font-weight:600;padding:.18rem .55rem;
+  border:1.5px solid var(--border);border-radius:2px;
+  background:none;cursor:pointer;color:var(--muted);
+  transition:all .15s;
+}
+.lvl-filter-btn.active-any{background:var(--ink);color:#fff;border-color:var(--ink);}
+.lvl-filter-btn.active-base{background:#e8f4fd;color:#1565c0;border-color:#1565c0;}
+.lvl-filter-btn.active-adv{background:#fff8e1;color:#e65100;border-color:#e65100;}
+.lvl-filter-btn.active-high{background:#fce4ec;color:#880e4f;border-color:#880e4f;}
+/* level badge in dots row */
+.lvl-badge{display:inline-block;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:2px;margin-right:.3rem;}
+.lvl-badge.base{background:#e8f4fd;color:#1565c0;}
+.lvl-badge.adv{background:#fff8e1;color:#e65100;}
+.lvl-badge.high{background:#fce4ec;color:#880e4f;}
 
 /* ── grade summary bar (bottom of menu) ── */
 .grade-bar{
@@ -302,8 +324,16 @@ header{padding:1.1rem 2rem;border-bottom:1px solid var(--border);display:flex;al
 <!-- MENU -->
 <div class="screen" id="sMenu">
   <div class="menu-head">
-    <h2 id="greetName">Привет!</h2>
-    <p>Выберите задание для отработки.</p>
+    <div class="menu-head-text">
+      <h2 id="greetName">Привет!</h2>
+      <p>Выберите задание для отработки.</p>
+    </div>
+    <button class="btn-sync-tasks" id="btnSyncTasks" onclick="syncTasks()" title="Обновить задачи из базы">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M11 6.5A4.5 4.5 0 1 1 6.5 2M6.5 2 8.5 4M6.5 2 4.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Обновить задачи
+    </button>
   </div>
   <div class="task-grid" id="taskGrid"></div>
   <div class="grade-bar" id="gradeBar" style="display:none">
@@ -427,13 +457,41 @@ async function loadDb() {
     return;
   }
   try {
-    const res = await fetch(`${JSONBIN_BASE}/${id}/latest`,{headers:{'X-Master-Key':API_KEY}});
+    const res = await fetch(`${JSONBIN_BASE}/${id}/latest`,{headers:{'X-Master-Key':API_KEY,'X-Bin-Meta':'false'}});
     const j = await res.json();
-    taskDb = j.record || {tasks:Array.from({length:8},()=>[])};
+    taskDb = j.record || j || {tasks:Array.from({length:8},()=>[])};
+    localStorage.setItem('kr8_algebra', JSON.stringify(taskDb));
   } catch {
     const r = localStorage.getItem('kr8_algebra');
     taskDb = r ? JSON.parse(r) : {tasks:Array.from({length:8},()=>[])};
   }
+}
+
+async function syncTasks() {
+  const btn = document.getElementById('btnSyncTasks');
+  if (btn) { btn.disabled=true; btn.classList.add('syncing'); }
+  const id = BINS.algebra;
+  if (!id || id==='ALGEBRA_BIN_ID') {
+    if (btn) { btn.disabled=false; btn.classList.remove('syncing'); }
+    toast('Bin ID не настроен', 'err'); return;
+  }
+  try {
+    const res = await fetch(`${JSONBIN_BASE}/${id}/latest`,{headers:{'X-Master-Key':API_KEY,'X-Bin-Meta':'false'}});
+    const j = await res.json();
+    const fresh = j.record || j || null;
+    if (fresh && fresh.tasks) {
+      taskDb = fresh;
+      localStorage.setItem('kr8_algebra', JSON.stringify(taskDb));
+      renderMenu();
+      const total = taskDb.tasks.reduce((s,a)=>s+a.length, 0);
+      toast(`Обновлено: ${total} задач загружено`, 'ok');
+    } else {
+      toast('Не удалось распознать данные из базы', 'err');
+    }
+  } catch(e) {
+    toast('Ошибка подключения к базе', 'err');
+  }
+  if (btn) { btn.disabled=false; btn.classList.remove('syncing'); }
 }
 
 // ════════════ LOGIN ════════════
@@ -528,14 +586,18 @@ function renderMenu() {
     const avg = weightedAvg(prog, i);
     if(avg !== null) { totalAvg += avg; anyData = true; }
 
-    const dots = tasks.slice(0,12).map(t=>{
+    const dots = tasks.map(t=>{
       const p=prog.find(p=>p.taskId===t.id);
       return `<div class="tdot-sm dot-${p?p.status:'empty'}"></div>`;
     }).join('');
 
     const noTasks = total===0;
     const cls = m.locked?'locked':noTasks?'empty-tasks':'';
-    const onclick = m.locked||noTasks ? '' : `onclick="startPractice(${i})"`;
+
+    // Count tasks by level
+    const lvlCounts = {base:0, adv:0, high:0};
+    tasks.forEach(t => { const l=t.level||'base'; if(lvlCounts[l]!==undefined) lvlCounts[l]++; });
+    const hasLevels = lvlCounts.adv>0 || lvlCounts.high>0;
 
     const avgHtml = avg !== null
       ? `<div class="tile-avg">Средний балл: <strong>${avg.toFixed(1)}</strong> / ${m.pts}</div>`
@@ -545,11 +607,22 @@ function renderMenu() {
       ? `<button class="tile-reset-btn" onclick="event.stopPropagation();askReset(${i})">Сбросить</button>`
       : '';
 
-    return `<div class="tile ${cls}" ${onclick}>
+    const lvlFilter = (!noTasks && !m.locked && hasLevels) ? `
+      <div class="lvl-filter" onclick="event.stopPropagation()">
+        <button class="lvl-filter-btn active-any" id="lf-${i}-any" onclick="startPractice(${i},'any')">Любой</button>
+        ${lvlCounts.base>0?`<button class="lvl-filter-btn" id="lf-${i}-base" onclick="startPractice(${i},'base')">Базовый (${lvlCounts.base})</button>`:''}
+        ${lvlCounts.adv>0?`<button class="lvl-filter-btn" id="lf-${i}-adv" onclick="startPractice(${i},'adv')">Повышенный (${lvlCounts.adv})</button>`:''}
+        ${lvlCounts.high>0?`<button class="lvl-filter-btn" id="lf-${i}-high" onclick="startPractice(${i},'high')">Высокий (${lvlCounts.high})</button>`:''}
+      </div>` : '';
+
+    const tileOnclick = (m.locked||noTasks||hasLevels) ? '' : `onclick="startPractice(${i},'any')"`;
+
+    return `<div class="tile ${cls}" ${tileOnclick}>
       ${m.locked?'<span class="tile-lock-badge">скоро</span>':''}
       <div class="tile-num">${i+1}</div>
       <div><div class="tile-title">${m.title}</div><div class="tile-desc">${m.desc}</div></div>
       ${avgHtml}
+      ${lvlFilter}
       <div class="tile-bottom">
         ${noTasks
           ? `<span style="font-size:.75rem;color:var(--muted)">Нет задач</span>`
@@ -575,9 +648,15 @@ function renderMenu() {
 }
 
 // ════════════ PRACTICE ════════════
-function startPractice(i) {
-  const tasks = taskDb?.tasks[i]||[];
-  if(!tasks.length){ toast('В этом задании пока нет задач','err'); return; }
+function startPractice(i, levelFilter) {
+  const allTasks = taskDb?.tasks[i]||[];
+  if(!allTasks.length){ toast('В этом задании пока нет задач','err'); return; }
+
+  // Filter by level
+  const lf = levelFilter || 'any';
+  const tasks = lf === 'any' ? allTasks : allTasks.filter(t => (t.level||'base') === lf);
+  if(!tasks.length){ toast(`Нет задач уровня «${lf==='base'?'Базовый':lf==='adv'?'Повышенный':'Высокий'}»`,'err'); return; }
+
   tidx=i; results=[]; pos=0; attempts=0;
 
   const prog = loadProg(i);
@@ -585,7 +664,8 @@ function startPractice(i) {
   const unseen = shuffle(tasks.filter(t=>!prog.find(p=>p.taskId===t.id)));
   queue = unseen.length>0 ? unseen : shuffle([...tasks]);
 
-  document.getElementById('pTitle').textContent = META[i].title;
+  const lvlSuffix = lf==='base'?' · Базовый':lf==='adv'?' · Повышенный':lf==='high'?' · Высокий':'';
+  document.getElementById('pTitle').textContent = META[i].title + lvlSuffix;
   document.getElementById('summary').classList.remove('show');
   document.getElementById('allDone').classList.remove('show');
   document.getElementById('qCard').style.display='';
