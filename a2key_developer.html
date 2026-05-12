@@ -165,7 +165,7 @@ main{flex:1;overflow-y:auto;padding:22px 26px 48px}
 .au-player-status{font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px}
 .au-player-status.ok{color:var(--ok)}
 .au-player-status.err{color:var(--er)}
-</style>
+/* IMAGE PREVIEWS */
 .img-prev-wrap{margin-top:7px;display:none}
 .img-prev-wrap.visible{display:block}
 .img-prev-inner{position:relative;display:inline-flex;align-items:flex-start;gap:0}
@@ -580,6 +580,7 @@ function selectVariant(id) {
   // NOW build all forms into the visible DOM
   buildAll();
   setTimeout(refreshAllPreviews, 80);
+  setTimeout(refreshAllAudioPlayers, 80);
   document.getElementById('main-area').scrollTop = 0;
 }
 
@@ -1315,31 +1316,45 @@ const _auTimers = {};
 function updateAuPlayer(input, pid) {
   clearTimeout(_auTimers[pid]);
   _auTimers[pid] = setTimeout(() => {
-    const url = input.value.trim();
+    let url = input.value.trim();
+    // Auto-prepend https:// if missing
+    if (url && !url.startsWith('http')) {
+      url = 'https://' + url;
+      input.value = url;
+    }
     const wrap = document.getElementById(pid);
     if (!wrap) return;
-    const audio = wrap.querySelector('audio');
+    const audioEl = wrap.querySelector('audio');
     const status = wrap.querySelector('.au-player-status');
-    if (!url || !url.startsWith('http')) {
+    if (!url) {
       wrap.classList.remove('visible');
-      audio.src = '';
+      audioEl.src = '';
       return;
     }
     wrap.classList.add('visible');
-    audio.src = url;
-    audio.load();
-    audio.oncanplay = () => {
+    audioEl.src = url;
+    audioEl.load();
+    status.style.display = 'none';
+    audioEl.oncanplay = () => {
       status.style.display = 'flex';
       status.className = 'au-player-status ok';
       status.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg> Track loaded — press play to verify`;
     };
-    audio.onerror = () => {
+    audioEl.onerror = () => {
       status.style.display = 'flex';
       status.className = 'au-player-status err';
       status.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Could not load audio`;
     };
     scheduleSave();
-  }, 700);
+  }, 500);
+}
+
+// Initialise all audio players already on the page (pre-filled URLs)
+function refreshAllAudioPlayers() {
+  document.querySelectorAll('input[type=url][oninput*="updateAuPlayer"]').forEach(inp => {
+    const match = inp.getAttribute('oninput').match(/'([^']+)'/);
+    if (match) updateAuPlayer(inp, match[1]);
+  });
 }
 
 // ══════════════════════════════════════════
