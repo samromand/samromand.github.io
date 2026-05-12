@@ -470,26 +470,31 @@ let saveTimer = null;
 // ══════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', async () => {
   setSt('Loading…', false);
+  // Always restore from localStorage first as instant fallback
+  const local = localStorage.getItem('a2kfs_db');
+  if (local) {
+    try { db = JSON.parse(local); } catch(e) { db = { variants: {} }; }
+  }
+
   try {
     const r = await fetch(`${URL_BASE}/latest`, {
       headers: { 'X-Master-Key': KEY, 'X-Bin-Meta': 'false' }
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
-    if (data && data.variants) db = data;
-    else db = { variants: {} };
+    if (data && data.variants) {
+      db = data;
+      localStorage.setItem('a2kfs_db', JSON.stringify(db));
+    }
     setSt('All saved', true);
-    renderTabs();
-    const ids = Object.keys(db.variants);
-    if (ids.length) selectVariant(ids[0]);
   } catch(e) {
-    setSt('Load failed — working offline', false);
-    toast('Could not reach database. Check you are on localhost, not file://', 'err');
-    // Still render whatever is already in memory so the UI is usable
-    renderTabs();
-    const ids = Object.keys(db.variants);
-    if (ids.length) selectVariant(ids[0]);
+    setSt('Offline — using local backup', false);
+    document.getElementById('sync-st').title = 'Could not reach JSONBin. Data loaded from browser cache.';
   }
+
+  renderTabs();
+  const ids = Object.keys(db.variants);
+  if (ids.length) selectVariant(ids[0]);
 });
 
 // ══════════════════════════════════════════
@@ -513,11 +518,13 @@ async function saveAll() {
       body: JSON.stringify(db)
     });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    localStorage.setItem('a2kfs_db', JSON.stringify(db));
     setSt('All saved', true);
     toast('Saved to database ✓', 'ok');
   } catch(e) {
-    setSt('Save failed', false);
-    toast('Save failed: ' + e.message, 'err');
+    setSt('DB unreachable — saved locally', false);
+    localStorage.setItem('a2kfs_db', JSON.stringify(db));
+    toast('JSONBin unreachable — data saved to browser cache', 'err');
   } finally {
     document.getElementById('btn-save').disabled = false;
   }
@@ -555,10 +562,18 @@ function selectVariant(id) {
   renderTabs();
   document.getElementById('empty-aside').style.display = 'none';
   document.getElementById('snav').style.display = 'block';
-  // Land on Part 1 so cards are immediately visible
+  // Show the page FIRST so cards render into a visible container
   const rw1Item = document.querySelector('#snav .aside-item[onclick*="rw1"]');
-  showPage('rw1', rw1Item);
+  // Temporarily bypass collect() in showPage since db isn't populated yet
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.aside-item').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-rw1').classList.add('visible');
+  if (rw1Item) rw1Item.classList.add('active');
+  curPage = 'rw1';
+  // NOW build all forms into the visible DOM
   buildAll();
+  setTimeout(refreshAllPreviews, 80);
+  document.getElementById('main-area').scrollTop = 0;
 }
 
 // ══════════════════════════════════════════
@@ -662,7 +677,7 @@ function confirmDel() {
 // NAVIGATION
 // ══════════════════════════════════════════
 function showPage(id, el) {
-  collect();
+  if (cv) collect();
   document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
   document.querySelectorAll('.aside-item').forEach(a => a.classList.remove('active'));
   const pg = document.getElementById('page-' + id);
@@ -1370,13 +1385,7 @@ document.getElementById('main-area').addEventListener('input', e => {
   }
 });
 
-// Also hook into buildAll to refresh after forms are rebuilt
-const _origBuildAll = buildAll;
-function buildAll() {
-  _origBuildAll();
-  // Give DOM a tick to paint, then load previews for pre-filled URLs
-  setTimeout(refreshAllPreviews, 60);
-}
+
 </script>
 </body>
 </html>
