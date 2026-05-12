@@ -9,159 +9,173 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --cb:#003087;--cm:#0078C8;--cl:#ddeeff;--ca:#00A859;
+  --cb:#003087;--cm:#0078C8;--cl:#E8F4FD;--ca:#00A859;
   --sf:#F7F8FA;--s2:#ECEEF2;--bd:#D4D8E1;--bs:#B0B7C3;
   --tx:#1A1D23;--tm:#6B7280;--wh:#FFFFFF;
   --er:#DC2626;--ok:#059669;--wa:#D97706;
-  --rc:#0078C8;--lc:#7C3AED;
-  --sw:248px;--hh:54px;--vbh:44px;--r:8px;--rl:12px;
+  --sw:248px;--hh:54px;--r:8px;--rl:12px;
 }
+*{font-size:inherit}
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--sf);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:14px}
-
 header{height:var(--hh);background:var(--cb);display:flex;align-items:center;padding:0 18px;gap:12px;z-index:300;border-bottom:2px solid var(--cm);flex-shrink:0}
 .logo{background:var(--cm);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.09em;padding:4px 9px;border-radius:4px;text-transform:uppercase;white-space:nowrap}
-header h1{color:#fff;font-size:13.5px;font-weight:500}
+header h1{color:#fff;font-size:14px;font-weight:500;letter-spacing:-.01em}
 .hright{margin-left:auto;display:flex;align-items:center;gap:7px}
 .hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:inherit;font-size:12.5px;padding:5px 13px;border-radius:6px;cursor:pointer;transition:.15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
 .hbtn:hover{background:rgba(255,255,255,.22)}
-.hbtn.green{background:var(--ca);border-color:var(--ca)}.hbtn.green:hover{background:#008a49}
-.sdot{width:7px;height:7px;border-radius:50%;background:#6ee7b7;flex-shrink:0;transition:.3s}
-.sdot.err{background:#fca5a5}.sdot.busy{background:#fde68a;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-#vbar{height:var(--vbh);background:var(--wh);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0;overflow-x:auto}
-.vbar-lbl{font-size:10.5px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;flex-shrink:0}
+.hbtn.green{background:var(--ca);border-color:var(--ca)}
+.hbtn.green:hover{background:#008a49}
+.hbtn:disabled{opacity:.4;cursor:not-allowed}
+#sync-st{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;padding-right:2px}
+#vbar{height:44px;background:var(--wh);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0;overflow-x:auto}
+.vbar-lbl{font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;flex-shrink:0}
 #vtabs{display:flex;align-items:center;gap:5px}
-.vtab{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--sf);font-size:12px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.05em;cursor:pointer;white-space:nowrap;transition:.12s;user-select:none;flex-shrink:0}
+.vtab{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--sf);font-size:12px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.06em;cursor:pointer;white-space:nowrap;transition:.12s;user-select:none;flex-shrink:0}
 .vtab:hover{border-color:var(--cm);background:var(--cl)}
 .vtab.active{background:var(--cb);color:#fff;border-color:var(--cb)}
-.vdel{width:14px;height:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;opacity:.4;margin-left:3px}
-.vtab.active .vdel{opacity:.5}.vdel:hover{opacity:1!important;background:rgba(0,0,0,.18)}
-#btn-add-v{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;border:1.5px dashed var(--bs);background:transparent;font-family:inherit;font-size:12px;color:var(--cm);cursor:pointer;white-space:nowrap;transition:.15s;flex-shrink:0}
+.vdel{display:inline-flex;align-items:center;justify-content:center;opacity:.45;border-radius:3px;padding:1px;cursor:pointer}
+.vtab.active .vdel{opacity:.55}
+.vdel:hover{opacity:1!important;background:rgba(0,0,0,.2)}
+#btn-add-v{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:6px;border:1.5px dashed var(--bs);background:transparent;font-family:inherit;font-size:12px;color:var(--cm);cursor:pointer;white-space:nowrap;transition:.15s;flex-shrink:0}
 #btn-add-v:hover{border-color:var(--cm);background:var(--cl)}
-
 .app-body{display:flex;flex:1;min-height:0;overflow:hidden}
 aside{width:var(--sw);background:var(--wh);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
 main{flex:1;overflow-y:auto;padding:22px 26px 48px}
-
 .aside-sec{padding:6px 0;border-bottom:1px solid var(--bd)}
-.aside-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tm);padding:5px 13px 6px}
+.aside-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tm);padding:5px 13px 6px;display:flex;align-items:center;gap:5px}
 .aside-item{display:flex;align-items:center;gap:9px;padding:7px 13px;cursor:pointer;font-size:13px;color:var(--tx);border-left:3px solid transparent;transition:.12s;user-select:none}
 .aside-item:hover{background:var(--sf)}
 .aside-item.active{background:var(--cl);border-left-color:var(--cm);color:var(--cb);font-weight:500}
-.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.drw{background:var(--rc)}.dls{background:var(--lc)}
-.cnt{margin-left:auto;background:var(--s2);color:var(--tm);font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:20px;text-align:center}
-.aside-item.active .cnt{background:rgba(0,120,200,.15);color:var(--cm)}
-
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.drw{background:#0078C8}.dls{background:#7C3AED}
+.cnt{margin-left:auto;background:var(--s2);color:var(--tm);font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
+.active .cnt{background:var(--cl);color:var(--cm)}
 .page{display:none}.page.visible{display:block}
-
-.pg-head{margin-bottom:18px;padding-bottom:13px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:13px}
+.pgh{margin-bottom:18px;padding-bottom:13px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:13px}
 .phi{width:40px;height:40px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.phi.rw{background:#EBF5FF}.phi.ls{background:#F3F0FF}
-.pg-head h2{font-size:16px;font-weight:600}
-.pg-head p{font-size:12.5px;color:var(--tm);margin-top:3px;line-height:1.5}
-.pills{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.pill{background:var(--s2);border:1px solid var(--bd);font-size:10.5px;color:var(--tm);padding:2px 9px;border-radius:20px}
-.pill strong{color:var(--tx);font-weight:500}
-
-.callout{border-left:3px solid var(--cm);border-radius:0 var(--r) var(--r) 0;padding:10px 13px;margin-bottom:14px;font-size:12.5px;line-height:1.6;background:var(--cl);color:#1E3A5F}
-.callout strong{font-weight:600}
-
-.qlist{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.phi-rw{background:#EBF5FF}.phi-ls{background:#F3F0FF}
+.pgh h2{font-size:16px;font-weight:600}
+.pgh p{font-size:12.5px;color:var(--tm);margin-top:3px;line-height:1.5}
+.mpills{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.mp{background:var(--s2);border:1px solid var(--bd);font-size:11px;color:var(--tm);padding:2px 8px;border-radius:20px}
+.mp strong{color:var(--tx);font-weight:600}
+.clt{background:var(--cl);border-left:3px solid var(--cm);border-radius:0 var(--r) var(--r) 0;padding:10px 13px;margin-bottom:14px;font-size:12.5px;color:#1E3A5F;line-height:1.6}
+.clt strong{font-weight:600}
+.ql{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
 .qcard{background:var(--wh);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;transition:.15s}
 .qcard:hover{border-color:var(--bs)}
-.qch{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;border-bottom:1px solid transparent;transition:.12s}
-.qcard.open>.qch{background:var(--sf);border-bottom-color:var(--bd)}
-.qnum{width:25px;height:25px;border-radius:6px;background:var(--s2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:var(--tm);flex-shrink:0}
-.qtitle{font-size:13px;font-weight:500;flex:1}.qsub{font-size:11px;color:var(--tm)}
-.qtag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:2px;white-space:nowrap}
-.tmc{background:#EBF5FF;color:#0369A1}.twr{background:#FFF7ED;color:#C2410C}
-.tmt{background:#FAF5FF;color:#7C3AED}.tim{background:#FFF1F2;color:#BE185D}
-.tau{background:#EDE9FE;color:#5B21B6}.tgf{background:#F0FDF4;color:#15803D}
+.qch{display:flex;align-items:center;gap:9px;padding:11px 13px;cursor:pointer;border-bottom:1px solid transparent;transition:.12s}
+.qcard.open .qch{background:var(--sf);border-bottom-color:var(--bd)}
+.qn{width:25px;height:25px;border-radius:6px;background:var(--s2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--tm);flex-shrink:0}
+.qt{font-size:13px;font-weight:500;flex:1}
+.qs{font-size:11px;color:var(--tm)}
+.qtag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-right:2px}
+.tmc{background:#EBF5FF;color:#0369A1}.tgf{background:#F0FDF4;color:#15803D}
+.twr{background:#FFF7ED;color:#C2410C}.tmt{background:#FAF5FF;color:#7C3AED}
+.tim{background:#FFF1F2;color:#BE185D}.tau{background:#EDE9FE;color:#5B21B6}
 .chev{width:14px;height:14px;color:var(--tm);transition:transform .2s;flex-shrink:0}
-.open>.qch .chev{transform:rotate(90deg)}
-.qcb{display:none;padding:16px 17px}.qcard.open>.qcb{display:block}
-
-.fg{display:grid;gap:12px}.fg2{grid-template-columns:1fr 1fr}.fg3{grid-template-columns:1fr 1fr 1fr}.fg1{grid-template-columns:1fr}
+.open .chev{transform:rotate(90deg)}
+.qcb{display:none;padding:16px;background:var(--wh)}
+.qcard.open .qcb{display:block}
+.fg{display:grid;gap:12px}
+.fg2{grid-template-columns:1fr 1fr}.fg3{grid-template-columns:1fr 1fr 1fr}
 .fi{display:flex;flex-direction:column;gap:5px}
-.fi label{font-size:10.5px;font-weight:700;color:var(--tm);letter-spacing:.04em;text-transform:uppercase}
+.fi label{font-size:10.5px;font-weight:700;color:var(--tm);letter-spacing:.05em;text-transform:uppercase}
 .fi input,.fi textarea,.fi select{font-family:'DM Sans',sans-serif;font-size:13px;background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:7px 10px;color:var(--tx);outline:none;transition:.15s;width:100%}
-.fi input:focus,.fi textarea:focus{border-color:var(--cm);box-shadow:0 0 0 3px rgba(0,120,200,.1)}
-.fi textarea{resize:vertical;min-height:74px;line-height:1.6}
+.fi input:focus,.fi textarea:focus,.fi select:focus{border-color:var(--cm);box-shadow:0 0 0 3px rgba(0,120,200,.1)}
+.fi textarea{resize:vertical;min-height:72px;line-height:1.6}
 .fi input[type=url]{font-family:'DM Mono',monospace;font-size:12px}
-.fhint{font-size:11px;color:var(--tm);line-height:1.5}
+.fh{font-size:11px;color:var(--tm);line-height:1.5}
 .sdiv{height:1px;background:var(--bd);margin:14px 0}
-.stitle{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm);margin-bottom:11px}
-
-.opts-block{margin-top:13px}
-.opts-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tm);margin-bottom:8px}
-.opt-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.opt-letter{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--bs);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;color:var(--tm);flex-shrink:0;background:var(--wh)}
-.opt-row.correct .opt-letter{border-color:var(--ok);background:#ECFDF5;color:var(--ok)}
-.opt-row input{flex:1;font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--bd);border-radius:6px;padding:6px 10px;outline:none;transition:.15s}
-.opt-row input:focus{border-color:var(--cm)}
-.mkbtn{padding:4px 9px;font-size:11px;font-weight:600;border:1px solid var(--bd);border-radius:6px;background:var(--wh);cursor:pointer;color:var(--tm);font-family:inherit;transition:.15s;white-space:nowrap;flex-shrink:0}
-.opt-row.correct .mkbtn{background:#ECFDF5;border-color:#86EFAC;color:var(--ok)}
-.abcbtn{padding:5px 14px;font-size:12px;font-weight:700;border:1px solid var(--bd);border-radius:6px;background:var(--wh);cursor:pointer;color:var(--tm);font-family:'DM Mono',monospace;transition:.15s}
-.abcbtn.sel{background:#ECFDF5;border-color:#86EFAC;color:var(--ok)}
-
-.gtbl{width:100%;border-collapse:collapse;margin-top:10px}
-.gtbl th{background:var(--s2);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--tm);padding:7px 11px;text-align:left;border-bottom:1px solid var(--bd)}
-.gtbl td{padding:7px 11px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.stitle{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tm);margin-bottom:10px}
+.au-blk{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:14px}
+.au-head{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:10px}
+.au-ico{width:28px;height:28px;border-radius:6px;background:#EDE9FE;color:#5B21B6;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ob{margin-top:12px}
+.ob-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tm);margin-bottom:8px}
+.orow{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.ol{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--bs);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--tm);flex-shrink:0;background:var(--wh)}
+.orow.correct .ol{border-color:var(--ok);background:#ECFDF5;color:var(--ok)}
+.orow input{flex:1;font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--bd);border-radius:6px;padding:6px 9px;outline:none;transition:.15s}
+.orow input:focus{border-color:var(--cm)}
+.mkb{padding:4px 8px;font-size:10.5px;font-weight:700;border:1px solid var(--bd);border-radius:6px;background:var(--wh);cursor:pointer;color:var(--tm);font-family:inherit;transition:.15s;white-space:nowrap;flex-shrink:0}
+.orow.correct .mkb{background:#ECFDF5;border-color:#86EFAC;color:var(--ok)}
+.gtbl{width:100%;border-collapse:collapse;margin-top:9px}
+.gtbl th{background:var(--s2);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--tm);padding:6px 10px;text-align:left;border-bottom:1px solid var(--bd)}
+.gtbl td{padding:6px 10px;border-bottom:1px solid var(--bd);vertical-align:middle}
 .gtbl tr:last-child td{border-bottom:none}
 .gtbl input{width:100%;font-family:'DM Sans',sans-serif;font-size:12.5px;border:1px solid var(--bd);border-radius:5px;padding:5px 8px;outline:none;transition:.15s}
 .gtbl input:focus{border-color:var(--cm)}
-
-.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
-.mch{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--tm);padding:5px 0;border-bottom:2px solid var(--bd);margin-bottom:7px}
-.mrow{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:9px}
+.mch{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--tm);padding:5px 0;border-bottom:2px solid var(--bd);margin-bottom:6px}
+.mrow{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .mrow input{flex:1;font-family:'DM Sans',sans-serif;font-size:13px;border:1px solid var(--bd);border-radius:6px;padding:6px 9px;outline:none;transition:.15s}
 .mrow input:focus{border-color:var(--cm)}
-
 .brow{display:flex;gap:7px;margin-top:15px}
-.btn{font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;padding:7px 16px;border-radius:var(--r);cursor:pointer;border:1px solid transparent;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn{font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;padding:6px 15px;border-radius:var(--r);cursor:pointer;border:1px solid transparent;transition:.15s;display:inline-flex;align-items:center;gap:5px}
 .btn-p{background:var(--cb);color:#fff;border-color:var(--cb)}.btn-p:hover{background:#002070}
 .btn-s{background:var(--wh);color:var(--tx);border-color:var(--bd)}.btn-s:hover{background:var(--sf)}
-
-.au-block{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:14px}
-.au-head{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;margin-bottom:10px;color:var(--lc)}
-.au-icon{width:26px;height:26px;border-radius:6px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-
 .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
 .sc{background:var(--wh);border:1px solid var(--bd);border-radius:var(--rl);padding:16px}
-.sc-val{font-size:28px;font-weight:700;color:var(--cb)}.sc-lbl{font-size:12.5px;color:var(--tm);margin-top:3px}.sc-sub{font-size:11px;color:var(--tm);margin-top:6px;line-height:1.5}
-
-.stbl-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-top:16px}
-.stbl-ph{padding:7px 17px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);background:var(--sf);border-bottom:1px solid var(--bd)}
-.stbl-row{display:flex;align-items:center;padding:9px 17px;border-bottom:1px solid var(--bd);gap:10px;font-size:12px}
+.sc-val{font-size:28px;font-weight:700;color:var(--cb)}
+.sc-lbl{font-size:12px;color:var(--tm);margin-top:2px}
+.sc-sub{font-size:11px;color:var(--tm);margin-top:6px;line-height:1.5}
+.stbl-wrap{background:var(--wh);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;margin-top:14px}
+.stbl-head{padding:11px 16px;background:var(--sf);border-bottom:1px solid var(--bd);font-weight:600;font-size:13px}
+.stbl-ph{padding:7px 16px 4px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tm);background:var(--sf);border-bottom:1px solid var(--bd)}
+.stbl-row{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid var(--bd);gap:9px;font-size:12px}
 .stbl-row:last-child{border-bottom:none}
-.stbl-name{font-weight:600;width:100px;flex-shrink:0}.stbl-type{color:var(--tm);flex:1;font-size:11.5px}.stbl-qs{color:var(--tm);font-size:11px;white-space:nowrap}
-
+.stbl-nm{font-weight:600;width:100px;flex-shrink:0}
+.stbl-tp{color:var(--tm);flex:1;font-size:11.5px}
+.stbl-q{color:var(--tm);font-size:11px;white-space:nowrap}
 /* MODAL */
-#mbg{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:1000;display:none;align-items:center;justify-content:center}
-#mbg.show{display:flex}
-.modal{background:var(--wh);border-radius:var(--rl);padding:26px 28px;width:420px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.22)}
+#modal-bg,#del-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+#modal-bg.show,#del-modal-bg.show{display:flex}
+.modal{background:var(--wh);border-radius:var(--rl);padding:26px;width:420px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:6px}
-.modal .mdesc{font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:18px}
-.mid-fi{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
-.mid-fi label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.04em}
-.mid-fi input{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;letter-spacing:.18em;border:2px solid var(--bd);border-radius:var(--r);padding:10px 14px;outline:none;color:var(--tx);text-transform:uppercase;width:100%;transition:.15s}
+.modal-sub{font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:16px}
+.mid-fi{display:flex;flex-direction:column;gap:5px;margin-bottom:5px}
+.mid-fi label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--tm)}
+.mid-fi input{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;letter-spacing:.2em;border:2px solid var(--bd);border-radius:var(--r);padding:10px 14px;outline:none;color:var(--tx);text-transform:uppercase;width:100%;transition:.15s}
 .mid-fi input:focus{border-color:var(--cm);box-shadow:0 0 0 3px rgba(0,120,200,.12)}
-.mid-fi input.err{border-color:var(--er)}
-.merr{font-size:12px;color:var(--er);margin-bottom:14px;min-height:16px}
-.mexs{font-size:11.5px;color:var(--tm);margin-bottom:18px}
-.mexs span{font-family:'DM Mono',monospace;font-weight:700;color:var(--tx);background:var(--s2);padding:1px 6px;border-radius:4px;margin-right:4px}
+.mid-fi input.err{border-color:var(--er);box-shadow:0 0 0 3px rgba(220,38,38,.1)}
+.merr{font-size:11.5px;color:var(--er);min-height:16px;margin-bottom:12px}
+.mexm{font-size:11.5px;color:var(--tm);margin-bottom:16px}
+.mexm code{font-family:'DM Mono',monospace;font-weight:600;background:var(--s2);padding:1px 5px;border-radius:4px;color:var(--tx);font-size:11.5px}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end}
-.mbtn{font-family:inherit;font-size:13px;font-weight:500;padding:7px 18px;border-radius:var(--r);cursor:pointer;border:1px solid var(--bd);background:var(--wh);color:var(--tx);transition:.15s}
-.mbtn:hover{background:var(--sf)}.mbtn.primary{background:var(--cb);color:#fff;border-color:var(--cb)}.mbtn.primary:hover{background:#002070}
-
-#toast{position:fixed;bottom:22px;right:22px;background:var(--cb);color:#fff;padding:9px 16px;border-radius:var(--r);font-size:13px;font-weight:500;opacity:0;transform:translateY(6px);transition:.2s;z-index:500;pointer-events:none}
-#toast.show{opacity:1;transform:none}#toast.err{background:var(--er)}#toast.warn{background:var(--wa)}
-
-#empty-v{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;text-align:center;gap:12px;padding:40px}
-#empty-v .evi{font-size:48px;opacity:.22}
-#empty-v h2{font-size:17px;font-weight:600}
-#empty-v p{font-size:13px;color:var(--tm);max-width:320px;line-height:1.6}
+.mbtn{font-family:inherit;font-size:13px;font-weight:500;padding:7px 17px;border-radius:var(--r);cursor:pointer;border:1px solid var(--bd);background:var(--wh);color:var(--tx);transition:.15s}
+.mbtn:hover{background:var(--sf)}
+.mbtn.primary{background:var(--cb);color:#fff;border-color:var(--cb)}.mbtn.primary:hover{background:#002070}
+.del-modal{background:var(--wh);border-radius:var(--rl);padding:24px;width:360px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.del-modal h3{font-size:15px;font-weight:600;margin-bottom:8px}
+.del-modal p{font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:18px}
+.del-modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.dbtn-c{font-family:inherit;font-size:13px;padding:7px 15px;border-radius:var(--r);cursor:pointer;border:1px solid var(--bd);background:var(--wh);color:var(--tx);font-weight:500;transition:.15s}
+.dbtn-c:hover{background:var(--sf)}
+.dbtn-d{font-family:inherit;font-size:13px;padding:7px 15px;border-radius:var(--r);cursor:pointer;border:1px solid #FECACA;background:#FEF2F2;color:var(--er);font-weight:700;transition:.15s}
+.dbtn-d:hover{background:#FEE2E2}
+#toast{position:fixed;bottom:20px;right:20px;padding:9px 15px;border-radius:var(--r);font-size:13px;font-weight:500;opacity:0;transform:translateY(6px);transition:.2s;z-index:2000;pointer-events:none}
+#toast.ok{background:var(--cb);color:#fff}
+#toast.err{background:#FEF2F2;border:1px solid #FECACA;color:var(--er)}
+#toast.show{opacity:1;transform:none}
+/* IMAGE PREVIEWS */
+.img-prev-wrap{margin-top:7px;display:none}
+.img-prev-wrap.visible{display:block}
+.img-prev-inner{position:relative;display:inline-flex;align-items:flex-start;gap:0}
+.img-prev-thumb{display:block;max-width:100%;max-height:160px;min-height:40px;border-radius:6px;border:1px solid var(--bd);object-fit:contain;background:var(--s2)}
+.img-prev-thumb.tall{max-height:200px}
+.img-prev-status{display:flex;align-items:center;gap:6px;font-size:11px;margin-top:5px}
+.img-prev-status.ok{color:var(--ok)}
+.img-prev-status.err{color:var(--er)}
+.img-prev-status.loading{color:var(--tm)}
+.img-prev-dismiss{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:var(--tx);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;line-height:1;opacity:.7;transition:.12s}
+.img-prev-dismiss:hover{opacity:1}
+/* Three-column picture grid for LS1 */
+.pic-opts-preview{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px}
+.pic-opt-slot{display:flex;flex-direction:column;gap:5px}
+.pic-opt-lbl{font-size:10.5px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.05em}
+.pic-opt-img{width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:6px;border:1px solid var(--bd);background:var(--s2);display:none}
+.pic-opt-img.loaded{display:block}
 </style>
 </head>
 <body>
@@ -170,12 +184,12 @@ main{flex:1;overflow-y:auto;padding:22px 26px 48px}
   <span class="logo">A2 KfS</span>
   <h1>Developer Platform — Question Bank</h1>
   <div class="hright">
-    <span class="sdot busy" id="sdot" title="Loading…"></span>
-    <button class="hbtn" onclick="saveAll()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
-      Save to JSONBin
+    <span id="sync-st">All saved</span>
+    <button class="hbtn" id="btn-save" onclick="saveAll()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+      Save All
     </button>
-    <button class="hbtn green" onclick="showToast('Preview not yet implemented','warn')">Preview Exam</button>
+    <button class="hbtn green" onclick="alert('Preview coming soon.')">Preview Exam</button>
   </div>
 </header>
 
@@ -189,62 +203,245 @@ main{flex:1;overflow-y:auto;padding:22px 26px 48px}
 </div>
 
 <div class="app-body">
-  <aside id="aside">
-    <div id="aside-empty" style="padding:18px 13px;font-size:12.5px;color:var(--tm);line-height:1.6">Create a variant first to begin adding questions.</div>
-    <div id="aside-nav" style="display:none">
-      <div class="aside-sec">
-        <div class="aside-lbl">Navigation</div>
-        <div class="aside-item active" id="nav-overview" onclick="showPage('overview',this)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Overview
-        </div>
-      </div>
-      <div class="aside-sec">
-        <div class="aside-lbl">Reading &amp; Writing</div>
-        <div class="aside-item" onclick="showPage('rw1',this)"><span class="pdot drw"></span>Part 1 — Signs &amp; Texts<span class="cnt">6</span></div>
-        <div class="aside-item" onclick="showPage('rw2',this)"><span class="pdot drw"></span>Part 2 — Matching<span class="cnt">7</span></div>
-        <div class="aside-item" onclick="showPage('rw3',this)"><span class="pdot drw"></span>Part 3 — Long Text<span class="cnt">5</span></div>
-        <div class="aside-item" onclick="showPage('rw4',this)"><span class="pdot drw"></span>Part 4 — MC Cloze<span class="cnt">6</span></div>
-        <div class="aside-item" onclick="showPage('rw5',this)"><span class="pdot drw"></span>Part 5 — Open Cloze<span class="cnt">6</span></div>
-        <div class="aside-item" onclick="showPage('rw6',this)"><span class="pdot drw"></span>Part 6 — Guided Writing<span class="cnt">1</span></div>
-        <div class="aside-item" onclick="showPage('rw7',this)"><span class="pdot drw"></span>Part 7 — Picture Story<span class="cnt">1</span></div>
-      </div>
-      <div class="aside-sec">
-        <div class="aside-lbl">Listening</div>
-        <div class="aside-item" onclick="showPage('ls1',this)"><span class="pdot dls"></span>Part 1 — Picture MC<span class="cnt">5</span></div>
-        <div class="aside-item" onclick="showPage('ls2',this)"><span class="pdot dls"></span>Part 2 — Note Fill<span class="cnt">5</span></div>
-        <div class="aside-item" onclick="showPage('ls3',this)"><span class="pdot dls"></span>Part 3 — Dialogue MC<span class="cnt">5</span></div>
-        <div class="aside-item" onclick="showPage('ls4',this)"><span class="pdot dls"></span>Part 4 — Short MC<span class="cnt">5</span></div>
-        <div class="aside-item" onclick="showPage('ls5',this)"><span class="pdot dls"></span>Part 5 — Matching<span class="cnt">6</span></div>
+<aside>
+  <div id="empty-aside" style="padding:18px 14px;font-size:12.5px;color:var(--tm);line-height:1.6;font-style:italic">Create a variant first to start adding questions.</div>
+  <div id="snav" style="display:none">
+    <div class="aside-sec">
+      <div class="aside-lbl">Navigation</div>
+      <div class="aside-item active" onclick="showPage('ov',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
       </div>
     </div>
-  </aside>
+    <div class="aside-sec">
+      <div class="aside-lbl"><span class="pdot drw" style="display:inline-block"></span>&nbsp;Reading &amp; Writing</div>
+      <div class="aside-item" onclick="showPage('rw1',this)"><span class="pdot drw"></span>Part 1 — Signs &amp; Texts<span class="cnt">6</span></div>
+      <div class="aside-item" onclick="showPage('rw2',this)"><span class="pdot drw"></span>Part 2 — Matching<span class="cnt">7</span></div>
+      <div class="aside-item" onclick="showPage('rw3',this)"><span class="pdot drw"></span>Part 3 — Long Text<span class="cnt">5</span></div>
+      <div class="aside-item" onclick="showPage('rw4',this)"><span class="pdot drw"></span>Part 4 — MC Cloze<span class="cnt">6</span></div>
+      <div class="aside-item" onclick="showPage('rw5',this)"><span class="pdot drw"></span>Part 5 — Open Cloze<span class="cnt">6</span></div>
+      <div class="aside-item" onclick="showPage('rw6',this)"><span class="pdot drw"></span>Part 6 — Guided Writing<span class="cnt">1</span></div>
+      <div class="aside-item" onclick="showPage('rw7',this)"><span class="pdot drw"></span>Part 7 — Picture Story<span class="cnt">1</span></div>
+    </div>
+    <div class="aside-sec">
+      <div class="aside-lbl"><span class="pdot dls" style="display:inline-block"></span>&nbsp;Listening</div>
+      <div class="aside-item" onclick="showPage('ls1',this)"><span class="pdot dls"></span>Part 1 — Picture MC<span class="cnt">5</span></div>
+      <div class="aside-item" onclick="showPage('ls2',this)"><span class="pdot dls"></span>Part 2 — Note Fill<span class="cnt">5</span></div>
+      <div class="aside-item" onclick="showPage('ls3',this)"><span class="pdot dls"></span>Part 3 — Dialogue MC<span class="cnt">5</span></div>
+      <div class="aside-item" onclick="showPage('ls4',this)"><span class="pdot dls"></span>Part 4 — Short MC<span class="cnt">5</span></div>
+      <div class="aside-item" onclick="showPage('ls5',this)"><span class="pdot dls"></span>Part 5 — Matching<span class="cnt">6</span></div>
+    </div>
+  </div>
+</aside>
 
-  <main id="main-content">
-    <div id="empty-v">
-      <div class="evi">📋</div>
-      <h2>No variant selected</h2>
-      <p>Click <strong>New variant</strong> in the bar above to create your first exam variant, then start filling in questions.</p>
+<main id="main-area">
+
+  <!-- EMPTY -->
+  <div class="page visible" id="page-empty">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:62vh;gap:16px;text-align:center">
+      <div style="font-size:52px;opacity:.2">📚</div>
+      <h2 style="font-size:18px;font-weight:600">No variant selected</h2>
+      <p style="font-size:13.5px;color:var(--tm);max-width:340px;line-height:1.6">Use the <strong>New variant</strong> button above to create your first exam variant, then select it to begin adding questions.</p>
     </div>
-  </main>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="page" id="page-ov">
+    <div class="pgh"><div>
+      <h2>Exam variant overview</h2>
+      <p>Select a part from the sidebar to add or edit questions for the current variant.</p>
+    </div></div>
+    <div class="sc-grid">
+      <div class="sc"><div class="sc-val">7</div><div class="sc-lbl">Parts — Reading &amp; Writing</div><div class="sc-sub">32 questions · 1 hour · 50% of marks</div></div>
+      <div class="sc"><div class="sc-val">5</div><div class="sc-lbl">Parts — Listening</div><div class="sc-sub">25 questions · 30 min · 25% of marks</div></div>
+    </div>
+    <div class="stbl-wrap">
+      <div class="stbl-head">Content structure</div>
+      <div class="stbl-ph"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0078C8;margin-right:6px;vertical-align:middle"></span>Paper 1 — Reading &amp; Writing</div>
+      <div class="stbl-row"><span class="stbl-nm">Part 1</span><span class="stbl-tp">6 signs/notices — image URL or typed text + 3 answer options each</span><span class="stbl-q">6 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 2</span><span class="stbl-tp">3 person profiles (text + optional photo URL) + 7 matching questions</span><span class="stbl-q">7 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 3</span><span class="stbl-tp">1 long text + optional illustration URL + 5 multiple-choice questions</span><span class="stbl-q">5 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 4</span><span class="stbl-tp">Cloze text with 6 gaps — 3 word options per gap</span><span class="stbl-q">6 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 5</span><span class="stbl-tp">Email open cloze — 6 gaps, one-word typed answers</span><span class="stbl-q">6 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 6</span><span class="stbl-tp">Guided writing — scenario + 3 bullet points → email (25+ words)</span><span class="stbl-q">1 task</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 7</span><span class="stbl-tp">Picture story — 3 sequential illustration URLs → story (35+ words)</span><span class="stbl-q">1 task</span></div>
+      <div class="stbl-ph"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7C3AED;margin-right:6px;vertical-align:middle"></span>Paper 2 — Listening</div>
+      <div class="stbl-row"><span class="stbl-nm">Part 1</span><span class="stbl-tp"><strong>1 audio track</strong> · 5 short dialogues — question + 3 picture-option URLs each</span><span class="stbl-q">5 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 2</span><span class="stbl-tp"><strong>1 audio track</strong> · monologue — notes form with 5 blank fields</span><span class="stbl-q">5 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 3</span><span class="stbl-tp"><strong>1 audio track</strong> · dialogue — 5 multiple-choice questions</span><span class="stbl-q">5 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 4</span><span class="stbl-tp"><strong>1 audio track</strong> · 5 clips in one recording — 5 MC questions (gist)</span><span class="stbl-q">5 Qs</span></div>
+      <div class="stbl-row"><span class="stbl-nm">Part 5</span><span class="stbl-tp"><strong>1 audio track</strong> · matching dialogue — 5 names → 8 activities</span><span class="stbl-q">6 Qs</span></div>
+    </div>
+  </div>
+
+  <!-- RW1 -->
+  <div class="page" id="page-rw1">
+    <div class="pgh"><div class="phi phi-rw">📋</div><div>
+      <h2>Reading — Part 1: Signs &amp; Short Texts</h2>
+      <p>Six real-world texts. Candidate chooses the option that best describes the meaning.</p>
+      <div class="mpills"><span class="mp">Type: <strong>3-option MC</strong></span><span class="mp">Questions: <strong>1–6</strong></span></div>
+    </div></div>
+    <div class="clt"><strong>Image URL</strong> for visual signs/notices. <strong>Typed text</strong> for emails, chat messages, or plain notices. Use one or the other per question.</div>
+    <div class="ql" id="ql-rw1"></div>
+  </div>
+
+  <!-- RW2 -->
+  <div class="page" id="page-rw2">
+    <div class="pgh"><div class="phi phi-rw">🔗</div><div>
+      <h2>Reading — Part 2: Person Matching</h2>
+      <p>Three people each with a profile text. Seven questions ask which person matches each statement.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>7–13</strong></span><span class="mp">Format: <strong>A / B / C</strong></span></div>
+    </div></div>
+    <div class="stitle">Three person profiles</div>
+    <div class="fg fg3" id="profiles-grid" style="margin-bottom:18px"></div>
+    <div class="stitle">Questions 7–13</div>
+    <div class="ql" id="ql-rw2"></div>
+  </div>
+
+  <!-- RW3 -->
+  <div class="page" id="page-rw3">
+    <div class="pgh"><div class="phi phi-rw">📖</div><div>
+      <h2>Reading — Part 3: Long Text</h2>
+      <p>One longer text followed by five 3-option multiple-choice questions.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>14–18</strong></span><span class="mp">Format: <strong>3-option MC</strong></span></div>
+    </div></div>
+    <div id="rw3-tc"></div>
+    <div class="stitle" style="margin-top:4px">Questions 14–18</div>
+    <div class="ql" id="ql-rw3"></div>
+  </div>
+
+  <!-- RW4 -->
+  <div class="page" id="page-rw4">
+    <div class="pgh"><div class="phi phi-rw">🔤</div><div>
+      <h2>Reading — Part 4: Multiple-Choice Cloze</h2>
+      <p>A factual text with six numbered gaps. Candidate chooses the correct word from three options per gap.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>19–24</strong></span><span class="mp">Format: <strong>3-option word choice</strong></span></div>
+    </div></div>
+    <div id="rw4-tc"></div>
+    <div class="stitle" style="margin-top:4px">Gaps 19–24</div>
+    <div class="ql" id="ql-rw4"></div>
+  </div>
+
+  <!-- RW5 -->
+  <div class="page" id="page-rw5">
+    <div class="pgh"><div class="phi phi-rw">✉️</div><div>
+      <h2>Reading — Part 5: Open Cloze</h2>
+      <p>An email with six gaps. Candidate types ONE word per gap.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>25–30</strong></span><span class="mp">Format: <strong>open cloze</strong></span></div>
+    </div></div>
+    <div id="rw5-ec"></div>
+    <div class="stitle" style="margin-top:4px">Answer key — gaps 25–30</div>
+    <div id="rw5-ac"></div>
+  </div>
+
+  <!-- RW6 -->
+  <div class="page" id="page-rw6">
+    <div class="pgh"><div class="phi phi-rw">✍️</div><div>
+      <h2>Writing — Part 6: Guided Writing</h2>
+      <p>Candidate writes an email or note of 25+ words, guided by a scenario and three bullet points.</p>
+      <div class="mpills"><span class="mp">Question: <strong>31</strong></span><span class="mp">Min. length: <strong>25 words</strong></span></div>
+    </div></div>
+    <div id="rw6-c"></div>
+  </div>
+
+  <!-- RW7 -->
+  <div class="page" id="page-rw7">
+    <div class="pgh"><div class="phi phi-rw">🖼️</div><div>
+      <h2>Writing — Part 7: Picture Story</h2>
+      <p>Three sequential cartoon illustrations. Candidate writes a story of 35+ words.</p>
+      <div class="mpills"><span class="mp">Question: <strong>32</strong></span><span class="mp">Min. length: <strong>35 words</strong></span><span class="mp">Format: <strong>3 image URLs</strong></span></div>
+    </div></div>
+    <div id="rw7-c"></div>
+  </div>
+
+  <!-- LS1 -->
+  <div class="page" id="page-ls1">
+    <div class="pgh"><div class="phi phi-ls">🎧</div><div>
+      <h2>Listening — Part 1: Picture Multiple Choice</h2>
+      <p>One audio track with five short dialogues. Candidate selects one correct picture from three options per dialogue.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>1–5</strong></span><span class="mp">Audio: <strong>1 track</strong></span></div>
+    </div></div>
+    <div id="ls1-ac"></div>
+    <div class="stitle">Questions 1–5 — picture options</div>
+    <div class="ql" id="ql-ls1"></div>
+  </div>
+
+  <!-- LS2 -->
+  <div class="page" id="page-ls2">
+    <div class="pgh"><div class="phi phi-ls">📝</div><div>
+      <h2>Listening — Part 2: Note / Form Fill</h2>
+      <p>One audio track — a monologue. Candidate fills in 5 gaps in a notes form.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>6–10</strong></span><span class="mp">Audio: <strong>1 monologue track</strong></span></div>
+    </div></div>
+    <div id="ls2-ac"></div>
+    <div id="ls2-fc"></div>
+  </div>
+
+  <!-- LS3 -->
+  <div class="page" id="page-ls3">
+    <div class="pgh"><div class="phi phi-ls">💬</div><div>
+      <h2>Listening — Part 3: Dialogue Multiple Choice</h2>
+      <p>One audio track — a longer dialogue. Candidate answers five 3-option questions.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>11–15</strong></span><span class="mp">Audio: <strong>1 dialogue track</strong></span></div>
+    </div></div>
+    <div id="ls3-ac"></div>
+    <div class="stitle">Questions 11–15</div>
+    <div class="ql" id="ql-ls3"></div>
+  </div>
+
+  <!-- LS4 -->
+  <div class="page" id="page-ls4">
+    <div class="pgh"><div class="phi phi-ls">📻</div><div>
+      <h2>Listening — Part 4: Short Monologues / Dialogues</h2>
+      <p>One audio track containing five short clips. One 3-option question per clip — focused on gist.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>16–20</strong></span><span class="mp">Audio: <strong>1 track, 5 clips</strong></span></div>
+    </div></div>
+    <div id="ls4-ac"></div>
+    <div class="stitle">Questions 16–20</div>
+    <div class="ql" id="ql-ls4"></div>
+  </div>
+
+  <!-- LS5 -->
+  <div class="page" id="page-ls5">
+    <div class="pgh"><div class="phi phi-ls">🔀</div><div>
+      <h2>Listening — Part 5: Matching</h2>
+      <p>One audio track — a dialogue. Match six names to one of eight activities. Q0 is the pre-answered example.</p>
+      <div class="mpills"><span class="mp">Questions: <strong>0 (ex) + 21–25</strong></span><span class="mp">Audio: <strong>1 dialogue track</strong></span></div>
+    </div></div>
+    <div id="ls5-ac"></div>
+    <div id="ls5-mc"></div>
+  </div>
+
+</main>
 </div>
 
-<!-- MODAL -->
-<div id="mbg" onclick="closeMBg(event)">
+<!-- NEW VARIANT MODAL -->
+<div id="modal-bg">
   <div class="modal">
-    <h3>Create new variant</h3>
-    <p class="mdesc">Enter a unique ID using <strong>digits and uppercase Latin letters only</strong> (A–Z, 0–9). Up to 12 characters.</p>
+    <h3>Create new exam variant</h3>
+    <p class="modal-sub">Enter a unique identifier using <strong>capital letters (A–Z) and digits (0–9)</strong> only, 2–12 characters.</p>
     <div class="mid-fi">
       <label>Variant ID</label>
-      <input id="vid" type="text" placeholder="e.g. A1" maxlength="12"
-        oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
-        onkeydown="if(event.key==='Enter')confirmVariant()">
+      <input type="text" id="vid-inp" placeholder="e.g. A1" maxlength="12" autocomplete="off"
+        oninput="validateVid()" onkeydown="if(event.key==='Enter')createVariant()">
     </div>
     <div class="merr" id="vid-err"></div>
-    <div class="mexs">Examples: <span>A1</span><span>2026B</span><span>TEST01</span><span>KZ24A</span></div>
+    <div class="mexm">Examples: <code>2025A</code> <code>KZ01</code> <code>TEST1</code> <code>MOCK2B</code></div>
     <div class="modal-btns">
       <button class="mbtn" onclick="closeModal()">Cancel</button>
-      <button class="mbtn primary" onclick="confirmVariant()">Create</button>
+      <button class="mbtn primary" onclick="createVariant()">Create variant</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="del-modal-bg">
+  <div class="del-modal">
+    <h3>Delete variant <span id="del-vid-lbl" style="font-family:'DM Mono',monospace;font-weight:700"></span>?</h3>
+    <p>All questions for this variant will be permanently removed from the database. This cannot be undone.</p>
+    <div class="del-modal-btns">
+      <button class="dbtn-c" onclick="closeDelModal()">Cancel</button>
+      <button class="dbtn-d" onclick="confirmDel()">Delete variant</button>
     </div>
   </div>
 </div>
@@ -252,814 +449,934 @@ main{flex:1;overflow-y:auto;padding:22px 26px 48px}
 <div id="toast"></div>
 
 <script>
-/* ═══════════════════════════════════
-   CONFIG
-═══════════════════════════════════ */
-const BIN_ID  = '6a022b31c0954111d80b71d2';
-const MKEY    = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
-const API     = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-const HDRS    = {'Content-Type':'application/json','X-Master-Key':MKEY};
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+const BIN = '6a022b31c0954111d80b71d2';
+const KEY = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const URL_BASE = `https://api.jsonbin.io/v3/b/${BIN}`;
 
-/* ═══════════════════════════════════
-   STATE
-═══════════════════════════════════ */
-let db = { variants:{} };
-let cur = null;   // current variant id
-let curPage = 'overview';
-let dirty = false;
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let db = { variants: {} };
+let cv = null; // current variant ID
+let curPage = 'empty';
+let pendingDel = null;
+let saveTimer = null;
 
-/* ═══════════════════════════════════
-   BOOT
-═══════════════════════════════════ */
-async function boot() {
-  sync('busy');
+// ══════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  setSt('Loading…', false);
   try {
-    const r = await fetch(API, {headers:{'X-Master-Key':MKEY}});
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    const j = await r.json();
-    db = j.record || {variants:{}};
-    if (!db.variants) db.variants = {};
-    sync('ok');
+    const r = await fetch(`${URL_BASE}/latest`, {
+      headers: { 'X-Master-Key': KEY, 'X-Bin-Meta': 'false' }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    if (data && data.variants) db = data;
+    else db = { variants: {} };
+    setSt('All saved', true);
     renderTabs();
-    const keys = Object.keys(db.variants);
-    if (keys.length) selectVariant(keys[0]);
-    showToast('Loaded from JSONBin ✓');
+    const ids = Object.keys(db.variants);
+    if (ids.length) selectVariant(ids[0]);
   } catch(e) {
-    sync('err');
-    showToast('Load error: '+e.message,'err');
+    setSt('Load failed — working offline', false);
+    toast('Could not reach database. Check you are on localhost, not file://', 'err');
+    // Still render whatever is already in memory so the UI is usable
+    renderTabs();
+    const ids = Object.keys(db.variants);
+    if (ids.length) selectVariant(ids[0]);
   }
+});
+
+// ══════════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════════
+function setSt(msg, ok) {
+  const el = document.getElementById('sync-st');
+  el.textContent = msg;
+  el.style.color = ok ? 'rgba(255,255,255,.5)' : '#FCA5A5';
 }
 
-/* ═══════════════════════════════════
-   SAVE
-═══════════════════════════════════ */
 async function saveAll() {
-  if (!dirty) { showToast('Nothing to save'); return; }
-  sync('busy');
+  if (!cv) return toast('No variant selected.', 'err');
+  collect();
+  setSt('Saving…', false);
+  document.getElementById('btn-save').disabled = true;
   try {
-    const r = await fetch(API, {method:'PUT', headers:HDRS, body:JSON.stringify(db)});
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    dirty = false;
-    sync('ok');
-    showToast('Saved to JSONBin ✓');
+    const r = await fetch(URL_BASE, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': KEY },
+      body: JSON.stringify(db)
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    setSt('All saved', true);
+    toast('Saved to database ✓', 'ok');
   } catch(e) {
-    sync('err');
-    showToast('Save error: '+e.message,'err');
+    setSt('Save failed', false);
+    toast('Save failed: ' + e.message, 'err');
+  } finally {
+    document.getElementById('btn-save').disabled = false;
   }
 }
 
-function sync(state) {
-  const d = document.getElementById('sdot');
-  d.className = 'sdot ' + state;
-  d.title = state==='busy'?'Syncing…':state==='err'?'Sync error':'Saved';
+function scheduleSave() {
+  setSt('Unsaved changes', false);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveAll, 4000);
 }
-function markDirty() { dirty=true; sync('busy'); }
 
-/* ═══════════════════════════════════
-   VARIANT TABS
-═══════════════════════════════════ */
+async function saveNow() { collect(); await saveAll(); }
+
+// ══════════════════════════════════════════
+// VARIANTS
+// ══════════════════════════════════════════
 function renderTabs() {
-  const c = document.getElementById('vtabs'); c.innerHTML='';
+  const c = document.getElementById('vtabs');
+  c.innerHTML = '';
   Object.keys(db.variants).forEach(id => {
     const t = document.createElement('div');
-    t.className = 'vtab'+(id===cur?' active':'');
-    t.innerHTML = `${id}<span class="vdel" title="Delete" onclick="delVariant(event,'${id}')"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span>`;
-    t.addEventListener('click', e=>{ if(!e.target.closest('.vdel')) selectVariant(id); });
+    t.className = 'vtab' + (id === cv ? ' active' : '');
+    t.dataset.id = id;
+    t.innerHTML = `${id}<span class="vdel" onclick="event.stopPropagation();openDelModal('${id}')" title="Delete variant">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </span>`;
+    t.addEventListener('click', () => selectVariant(id));
     c.appendChild(t);
   });
 }
 
 function selectVariant(id) {
-  cur = id; renderTabs();
-  document.getElementById('aside-empty').style.display='none';
-  document.getElementById('aside-nav').style.display='block';
-  document.getElementById('empty-v').style.display='none';
-  // Remove old pages
-  document.querySelectorAll('.page').forEach(p=>p.remove());
-  showPage(curPage, document.getElementById('nav-'+curPage)||document.getElementById('nav-overview'));
+  if (!db.variants[id]) return;
+  cv = id;
+  renderTabs();
+  document.getElementById('empty-aside').style.display = 'none';
+  document.getElementById('snav').style.display = 'block';
+  // Land on Part 1 so cards are immediately visible
+  const rw1Item = document.querySelector('#snav .aside-item[onclick*="rw1"]');
+  showPage('rw1', rw1Item);
+  buildAll();
 }
 
-function delVariant(e,id) {
-  e.stopPropagation();
-  if (!confirm(`Delete variant "${id}"? This cannot be undone.`)) return;
-  delete db.variants[id];
-  if (cur===id) {
-    cur=null;
-    const keys=Object.keys(db.variants);
-    if (keys.length) { selectVariant(keys[0]); }
-    else {
-      document.getElementById('aside-empty').style.display='';
-      document.getElementById('aside-nav').style.display='none';
-      document.getElementById('empty-v').style.display='flex';
-      document.querySelectorAll('.page').forEach(p=>p.remove());
-    }
-  }
-  renderTabs(); markDirty(); showToast(`Variant ${id} deleted`);
-}
-
-/* ═══════════════════════════════════
-   MODAL
-═══════════════════════════════════ */
-function openModal() {
-  const inp=document.getElementById('vid'); inp.value='';
-  document.getElementById('vid-err').textContent='';
-  inp.classList.remove('err');
-  document.getElementById('mbg').classList.add('show');
-  setTimeout(()=>inp.focus(),80);
-}
-function closeModal(){ document.getElementById('mbg').classList.remove('show'); }
-function closeMBg(e){ if(e.target===document.getElementById('mbg')) closeModal(); }
-
-function confirmVariant() {
-  const inp=document.getElementById('vid');
-  const val=inp.value.trim().toUpperCase();
-  const err=document.getElementById('vid-err');
-  if (!val){ inp.classList.add('err'); err.textContent='Please enter an ID.'; return; }
-  if (!/^[A-Z0-9]+$/.test(val)){ inp.classList.add('err'); err.textContent='Only A–Z and 0–9 allowed.'; return; }
-  if (db.variants[val]){ inp.classList.add('err'); err.textContent=`"${val}" already exists.`; return; }
-  inp.classList.remove('err'); err.textContent='';
-  db.variants[val] = emptyVariant(val);
-  closeModal(); renderTabs(); selectVariant(val); markDirty();
-  showToast(`Variant ${val} created`);
-}
-
-/* ═══════════════════════════════════
-   EMPTY VARIANT TEMPLATE
-═══════════════════════════════════ */
-function emptyVariant(id) {
-  const mc3 = (n,offset=0) => Array.from({length:n},(_,i)=>({n:i+1+offset,text:'',optA:'',optB:'',optC:'',correct:''}));
+// ══════════════════════════════════════════
+// EMPTY VARIANT TEMPLATE
+// ══════════════════════════════════════════
+function emptyVariant() {
   return {
-    meta:{id,created:new Date().toISOString().slice(0,10)},
-    rw:{
-      p1: Array.from({length:6},(_,i)=>({n:i+1,imageUrl:'',text:'',optA:'',optB:'',optC:'',correct:''})),
-      p2:{
-        persons:[
-          {letter:'A',name:'',photoUrl:'',profile:''},
-          {letter:'B',name:'',photoUrl:'',profile:''},
-          {letter:'C',name:'',photoUrl:'',profile:''}
-        ],
-        questions:Array.from({length:7},(_,i)=>({n:i+7,text:'',correct:''}))
-      },
-      p3:{title:'',byline:'',body:'',imageUrl:'',questions:mc3(5,13)},
-      p4:{title:'',body:'',gaps:Array.from({length:6},(_,i)=>({n:i+19,optA:'',optB:'',optC:'',correct:''}))},
-      p5:{from:'',to:'',exampleWord:'',body:'',replyBody:'',answers:Array.from({length:6},(_,i)=>({n:i+25,correct:'',alsoAccept:''}))},
-      p6:{scenario:'',bullet1:'',bullet2:'',bullet3:'',recipient:''},
-      p7:{img1:'',img2:'',img3:'',note:''}
+    rw1: Array.from({length:6}, () => ({img:'',text:'',question:'',optA:'',optB:'',optC:'',correct:''})),
+    rw2: {
+      persons: [{name:'',photo:'',profile:''},{name:'',photo:'',profile:''},{name:'',photo:'',profile:''}],
+      questions: Array.from({length:7}, () => ({text:'',correct:''}))
     },
-    ls:{
-      p1:{audioUrl:'',context:'',questions:Array.from({length:5},(_,i)=>({n:i+1,text:'',imgA:'',imgB:'',imgC:'',correct:''}))},
-      p2:{audioUrl:'',context:'',notesTitle:'',exampleLabel:'',exampleAnswer:'',rows:Array.from({length:5},(_,i)=>({n:i+6,label:'',correct:'',alsoAccept:''}))},
-      p3:{audioUrl:'',context:'',questions:mc3(5,10)},
-      p4:{audioUrl:'',context:'',questions:mc3(5,15)},
-      p5:{audioUrl:'',context:'',names:Array.from({length:6},(_,i)=>({n:i===0?'0':String(20+i),name:'',answer:''})),options:Array.from({length:8},(_,i)=>({letter:String.fromCharCode(65+i),text:''}))}
-    }
+    rw3: {title:'',byline:'',body:'',illustration:'',
+      questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
+    rw4: {title:'',body:'',
+      gaps: Array.from({length:6}, () => ({optA:'',optB:'',optC:'',correct:''}))},
+    rw5: {from:'',to:'',example:'',body:'',reply:'',
+      answers: Array.from({length:6}, () => ({answer:'',also:''}))},
+    rw6: {scenario:'',bullet1:'',bullet2:'',bullet3:'',recipient:''},
+    rw7: {img1:'',img2:'',img3:'',note:''},
+    ls1: {audio:'',context:'',
+      questions: Array.from({length:5}, () => ({text:'',picA:'',picB:'',picC:'',correct:''}))},
+    ls2: {audio:'',context:'',title:'',exLbl:'',exAns:'',
+      rows: Array.from({length:5}, () => ({label:'',answer:'',also:''}))},
+    ls3: {audio:'',context:'',
+      questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
+    ls4: {audio:'',context:'',
+      questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
+    ls5: {audio:'',context:'',
+      names: Array(6).fill(''), activities: Array(8).fill(''), answers: Array(6).fill('')}
   };
 }
 
-/* ═══════════════════════════════════
-   PAGE ROUTING
-═══════════════════════════════════ */
-function showPage(pageId, el) {
-  curPage=pageId;
-  document.querySelectorAll('.aside-item').forEach(a=>a.classList.remove('active'));
-  if(el) el.classList.add('active');
-  let pg=document.getElementById('pg-'+pageId);
-  if (!pg) {
-    pg=document.createElement('div');
-    pg.className='page'; pg.id='pg-'+pageId;
-    pg.innerHTML=buildPage(pageId);
-    document.getElementById('main-content').appendChild(pg);
+// ══════════════════════════════════════════
+// MODAL — NEW VARIANT
+// ══════════════════════════════════════════
+function openModal() {
+  document.getElementById('vid-inp').value = '';
+  document.getElementById('vid-err').textContent = '';
+  document.getElementById('vid-inp').classList.remove('err');
+  document.getElementById('modal-bg').classList.add('show');
+  setTimeout(() => document.getElementById('vid-inp').focus(), 80);
+}
+function closeModal() { document.getElementById('modal-bg').classList.remove('show'); }
+
+function validateVid() {
+  const inp = document.getElementById('vid-inp');
+  const v = inp.value.toUpperCase();
+  inp.value = v;
+  const err = document.getElementById('vid-err');
+  if (!v) { err.textContent = ''; inp.classList.remove('err'); return false; }
+  if (!/^[A-Z0-9]+$/.test(v)) { err.textContent = 'Only letters A–Z and digits 0–9 are allowed.'; inp.classList.add('err'); return false; }
+  if (v.length < 2) { err.textContent = 'Minimum 2 characters.'; inp.classList.add('err'); return false; }
+  if (db.variants[v]) { err.textContent = `Variant "${v}" already exists.`; inp.classList.add('err'); return false; }
+  err.textContent = ''; inp.classList.remove('err'); return true;
+}
+
+function createVariant() {
+  if (!validateVid()) return;
+  const id = document.getElementById('vid-inp').value.toUpperCase();
+  db.variants[id] = emptyVariant();
+  closeModal();
+  renderTabs();
+  selectVariant(id);
+  scheduleSave();
+  toast(`Variant ${id} created`, 'ok');
+}
+
+// ══════════════════════════════════════════
+// MODAL — DELETE VARIANT
+// ══════════════════════════════════════════
+function openDelModal(id) {
+  pendingDel = id;
+  document.getElementById('del-vid-lbl').textContent = id;
+  document.getElementById('del-modal-bg').classList.add('show');
+}
+function closeDelModal() { document.getElementById('del-modal-bg').classList.remove('show'); pendingDel = null; }
+
+function confirmDel() {
+  if (!pendingDel) return;
+  const id = pendingDel;
+  delete db.variants[id];
+  const wasActive = cv === id;
+  if (wasActive) cv = null;
+  closeDelModal();
+  renderTabs();
+  if (wasActive) {
+    const ids = Object.keys(db.variants);
+    if (ids.length) selectVariant(ids[0]);
+    else {
+      document.getElementById('empty-aside').style.display = '';
+      document.getElementById('snav').style.display = 'none';
+      showPage('empty', null);
+    }
   }
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('visible'));
-  pg.classList.add('visible');
+  scheduleSave();
+  toast(`Variant ${id} deleted`, 'ok');
 }
 
-function buildPage(id) {
-  const v=db.variants[cur];
-  if (!v) return '';
-  switch(id){
-    case 'overview': return pgOverview(v);
-    case 'rw1': return pgRW1(v);
-    case 'rw2': return pgRW2(v);
-    case 'rw3': return pgRW3(v);
-    case 'rw4': return pgRW4(v);
-    case 'rw5': return pgRW5(v);
-    case 'rw6': return pgRW6(v);
-    case 'rw7': return pgRW7(v);
-    case 'ls1': return pgLS1(v);
-    case 'ls2': return pgLS2(v);
-    case 'ls3': return pgLS3(v);
-    case 'ls4': return pgLS4(v);
-    case 'ls5': return pgLS5(v);
-    default: return '<p>Unknown page.</p>';
-  }
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function showPage(id, el) {
+  collect();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.aside-item').forEach(a => a.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('visible');
+  if (el) el.classList.add('active');
+  curPage = id;
+  document.getElementById('main-area').scrollTop = 0;
 }
 
-/* ═══════════════════════════════════
-   HTML HELPERS
-═══════════════════════════════════ */
-const E = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-const fi = (lbl,inp,hint='') => `<div class="fi"><label>${lbl}</label>${inp}${hint?`<span class="fhint">${hint}</span>`:''}</div>`;
-const inp  = (p,v,t='text') => `<input type="${t}" placeholder="${E(p)}" value="${E(v)}" onchange="markDirty()">`;
-const url  = (p,v) => `<input type="url" placeholder="${E(p)}" value="${E(v)}" onchange="markDirty()">`;
-const ta   = (p,v,r=3) => `<textarea placeholder="${E(p)}" rows="${r}" onchange="markDirty()">${E(v)}</textarea>`;
-const pill = (l,v) => `<span class="pill">${l}: <strong>${v}</strong></span>`;
-const tag  = (cls,t) => `<span class="qtag ${cls}">${t}</span>`;
-const sbtn = (fn) => `<div class="brow"><button class="btn btn-p" onclick="${fn}">Save</button></div>`;
-
-function pgHead(icon,cls,title,desc,pills) {
-  return `<div class="pg-head"><div class="phi ${cls}">${icon}</div><div><h2>${title}</h2><p>${desc}</p><div class="pills">${pills}</div></div></div>`;
+// ══════════════════════════════════════════
+// BUILD ALL FORMS
+// ══════════════════════════════════════════
+function buildAll() {
+  if (!cv || !db.variants[cv]) return;
+  bRW1(); bRW2(); bRW3(); bRW4(); bRW5(); bRW6(); bRW7();
+  bLS1(); bLS2(); bLS3(); bLS4(); bLS5();
 }
 
-function qCard(num,title,sub,tags,body,open=false) {
-  return `<div class="qcard${open?' open':''}">
-  <div class="qch" onclick="this.closest('.qcard').classList.toggle('open')">
-    <span class="qnum">${num}</span>
-    <div><div class="qtitle">${title}</div>${sub?`<div class="qsub">${sub}</div>`:''}</div>
-    ${tags}
-    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
-  </div>
-  <div class="qcb">${body}</div>
-</div>`;
-}
+function D() { return db.variants[cv]; }
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-function opts3(pid,q) {
-  return ['A','B','C'].map(l=>`<div class="opt-row${q.correct===l?' correct':''}" id="or-${pid}-${l}">
-  <div class="opt-letter">${l}</div>
-  <input type="text" placeholder="Option ${l}…" value="${E(q['opt'+l])}" onchange="markDirty()">
-  <button class="mkbtn" onclick="setCorrect('${pid}','${l}')">${q.correct===l?'✓ Correct':'Mark correct'}</button>
-</div>`).join('');
-}
-
-function abcBtns(pid,correct) {
-  return `<div style="display:flex;gap:7px;margin-top:8px">`+
-    ['A','B','C'].map(l=>`<button class="abcbtn${correct===l?' sel':''}" id="abc-${pid}-${l}" onclick="setABC('${pid}','${l}')">${correct===l?'✓ '+l:l}</button>`).join('')+
-  `</div>`;
-}
-
-function auBlock(label,urlVal,hint='Approx. 2–3 min. Played twice during the exam.') {
-  return `<div class="au-block">
-  <div class="au-head">
-    <div class="au-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
-    ${label}
-  </div>
-  ${fi('Audio URL (MP3 / OGG / WAV)', url('https://example.com/audio.mp3', urlVal), hint)}
-</div>`;
-}
-
-/* ═══════════════════════════════════
-   CORRECT ANSWER SETTERS
-═══════════════════════════════════ */
-function setCorrect(pid,letter) {
-  ['A','B','C'].forEach(l => {
-    const row=document.getElementById(`or-${pid}-${l}`);
-    if(!row) return;
-    const active=l===letter;
-    row.classList.toggle('correct',active);
-    row.querySelector('.mkbtn').textContent=active?'✓ Correct':'Mark correct';
-  });
-  markDirty();
-}
-function setABC(pid,letter) {
-  ['A','B','C'].forEach(l => {
-    const btn=document.getElementById(`abc-${pid}-${l}`);
-    if(!btn) return;
-    const active=l===letter;
-    btn.classList.toggle('sel',active);
-    btn.textContent=active?'✓ '+l:l;
-  });
-  markDirty();
-}
-
-/* ═══════════════════════════════════
-   PAGE BUILDERS
-═══════════════════════════════════ */
-
-/* OVERVIEW */
-function pgOverview(v) {
-  return pgHead('📋','rw',`Variant <span style="font-family:'DM Mono',monospace;font-weight:700">${v.meta.id}</span>`,
-    `Created ${v.meta.created}. Select a section from the sidebar to add content.`,
-    pill('R&amp;W','7 parts · 32 Qs · 1 hr')+pill('Listening','5 parts · 25 Qs · 30 min'))+
-  `<div class="callout"><strong>Getting started:</strong> Fill in every section. Images must be HTTPS URLs. Audio must be HTTPS MP3/OGG. Writing tasks need only the prompt — no model answer. Use "Save to JSONBin" often.</div>
-  <div class="sc-grid">
-    <div class="sc"><div class="sc-val">7</div><div class="sc-lbl">Parts — Reading &amp; Writing</div><div class="sc-sub">Parts 1–5 reading (30 Qs). Parts 6–7 writing (2 tasks).</div></div>
-    <div class="sc"><div class="sc-val">5</div><div class="sc-lbl">Parts — Listening</div><div class="sc-sub">One shared audio track per part (5 tracks total).</div></div>
-  </div>
-  <div class="stbl-wrap">
-    <div class="stbl-ph">Paper 1 — Reading &amp; Writing</div>
-    ${strow('Part 1','6 signs/notices — image URL or typed text + 3 MC options','6 Qs')}
-    ${strow('Part 2','3 person profiles (text + optional photo) + 7 matching Qs','7 Qs')}
-    ${strow('Part 3','1 long text + optional photo + 5 MC questions','5 Qs')}
-    ${strow('Part 4','Cloze text — 6 gaps, 3 word options each','6 Qs')}
-    ${strow('Part 5','Email open cloze — 6 gaps, 1-word answers','6 Qs')}
-    ${strow('Part 6','Guided writing — scenario + 3 bullets → email 25+ words','1 task')}
-    ${strow('Part 7','Picture story — 3 sequential illustration URLs → story 35+ words','1 task')}
-    <div class="stbl-ph">Paper 2 — Listening</div>
-    ${strow('Part 1','1 audio track · 5 short dialogues · choose correct picture (A/B/C)','5 Qs')}
-    ${strow('Part 2','1 monologue · note-fill form with 5 blank rows','5 Qs')}
-    ${strow('Part 3','1 dialogue · 5 MC questions about key information','5 Qs')}
-    ${strow('Part 4','1 audio (5 short clips) · 1 MC question each','5 Qs')}
-    ${strow('Part 5','1 matching dialogue · 6 names → 8 activities','6 Qs')}
+// ── helpers ──
+function optRow(letter, val, correct) {
+  return `<div class="orow${correct?' correct':''}" data-opt="${letter}">
+    <div class="ol">${letter}</div>
+    <input type="text" placeholder="Option ${letter}…" data-key="opt${letter}" value="${esc(val)}">
+    <button class="mkb" onclick="markCorrect(this)">${correct?'✓ Correct':'Mark correct'}</button>
   </div>`;
 }
-function strow(n,t,q){ return `<div class="stbl-row"><span class="stbl-name">${n}</span><span class="stbl-type">${t}</span><span class="stbl-qs">${q}</span></div>`; }
 
-/* R&W PART 1 */
-function pgRW1(v) {
-  const cards = v.rw.p1.map((q,i) => {
-    const pid=`rw1-${i}`;
-    const body=`<div class="callout" style="margin-bottom:12px">Use <strong>Image URL</strong> for a photograph of a real notice or sign. Use <strong>Typed text</strong> for messages, emails, or simple written notices. Use one or the other, not both.</div>
+function mcBtns(letters, correct, fn) {
+  return letters.map(l =>
+    `<button class="mkb" style="${correct===l?'background:#ECFDF5;border-color:#86EFAC;color:var(--ok)':''}" onclick="${fn}(this,'${l}')">${l}</button>`
+  ).join('');
+}
+
+function auBlock(audio, ctx, dAu, dCtx, hint) {
+  return `<div class="au-blk">
+    <div class="au-head">
+      <div class="au-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+      Audio track for this part
+    </div>
     <div class="fg fg2">
-      ${fi('Sign / notice image URL', url('https://…', q.imageUrl), 'HTTPS photo of the sign, advertisement, or notice.')}
-      ${fi('OR: Typed text content', ta('Type the text exactly as it should appear to the candidate…', q.text, 3), 'For chat messages, emails, or simple text notices.')}
-    </div>
-    <div class="opts-block"><div class="opts-lbl">Answer options — mark the correct one</div>${opts3(pid,q)}</div>
-    ${sbtn(`saveRW1(${i})`)}`;
-    return qCard(q.n, `Question ${q.n}`, 'Short text / sign', tag('tim','Image or text')+tag('tmc','MC × 3'), body, i===0);
-  }).join('');
-  return pgHead('📋','rw','Reading — Part 1: Signs &amp; Short Texts',
-    'Six real-world texts. Candidate selects the option that best describes the meaning.',
-    pill('Questions','1 – 6')+pill('Format','3-option MC'))+
-    `<div class="qlist">${cards}</div>`;
-}
-function saveRW1(i) {
-  const pg=document.getElementById('pg-rw1'); if(!pg) return;
-  const card=pg.querySelectorAll('.qcard')[i];
-  const ins=card.querySelectorAll('input[type=url],textarea');
-  const opts=card.querySelectorAll('.opt-row input[type=text]');
-  const v=db.variants[cur];
-  v.rw.p1[i].imageUrl=ins[0]?.value||'';
-  v.rw.p1[i].text=ins[1]?.value||'';
-  v.rw.p1[i].optA=opts[0]?.value||'';
-  v.rw.p1[i].optB=opts[1]?.value||'';
-  v.rw.p1[i].optC=opts[2]?.value||'';
-  const corr=card.querySelector('.opt-row.correct .opt-letter');
-  if(corr) v.rw.p1[i].correct=corr.textContent.trim();
-  markDirty(); showToast(`Q${v.rw.p1[i].n} saved`);
-}
-
-/* R&W PART 2 */
-function pgRW2(v) {
-  const pcards = v.rw.p2.persons.map((p,i) => {
-    const body=`<div class="fg fg2">
-      ${fi('Name', inp('e.g. Tanya', p.name))}
-      ${fi('Photo URL (optional)', url('https://…', p.photoUrl), 'Small portrait shown beside the profile.')}
-    </div>
-    <div style="margin-top:10px">${fi('Profile paragraph', ta('Write the profile text for this person…', p.profile, 5), 'Approx. 80–120 words.')}</div>
-    ${sbtn(`saveRW2p(${i})`)}`;
-    return qCard(p.letter, `Person ${p.letter}`, p.name||'(unnamed)', tag('tmt','Profile'), body, false);
-  }).join('');
-
-  const qcards = v.rw.p2.questions.map((q,i) => {
-    const pid=`rw2q-${i}`;
-    const body=`${fi('Question text', inp('e.g. Who took a photo in the evening?', q.text))}
-    <div class="opts-block"><div class="opts-lbl">Correct person (A, B, or C)</div>${abcBtns(pid,q.correct)}</div>
-    ${sbtn(`saveRW2q(${i})`)}`;
-    return qCard(q.n, `Question ${q.n}`, '', tag('tmt','A / B / C'), body, false);
-  }).join('');
-
-  return pgHead('🔗','rw','Reading — Part 2: Person Matching',
-    'Three people with profile texts. Seven questions ask which person (A/B/C) matches each statement.',
-    pill('Questions','7 – 13')+pill('Format','3-person matching'))+
-    `<div class="stitle">Three person profiles</div><div class="qlist">${pcards}</div>
-    <div style="height:1px;background:var(--bd);margin:14px 0"></div>
-    <div class="stitle">Questions 7 – 13</div><div class="qlist">${qcards}</div>`;
-}
-function saveRW2p(i) {
-  const pg=document.getElementById('pg-rw2'); if(!pg) return;
-  const card=pg.querySelectorAll('.qcard')[i];
-  const ins=card.querySelectorAll('input,textarea');
-  const v=db.variants[cur];
-  v.rw.p2.persons[i].name=ins[0]?.value||'';
-  v.rw.p2.persons[i].photoUrl=ins[1]?.value||'';
-  v.rw.p2.persons[i].profile=ins[2]?.value||'';
-  markDirty(); showToast(`Person ${v.rw.p2.persons[i].letter} saved`);
-  // refresh title
-  card.querySelector('.qsub').textContent=v.rw.p2.persons[i].name||'(unnamed)';
-}
-function saveRW2q(i) {
-  const pg=document.getElementById('pg-rw2'); if(!pg) return;
-  const card=pg.querySelectorAll('.qcard')[3+i];
-  const inp=card.querySelector('input');
-  const v=db.variants[cur];
-  v.rw.p2.questions[i].text=inp?.value||'';
-  const sel=card.querySelector('.abcbtn.sel');
-  if(sel) v.rw.p2.questions[i].correct=sel.textContent.replace('✓ ','');
-  markDirty(); showToast(`Q${v.rw.p2.questions[i].n} saved`);
-}
-
-/* R&W PART 3 */
-function pgRW3(v) {
-  const d=v.rw.p3;
-  const textCard=qCard('📄','Reading text','',tag('tmt','Long text'),`<div class="fg fg2">
-    ${fi('Title', inp('e.g. Summer Camp in Edinburgh', d.title))}
-    ${fi('Byline / subtitle (optional)', inp('e.g. by Emma Lee, age 12', d.byline))}
-  </div>
-  <div style="margin-top:10px">${fi('Article text', ta('Paste the full reading passage (approx. 200–250 words)…', d.body, 8))}</div>
-  <div style="margin-top:10px">${fi('Illustration URL (optional)', url('https://…', d.imageUrl), 'Large photo displayed below the text.')}</div>
-  ${sbtn('saveRW3text()')}`,true);
-
-  const qcards=d.questions.map((q,i)=>{
-    const pid=`rw3q-${i}`;
-    const body=`${fi('Question text', inp('Question…', q.text))}
-    <div class="opts-block"><div class="opts-lbl">Answer options</div>${opts3(pid,q)}</div>
-    ${sbtn(`saveRW3q(${i})`)}`;
-    return qCard(q.n,`Question ${q.n}`,'',tag('tmc','MC × 3'),body,false);
-  }).join('');
-
-  return pgHead('📖','rw','Reading — Part 3: Long Text',
-    'One longer text. Five MC questions on detailed meaning and main ideas.',
-    pill('Questions','14 – 18')+pill('Text length','200–250 words'))+
-    `<div class="qlist">${textCard}</div>
-    <div class="stitle">Questions 14 – 18</div><div class="qlist">${qcards}</div>`;
-}
-function saveRW3text() {
-  const pg=document.getElementById('pg-rw3'); if(!pg) return;
-  const card=pg.querySelector('.qcard');
-  const ins=card.querySelectorAll('input,textarea');
-  const v=db.variants[cur];
-  v.rw.p3.title=ins[0]?.value||''; v.rw.p3.byline=ins[1]?.value||'';
-  v.rw.p3.body=ins[2]?.value||''; v.rw.p3.imageUrl=ins[3]?.value||'';
-  markDirty(); showToast('Text saved');
-}
-function saveRW3q(i) {
-  const pg=document.getElementById('pg-rw3'); if(!pg) return;
-  const card=pg.querySelectorAll('.qcard')[1+i];
-  const q=db.variants[cur].rw.p3.questions[i];
-  q.text=card.querySelector('input[type=text]')?.value||'';
-  const opts=card.querySelectorAll('.opt-row input[type=text]');
-  q.optA=opts[0]?.value||''; q.optB=opts[1]?.value||''; q.optC=opts[2]?.value||'';
-  const corr=card.querySelector('.opt-row.correct .opt-letter');
-  if(corr) q.correct=corr.textContent.trim();
-  markDirty(); showToast(`Q${q.n} saved`);
-}
-
-/* R&W PART 4 */
-function pgRW4(v) {
-  const d=v.rw.p4;
-  const textCard=qCard('📄','Cloze text','',tag('tmt','Text with gaps'),`${fi('Title', inp('e.g. The Talent Factory', d.title))}
-  <div style="margin-top:10px">${fi('Full cloze text', ta('Type the text. Mark gaps as (19), (20)… (24). E.g.: …a new music school (19) ______ has courses…', d.body, 7), 'Use (19)–(24) notation for the six gaps.')}</div>
-  ${sbtn('saveRW4text()')}`,true);
-
-  const gcards=d.gaps.map((g,i)=>{
-    const pid=`rw4g-${i}`;
-    const body=`<div class="opts-block"><div class="opts-lbl">Three word options for gap ${g.n}</div>${opts3(pid,g)}</div>${sbtn(`saveRW4g(${i})`)}`;
-    return qCard(g.n,`Gap ${g.n}`,'',tag('tmc','MC × 3 words'),body,false);
-  }).join('');
-
-  return pgHead('🔤','rw','Reading — Part 4: Multiple-Choice Cloze',
-    'A factual text with 6 gaps. Candidate chooses the correct word from three options per gap.',
-    pill('Questions','19 – 24')+pill('Format','3-option word choice'))+
-    `<div class="qlist">${textCard}</div>
-    <div class="stitle">Questions 19 – 24 — gap options</div><div class="qlist">${gcards}</div>`;
-}
-function saveRW4text() {
-  const pg=document.getElementById('pg-rw4'); if(!pg) return;
-  const ins=pg.querySelector('.qcard .qcb').querySelectorAll('input,textarea');
-  const v=db.variants[cur]; v.rw.p4.title=ins[0]?.value||''; v.rw.p4.body=ins[1]?.value||'';
-  markDirty(); showToast('Cloze text saved');
-}
-function saveRW4g(i) {
-  const pg=document.getElementById('pg-rw4'); if(!pg) return;
-  const card=pg.querySelectorAll('.qcard')[1+i];
-  const g=db.variants[cur].rw.p4.gaps[i];
-  const opts=card.querySelectorAll('.opt-row input[type=text]');
-  g.optA=opts[0]?.value||''; g.optB=opts[1]?.value||''; g.optC=opts[2]?.value||'';
-  const corr=card.querySelector('.opt-row.correct .opt-letter');
-  if(corr) g.correct=corr.textContent.trim();
-  markDirty(); showToast(`Gap ${g.n} saved`);
-}
-
-/* R&W PART 5 */
-function pgRW5(v) {
-  const d=v.rw.p5;
-  const rows=d.answers.map(a=>`<tr>
-    <td><strong>${a.n}</strong></td>
-    <td><input type="text" placeholder="Correct word…" value="${E(a.correct)}" onchange="markDirty()"></td>
-    <td><input type="text" placeholder="Also accept…" value="${E(a.alsoAccept)}" onchange="markDirty()"></td>
-  </tr>`).join('');
-
-  return pgHead('✉️','rw','Reading — Part 5: Open Cloze (Email)',
-    'An email with 6 gaps. Candidate types ONE missing word per gap.',
-    pill('Questions','25 – 30')+pill('Format','Open cloze'))+
-  `<div class="qcard open">
-    <div class="qch" onclick="this.closest('.qcard').classList.toggle('open')">
-      <span class="qnum">✉</span><div><div class="qtitle">Email content</div></div>
-      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
-    </div>
-    <div class="qcb">
-      <div class="fg fg3">
-        ${fi('From', inp('e.g. Andrew', d.from))}
-        ${fi('To', inp('e.g. Sylvia', d.to))}
-        ${fi('Example word (gap 0)', inp('e.g. that', d.exampleWord), 'Pre-filled example shown to candidate before Q25.')}
+      <div class="fi"><label>Audio URL (MP3 / OGG)</label>
+        <input type="url" ${dAu} placeholder="https://…" value="${esc(audio)}">
+        <span class="fh">${hint||'One recording for the entire part. Must be HTTPS.'}</span>
       </div>
-      <div style="margin-top:10px">${fi('Email body', ta("Use (0) for the example and (25)–(30) for the 6 gaps. E.g.: I'm glad to hear (0) _______ you like your new school…", d.body, 7), '')}</div>
-      <div style="margin-top:10px">${fi('Reply email (optional)', ta('If the task includes a reply, write it here…', d.replyBody, 3), '')}</div>
-      ${sbtn('saveRW5email()')}
+      <div class="fi"><label>Context sentence (shown to candidate)</label>
+        <input type="text" ${dCtx} placeholder="You will hear…" value="${esc(ctx)}">
+      </div>
     </div>
-  </div>
-  <div class="stitle" style="margin-top:16px">Correct answers — gaps 25 – 30</div>
-  <table class="gtbl">
-    <thead><tr><th style="width:65px">Gap</th><th>Correct answer</th><th>Also accept</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <div class="brow"><button class="btn btn-p" onclick="saveRW5ans()">Save answers</button></div>`;
-}
-function saveRW5email() {
-  const pg=document.getElementById('pg-rw5'); if(!pg) return;
-  const ins=pg.querySelector('.qcard .qcb').querySelectorAll('input,textarea');
-  const d=db.variants[cur].rw.p5;
-  d.from=ins[0]?.value||''; d.to=ins[1]?.value||''; d.exampleWord=ins[2]?.value||'';
-  d.body=ins[3]?.value||''; d.replyBody=ins[4]?.value||'';
-  markDirty(); showToast('Email saved');
-}
-function saveRW5ans() {
-  const pg=document.getElementById('pg-rw5'); if(!pg) return;
-  pg.querySelectorAll('.gtbl tbody tr').forEach((row,i)=>{
-    const ins=row.querySelectorAll('input');
-    db.variants[cur].rw.p5.answers[i].correct=ins[0]?.value||'';
-    db.variants[cur].rw.p5.answers[i].alsoAccept=ins[1]?.value||'';
-  });
-  markDirty(); showToast('Answers saved');
+  </div>`;
 }
 
-/* R&W PART 6 */
-function pgRW6(v) {
-  const d=v.rw.p6;
-  return pgHead('✍️','rw','Writing — Part 6: Guided Writing',
-    'Candidate writes an email of 25+ words guided by a scenario and three bullet points.',
-    pill('Question','31')+pill('Min. length','25 words'))+
-  qCard('31','Task prompt','',tag('twr','Writing'),`${fi('Scenario instruction', ta("e.g. You want to invite your new classmate Shane to a birthday party next week. Write an email to Shane.", d.scenario, 3))}
-  <div style="height:1px;background:var(--bd);margin:14px 0"></div>
-  <div class="stitle">Three "Say:" bullet points</div>
-  <div class="fg fg2">
-    ${fi('Bullet 1', inp('e.g. when the party is', d.bullet1))}
-    ${fi('Bullet 2', inp('e.g. where the party is', d.bullet2))}
-  </div>
-  <div class="fg fg2" style="margin-top:10px">
-    ${fi('Bullet 3', inp('e.g. what food or drink he can bring', d.bullet3))}
-    ${fi('Recipient name (shown in email "To:" field)', inp('e.g. Shane', d.recipient))}
-  </div>
-  ${sbtn('saveRW6()')}`,true);
-}
-function saveRW6() {
-  const pg=document.getElementById('pg-rw6'); if(!pg) return;
-  const ins=pg.querySelectorAll('.qcb input,textarea');
-  const d=db.variants[cur].rw.p6;
-  d.scenario=ins[0]?.value||''; d.bullet1=ins[1]?.value||'';
-  d.bullet2=ins[2]?.value||''; d.bullet3=ins[3]?.value||''; d.recipient=ins[4]?.value||'';
-  markDirty(); showToast('Part 6 saved');
-}
-
-/* R&W PART 7 */
-function pgRW7(v) {
-  const d=v.rw.p7;
-  return pgHead('🖼️','rw','Writing — Part 7: Picture Story',
-    'Three sequential cartoon illustrations. Candidate writes a story of 35+ words.',
-    pill('Question','32')+pill('Min. length','35 words')+pill('Images','3 sequential URLs'))+
-  `<div class="callout">Use cartoon-style illustrations (not photographs). All three must tell a coherent sequence. Landscape format (4:3 or 16:9) works best.</div>`+
-  qCard('32','Picture story task','',tag('tim','3 Images')+tag('twr','Writing'),`<div class="fg fg3">
-    ${fi('Picture 1 URL — opening scene', url('https://…', d.img1), 'What starts the story?')}
-    ${fi('Picture 2 URL — development', url('https://…', d.img2), 'What happens next?')}
-    ${fi('Picture 3 URL — conclusion', url('https://…', d.img3), 'How does it end?')}
-  </div>
-  <div style="margin-top:10px">${fi('Internal note (not shown to candidate)', ta('Optional: describe what the story depicts, for your reference.', d.note, 2))}</div>
-  ${sbtn('saveRW7()')}`,true);
-}
-function saveRW7() {
-  const pg=document.getElementById('pg-rw7'); if(!pg) return;
-  const ins=pg.querySelectorAll('.qcb input[type=url],.qcb textarea');
-  const d=db.variants[cur].rw.p7;
-  d.img1=ins[0]?.value||''; d.img2=ins[1]?.value||''; d.img3=ins[2]?.value||''; d.note=ins[3]?.value||'';
-  markDirty(); showToast('Part 7 saved');
-}
-
-/* LISTENING PART 1 */
-function pgLS1(v) {
-  const d=v.ls.p1;
-  const qcards=d.questions.map((q,i)=>{
-    const pid=`ls1q-${i}`;
-    const body=`${fi('Question text', inp('e.g. What time does Greta have her tennis match?', q.text))}
-    <div style="height:1px;background:var(--bd);margin:12px 0"></div>
-    <div class="stitle">Three picture options</div>
-    <div class="fg fg3">
-      ${fi('Picture A URL', url('https://…', q.imgA), 'e.g. clock showing 2:30')}
-      ${fi('Picture B URL', url('https://…', q.imgB), 'e.g. clock showing 3:00')}
-      ${fi('Picture C URL', url('https://…', q.imgC), 'e.g. clock showing 4:15')}
-    </div>
-    <div class="opts-block"><div class="opts-lbl">Correct picture</div>${abcBtns(pid,q.correct)}</div>
-    ${sbtn(`saveLS1q(${i})`)}`;
-    return qCard(q.n,`Question ${q.n}`,'',tag('tim','3 Pictures'),body,i===0);
-  }).join('');
-
-  return pgHead('🎧','ls','Listening — Part 1: Picture Multiple Choice',
-    'One audio track containing five short dialogues. For each question, candidate picks the correct picture (A/B/C).',
-    pill('Questions','1 – 5')+pill('Audio','1 shared track')+pill('Format','3-picture choice'))+
-    auBlock('Audio track — Part 1 (contains all 5 short dialogues)', d.audioUrl,'All five short dialogues in sequence. Each dialogue plays twice.')+
-    `<div class="fg fg1" style="margin-bottom:14px">${fi('Context sentence (shown above questions)', inp('e.g. For each question, choose the correct picture.', d.context))}</div>
-    <div class="stitle">Five picture questions</div><div class="qlist">${qcards}</div>`;
-}
-function saveLS1q(i) {
-  const pg=document.getElementById('pg-ls1'); if(!pg) return;
-  const d=db.variants[cur].ls.p1;
-  d.audioUrl=pg.querySelector('.au-block input[type=url]')?.value||'';
-  d.context=pg.querySelector('.fg.fg1 input')?.value||'';
-  const card=pg.querySelectorAll('.qcard')[i];
-  const ins=card.querySelectorAll('input[type=text],input[type=url]');
-  d.questions[i].text=ins[0]?.value||'';
-  d.questions[i].imgA=ins[1]?.value||'';
-  d.questions[i].imgB=ins[2]?.value||'';
-  d.questions[i].imgC=ins[3]?.value||'';
-  const sel=card.querySelector('.abcbtn.sel');
-  if(sel) d.questions[i].correct=sel.textContent.replace('✓ ','');
-  markDirty(); showToast(`Q${d.questions[i].n} saved`);
-}
-
-/* LISTENING PART 2 */
-function pgLS2(v) {
-  const d=v.ls.p2;
-  const rows=d.rows.map(r=>`<tr>
-    <td><strong>${r.n}</strong></td>
-    <td><input type="text" placeholder="e.g. Cost of the ticket (students): £" value="${E(r.label)}" onchange="markDirty()"></td>
-    <td><input type="text" placeholder="e.g. 5.50" value="${E(r.correct)}" onchange="markDirty()"></td>
-    <td><input type="text" placeholder="Alternatives…" value="${E(r.alsoAccept)}" onchange="markDirty()"></td>
-  </tr>`).join('');
-
-  return pgHead('📝','ls','Listening — Part 2: Note / Form Fill',
-    'One monologue. Candidate fills in 5 gaps in a notes form with one word, number, date, or time.',
-    pill('Questions','6 – 10')+pill('Audio','1 monologue track'))+
-    auBlock('Audio track — Part 2 (monologue)', d.audioUrl,'Approx. 2–3 minutes. Played twice.')+
-  `<div class="qcard open">
-    <div class="qch" onclick="this.closest('.qcard').classList.toggle('open')">
-      <span class="qnum" style="font-size:14px">📋</span><div><div class="qtitle">Notes form setup</div></div>
+// ── RW1 ──
+function bRW1() {
+  const d = D().rw1, ul = document.getElementById('ql-rw1');
+  ul.innerHTML = '';
+  d.forEach((q, i) => {
+    const c = document.createElement('div');
+    c.className = 'qcard open';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)">
+      <span class="qn">${i+1}</span><div><div class="qt">Question ${i+1}</div><div class="qs">Sign / short text</div></div>
+      <span class="qtag tim">Image</span><span class="qtag tmc">MC × 3</span>
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
     </div>
     <div class="qcb">
       <div class="fg fg2">
-        ${fi('Context sentence', inp('e.g. You will hear a teacher telling her students about a museum they are going to visit.', d.context), 'Shown above the notes form.')}
-        ${fi('Notes form title', inp('e.g. EGYPTIAN MUSEUM', d.notesTitle), 'Displayed bold, centred, above the rows.')}
+        <div class="fi"><label>Image URL (sign / notice)</label>
+          <input type="url" placeholder="https://…" data-key="img" value="${esc(q.img)}">
+          <span class="fh">HTTPS image of the sign, notice, or advertisement.</span></div>
+        <div class="fi"><label>OR — Typed text content</label>
+          <textarea placeholder="Text of the email, message or notice…" data-key="text">${esc(q.text)}</textarea>
+          <span class="fh">Leave blank if using an image URL.</span></div>
       </div>
-      <div class="fg fg2" style="margin-top:10px">
-        ${fi('Example row label (pre-answered)', inp('e.g. When:', d.exampleLabel))}
-        ${fi('Example row answer', inp('e.g. Friday', d.exampleAnswer), 'Shown in italics — not a gap.')}
+      <div class="fi" style="margin-top:12px">
+        <label>Question (optional) <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--tm)">— shown above the answer options</span></label>
+        <input type="text" placeholder="e.g. What should Patrick do?" data-key="question" value="${esc(q.question||'')}">
+        <span class="fh">Leave blank when the answer options speak for themselves without an explicit question.</span>
       </div>
-      ${sbtn('saveLS2setup()')}
+      <div class="ob"><div class="ob-lbl">Answer options — mark the correct one</div>
+        ${optRow('A',q.optA,q.correct==='A')}
+        ${optRow('B',q.optB,q.correct==='B')}
+        ${optRow('C',q.optC,q.correct==='C')}
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save question</button></div>
+    </div>`;
+    ul.appendChild(c);
+  });
+}
+
+// ── RW2 ──
+function bRW2() {
+  const d = D().rw2;
+  const pg = document.getElementById('profiles-grid');
+  pg.innerHTML = '';
+  ['A','B','C'].forEach((letter, i) => {
+    const p = d.persons[i], c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)"><span class="qn">${letter}</span><div><div class="qt">Person ${letter}</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
     </div>
-  </div>
-  <div class="stitle" style="margin-top:14px">Form rows — gaps 6 – 10</div>
-  <table class="gtbl">
-    <thead><tr><th style="width:50px">Gap</th><th>Row label (left column)</th><th>Correct answer</th><th>Also accept</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <div class="brow"><button class="btn btn-p" onclick="saveLS2rows()">Save rows</button></div>`;
-}
-function saveLS2setup() {
-  const pg=document.getElementById('pg-ls2'); if(!pg) return;
-  const d=db.variants[cur].ls.p2;
-  d.audioUrl=pg.querySelector('.au-block input[type=url]')?.value||'';
-  const ins=pg.querySelectorAll('.qcard .qcb input');
-  d.context=ins[0]?.value||''; d.notesTitle=ins[1]?.value||'';
-  d.exampleLabel=ins[2]?.value||''; d.exampleAnswer=ins[3]?.value||'';
-  markDirty(); showToast('Setup saved');
-}
-function saveLS2rows() {
-  const pg=document.getElementById('pg-ls2'); if(!pg) return;
-  const d=db.variants[cur].ls.p2;
-  pg.querySelectorAll('.gtbl tbody tr').forEach((row,i)=>{
-    const ins=row.querySelectorAll('input');
-    d.rows[i].label=ins[0]?.value||''; d.rows[i].correct=ins[1]?.value||''; d.rows[i].alsoAccept=ins[2]?.value||'';
+    <div class="qcb">
+      <div class="fi"><label>Name</label><input type="text" data-pi="${i}" data-pk="name" placeholder="e.g. Tanya" value="${esc(p.name)}"></div>
+      <div class="fi" style="margin-top:10px"><label>Photo URL (optional)</label><input type="url" data-pi="${i}" data-pk="photo" placeholder="https://…" value="${esc(p.photo)}"></div>
+      <div class="fi" style="margin-top:10px"><label>Profile paragraph</label><textarea style="min-height:90px" data-pi="${i}" data-pk="profile">${esc(p.profile)}</textarea></div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save</button></div>
+    </div>`;
+    pg.appendChild(c);
   });
-  markDirty(); showToast('Rows saved');
-}
-
-/* LISTENING PART 3 */
-function pgLS3(v) {
-  const d=v.ls.p3;
-  const qcards=d.questions.map((q,i)=>{
-    const pid=`ls3q-${i}`;
-    const body=`${fi('Question text', inp('e.g. Where did they decide to meet?', q.text))}
-    <div class="opts-block"><div class="opts-lbl">Answer options</div>${opts3(pid,q)}</div>
-    ${sbtn(`saveLS3q(${i})`)}`;
-    return qCard(q.n,`Question ${q.n}`,'',tag('tmc','MC × 3'),body,false);
-  }).join('');
-
-  return pgHead('💬','ls','Listening — Part 3: Dialogue Multiple Choice',
-    'One longer dialogue. Five MC questions about key information.',
-    pill('Questions','11 – 15')+pill('Audio','1 dialogue track (~3 min)'))+
-    auBlock('Audio track — Part 3 (dialogue)', d.audioUrl)+
-    `<div class="fg fg1" style="margin-bottom:14px">${fi('Context sentence', inp('e.g. You will hear two friends talking about a school trip.', d.context))}</div>
-    <div class="stitle">Questions 11 – 15</div><div class="qlist">${qcards}</div>`;
-}
-function saveLS3q(i) {
-  const pg=document.getElementById('pg-ls3'); if(!pg) return;
-  const d=db.variants[cur].ls.p3;
-  d.audioUrl=pg.querySelector('.au-block input[type=url]')?.value||'';
-  d.context=pg.querySelector('.fg.fg1 input')?.value||'';
-  const card=pg.querySelectorAll('.qcard')[i];
-  const q=d.questions[i];
-  q.text=card.querySelector('input[type=text]')?.value||'';
-  const opts=card.querySelectorAll('.opt-row input[type=text]');
-  q.optA=opts[0]?.value||''; q.optB=opts[1]?.value||''; q.optC=opts[2]?.value||'';
-  const corr=card.querySelector('.opt-row.correct .opt-letter');
-  if(corr) q.correct=corr.textContent.trim();
-  markDirty(); showToast(`Q${q.n} saved`);
-}
-
-/* LISTENING PART 4 */
-function pgLS4(v) {
-  const d=v.ls.p4;
-  const qcards=d.questions.map((q,i)=>{
-    const pid=`ls4q-${i}`;
-    const body=`${fi('Question text', inp('e.g. What does the boy think about the film?', q.text))}
-    <div class="opts-block"><div class="opts-lbl">Answer options</div>${opts3(pid,q)}</div>
-    ${sbtn(`saveLS4q(${i})`)}`;
-    return qCard(q.n,`Question ${q.n}`,'',tag('tmc','MC × 3'),body,false);
-  }).join('');
-
-  return pgHead('📻','ls','Listening — Part 4: Short Monologues / Dialogues',
-    'One audio track containing five short recordings. One MC question per recording (main idea / gist).',
-    pill('Questions','16 – 20')+pill('Audio','1 shared track (5 clips)'))+
-    auBlock('Audio track — Part 4 (all 5 short recordings in sequence)', d.audioUrl,'All five clips in one file. Each is played twice.')+
-    `<div class="fg fg1" style="margin-bottom:14px">${fi('Context sentence', inp('e.g. You will hear five short conversations. For each, choose the best answer.', d.context))}</div>
-    <div class="stitle">Questions 16 – 20</div><div class="qlist">${qcards}</div>`;
-}
-function saveLS4q(i) {
-  const pg=document.getElementById('pg-ls4'); if(!pg) return;
-  const d=db.variants[cur].ls.p4;
-  d.audioUrl=pg.querySelector('.au-block input[type=url]')?.value||'';
-  d.context=pg.querySelector('.fg.fg1 input')?.value||'';
-  const card=pg.querySelectorAll('.qcard')[i];
-  const q=d.questions[i];
-  q.text=card.querySelector('input[type=text]')?.value||'';
-  const opts=card.querySelectorAll('.opt-row input[type=text]');
-  q.optA=opts[0]?.value||''; q.optB=opts[1]?.value||''; q.optC=opts[2]?.value||'';
-  const corr=card.querySelector('.opt-row.correct .opt-letter');
-  if(corr) q.correct=corr.textContent.trim();
-  markDirty(); showToast(`Q${q.n} saved`);
-}
-
-/* LISTENING PART 5 */
-function pgLS5(v) {
-  const d=v.ls.p5;
-  const names=d.names.map(n=>`<div class="mrow">
-    <span style="width:28px;font-size:12px;font-weight:700;color:var(--tm);flex-shrink:0">${n.n}</span>
-    <input type="text" placeholder="${n.n==='0'?'Example name (pre-answered)':'Name…'}" value="${E(n.name)}" onchange="markDirty()">
-    <input type="text" placeholder="A–H" value="${E(n.answer)}" style="max-width:58px;text-align:center;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase" onchange="markDirty()">
-  </div>`).join('');
-  const options=d.options.map(o=>`<div class="mrow">
-    <span style="width:24px;font-size:12px;font-weight:700;color:var(--tm);flex-shrink:0">${o.letter}</span>
-    <input type="text" placeholder="Activity ${o.letter}…" value="${E(o.text)}" onchange="markDirty()">
-  </div>`).join('');
-
-  return pgHead('🔀','ls','Listening — Part 5: Matching',
-    'One dialogue. Six names must each be matched to one of eight activity options.',
-    pill('Questions','21 – 25')+pill('Audio','1 dialogue track')+pill('Format','Name → activity'))+
-    auBlock('Audio track — Part 5 (matching dialogue)', d.audioUrl)+
-    `<div class="fg fg1" style="margin-bottom:14px">${fi('Context sentence', inp('e.g. You will hear two friends talking about what people did at the weekend.', d.context))}</div>
-    <div class="mgrid">
-      <div>
-        <div class="mch">Six names — example (0) + questions 21–25</div>
-        <div class="callout" style="font-size:11.5px;padding:8px 10px;margin-bottom:10px">Row <strong>0</strong> is the pre-answered example (shown to candidate). Type the matching letter (A–H) in the right column for each row.</div>
-        ${names}
-      </div>
-      <div>
-        <div class="mch">Eight activity options (A – H)</div>
-        ${options}
-      </div>
+  const ul = document.getElementById('ql-rw2');
+  ul.innerHTML = '';
+  d.questions.forEach((q, i) => {
+    const c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)"><span class="qn">${i+7}</span><div><div class="qt">Question ${i+7}</div></div>
+      <span class="qtag tmt">Matching</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
     </div>
-    <div class="brow"><button class="btn btn-p" onclick="saveLS5()">Save matching</button></div>`;
-}
-function saveLS5() {
-  const pg=document.getElementById('pg-ls5'); if(!pg) return;
-  const d=db.variants[cur].ls.p5;
-  d.audioUrl=pg.querySelector('.au-block input[type=url]')?.value||'';
-  d.context=pg.querySelector('.fg.fg1 input')?.value||'';
-  pg.querySelectorAll('.mgrid>div:first-child .mrow').forEach((row,i)=>{
-    const ins=row.querySelectorAll('input');
-    d.names[i].name=ins[0]?.value||''; d.names[i].answer=ins[1]?.value||'';
+    <div class="qcb">
+      <div class="fi"><label>Question text</label><input type="text" data-rw2q="${i}" data-qk="text" placeholder="Who…?" value="${esc(q.text)}"></div>
+      <div class="ob" style="margin-top:12px"><div class="ob-lbl">Correct answer (A / B / C)</div>
+        <div style="display:flex;gap:8px">${mcBtns(['A','B','C'],q.correct,`markMC2`)}</div>
+        <input type="hidden" data-rw2q="${i}" data-qk="correct" value="${esc(q.correct)}">
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save</button></div>
+    </div>`;
+    ul.appendChild(c);
   });
-  pg.querySelectorAll('.mgrid>div:last-child .mrow').forEach((row,i)=>{
-    d.options[i].text=row.querySelector('input')?.value||'';
-  });
-  markDirty(); showToast('Matching saved');
 }
 
-/* ═══════════════════════════════════
-   TOAST
-═══════════════════════════════════ */
-let toastT;
-function showToast(msg,type) {
-  const el=document.getElementById('toast');
-  el.textContent=(type==='err'?'✕ ':'✓ ')+msg;
-  el.className='show'+(type?' '+type:'');
-  clearTimeout(toastT);
-  toastT=setTimeout(()=>el.className='',2600);
+// ── RW3 ──
+function bRW3() {
+  const d = D().rw3;
+  document.getElementById('rw3-tc').innerHTML = `<div class="qcard" style="margin-bottom:14px">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">📄</span><div><div class="qt">Main reading text</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fg fg2">
+        <div class="fi"><label>Title</label><input type="text" data-rw3="title" placeholder="e.g. Summer Camp in Edinburgh" value="${esc(d.title)}"></div>
+        <div class="fi"><label>Byline (optional)</label><input type="text" data-rw3="byline" placeholder="e.g. by Emma Lee, age 12" value="${esc(d.byline)}"></div>
+      </div>
+      <div class="fi" style="margin-top:12px"><label>Article text (~200–250 words)</label>
+        <textarea style="min-height:160px" data-rw3="body">${esc(d.body)}</textarea></div>
+      <div class="fi" style="margin-top:10px"><label>Illustration URL (optional)</label>
+        <input type="url" data-rw3="illustration" placeholder="https://…" value="${esc(d.illustration)}"></div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save text</button></div>
+    </div>
+  </div>`;
+  const ul = document.getElementById('ql-rw3');
+  ul.innerHTML = '';
+  d.questions.forEach((q, i) => {
+    const n = i+14, c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)"><span class="qn">${n}</span><div><div class="qt">Question ${n}</div></div>
+      <span class="qtag tmc">MC × 3</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fi"><label>Question text</label><input type="text" data-rw3q="${i}" data-qk="text" placeholder="Question…" value="${esc(q.text)}"></div>
+      <div class="ob"><div class="ob-lbl">Options</div>
+        ${optRow('A',q.optA,q.correct==='A')}
+        ${optRow('B',q.optB,q.correct==='B')}
+        ${optRow('C',q.optC,q.correct==='C')}
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save</button></div>
+    </div>`;
+    ul.appendChild(c);
+  });
 }
 
-/* ═══════════════════════════════════
-   BOOT
-═══════════════════════════════════ */
-boot();
+// ── RW4 ──
+function bRW4() {
+  const d = D().rw4;
+  document.getElementById('rw4-tc').innerHTML = `<div class="qcard" style="margin-bottom:14px">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">📄</span><div><div class="qt">Cloze text</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fi"><label>Text title</label><input type="text" data-rw4="title" placeholder="e.g. The Talent Factory" value="${esc(d.title)}"></div>
+      <div class="fi" style="margin-top:11px"><label>Cloze text</label>
+        <textarea style="min-height:150px" data-rw4="body">${esc(d.body)}</textarea>
+        <span class="fh">Mark gaps as (19), (20)… (24) within the text.</span></div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save text</button></div>
+    </div>
+  </div>`;
+  const ul = document.getElementById('ql-rw4');
+  ul.innerHTML = '';
+  d.gaps.forEach((g, i) => {
+    const n = i+19, c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)"><span class="qn">${n}</span><div><div class="qt">Gap ${n}</div></div>
+      <span class="qtag tmc">MC × 3</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="ob"><div class="ob-lbl">Three word options</div>
+        ${optRow('A',g.optA,g.correct==='A')}
+        ${optRow('B',g.optB,g.correct==='B')}
+        ${optRow('C',g.optC,g.correct==='C')}
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save</button></div>
+    </div>`;
+    ul.appendChild(c);
+  });
+}
+
+// ── RW5 ──
+function bRW5() {
+  const d = D().rw5;
+  document.getElementById('rw5-ec').innerHTML = `<div class="qcard" style="margin-bottom:14px">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">✉</span><div><div class="qt">Email content</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fg" style="grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div class="fi"><label>From</label><input type="text" data-rw5="from" placeholder="e.g. Andrew" value="${esc(d.from)}"></div>
+        <div class="fi"><label>To</label><input type="text" data-rw5="to" placeholder="e.g. Sylvia" value="${esc(d.to)}"></div>
+        <div class="fi"><label>Example word (0)</label><input type="text" data-rw5="example" placeholder="e.g. that" value="${esc(d.example)}">
+          <span class="fh">Pre-filled example before Q25.</span></div>
+      </div>
+      <div class="fi" style="margin-top:12px"><label>Email body</label>
+        <textarea style="min-height:180px" data-rw5="body">${esc(d.body)}</textarea>
+        <span class="fh">Use (0) for example gap and (25)–(30) for answer gaps.</span></div>
+      <div class="fi" style="margin-top:10px"><label>Reply email (optional)</label>
+        <textarea style="min-height:68px" data-rw5="reply">${esc(d.reply)}</textarea></div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save email</button></div>
+    </div>
+  </div>`;
+  document.getElementById('rw5-ac').innerHTML = `<div class="qcard" style="margin-bottom:14px">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">🔑</span><div><div class="qt">Answer key</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <table class="gtbl">
+        <thead><tr><th style="width:55px">Gap</th><th>Correct answer</th><th>Accept also</th></tr></thead>
+        <tbody>${d.answers.map((a,i)=>`<tr>
+          <td><strong>${i+25}</strong></td>
+          <td><input type="text" data-rw5a="${i}" data-ak="answer" placeholder="e.g. than" value="${esc(a.answer)}"></td>
+          <td><input type="text" data-rw5a="${i}" data-ak="also" placeholder="Alternatives…" value="${esc(a.also)}"></td>
+        </tr>`).join('')}</tbody>
+      </table>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save answers</button></div>
+    </div>
+  </div>`;
+}
+
+// ── RW6 ──
+function bRW6() {
+  const d = D().rw6;
+  document.getElementById('rw6-c').innerHTML = `<div class="qcard open">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">31</span><div><div class="qt">Task prompt</div></div>
+      <span class="qtag twr">Writing</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fi"><label>Scenario instruction</label>
+        <textarea style="min-height:80px" data-rw6="scenario">${esc(d.scenario)}</textarea></div>
+      <div class="sdiv"></div>
+      <div class="stitle">Three "Say:" bullet points</div>
+      <div class="fg fg2">
+        <div class="fi"><label>Bullet 1</label><input type="text" data-rw6="bullet1" placeholder="e.g. when the party is" value="${esc(d.bullet1)}"></div>
+        <div class="fi"><label>Bullet 2</label><input type="text" data-rw6="bullet2" placeholder="e.g. where the party is" value="${esc(d.bullet2)}"></div>
+      </div>
+      <div class="fg fg2" style="margin-top:11px">
+        <div class="fi"><label>Bullet 3</label><input type="text" data-rw6="bullet3" placeholder="e.g. what food or drink he can bring" value="${esc(d.bullet3)}"></div>
+        <div class="fi"><label>Recipient name (for "To:" field)</label><input type="text" data-rw6="recipient" placeholder="e.g. Shane" value="${esc(d.recipient)}"></div>
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save task</button></div>
+    </div>
+  </div>`;
+}
+
+// ── RW7 ──
+function bRW7() {
+  const d = D().rw7;
+  document.getElementById('rw7-c').innerHTML = `<div class="qcard open">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">32</span><div><div class="qt">Picture story task</div></div>
+      <span class="qtag tim">3 Images</span><span class="qtag twr">Writing</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="clt">All three images must tell a sequential story. Use cartoon-style illustrations, landscape format.</div>
+      <div class="fg fg3">
+        <div class="fi"><label>Picture 1 — opening scene</label><input type="url" data-rw7="img1" placeholder="https://…" value="${esc(d.img1)}"><span class="fh">What happens at the start?</span></div>
+        <div class="fi"><label>Picture 2 — development</label><input type="url" data-rw7="img2" placeholder="https://…" value="${esc(d.img2)}"><span class="fh">What happens next?</span></div>
+        <div class="fi"><label>Picture 3 — conclusion</label><input type="url" data-rw7="img3" placeholder="https://…" value="${esc(d.img3)}"><span class="fh">How does it end?</span></div>
+      </div>
+      <div class="fi" style="margin-top:12px"><label>Internal note (not shown to candidate)</label>
+        <textarea style="min-height:52px" data-rw7="note">${esc(d.note)}</textarea></div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save task</button></div>
+    </div>
+  </div>`;
+}
+
+// ── LS1 ──
+function bLS1() {
+  const d = D().ls1;
+  document.getElementById('ls1-ac').innerHTML = auBlock(d.audio, d.context||'', 'data-ls1="audio"', 'data-ls1="context"',
+    'One recording containing all 5 short dialogues for this part.');
+  const ul = document.getElementById('ql-ls1');
+  ul.innerHTML = '';
+  d.questions.forEach((q, i) => {
+    const c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)">
+      <span class="qn">${i+1}</span><div><div class="qt">Question ${i+1}</div><div class="qs">Dialogue ${i+1} of 5</div></div>
+      <span class="qtag tim">3 Pictures</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fi"><label>Question text</label><input type="text" data-ls1q="${i}" data-qk="text" placeholder="e.g. What time does Greta have her tennis match?" value="${esc(q.text)}"></div>
+      <div class="sdiv"></div>
+      <div class="stitle">Three picture options (A / B / C)</div>
+      <div class="fg fg3">
+        <div class="fi"><label>Picture A URL</label><input type="url" data-ls1q="${i}" data-qk="picA" placeholder="https://…" value="${esc(q.picA)}"></div>
+        <div class="fi"><label>Picture B URL</label><input type="url" data-ls1q="${i}" data-qk="picB" placeholder="https://…" value="${esc(q.picB)}"></div>
+        <div class="fi"><label>Picture C URL</label><input type="url" data-ls1q="${i}" data-qk="picC" placeholder="https://…" value="${esc(q.picC)}"></div>
+      </div>
+      <div class="ob" style="margin-top:12px"><div class="ob-lbl">Correct picture</div>
+        <div style="display:flex;gap:8px">${mcBtns(['A','B','C'],q.correct,'markLS1')}</div>
+        <input type="hidden" data-ls1q="${i}" data-qk="correct" value="${esc(q.correct)}">
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save question</button></div>
+    </div>`;
+    ul.appendChild(c);
+  });
+}
+
+// ── LS2 ──
+function bLS2() {
+  const d = D().ls2;
+  document.getElementById('ls2-ac').innerHTML = auBlock(d.audio, d.context||'', 'data-ls2="audio"', 'data-ls2="context"',
+    'Monologue recording. Candidate hears it twice.');
+  document.getElementById('ls2-fc').innerHTML = `<div class="qcard open">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">📋</span><div><div class="qt">Notes form</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fg" style="grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="fi"><label>Form title</label><input type="text" data-ls2="title" placeholder="e.g. EGYPTIAN MUSEUM" value="${esc(d.title)}"></div>
+        <div class="fi"><label>Example row label</label><input type="text" data-ls2="exLbl" placeholder="e.g. When:" value="${esc(d.exLbl)}"></div>
+        <div class="fi"><label>Example row answer (pre-filled)</label><input type="text" data-ls2="exAns" placeholder="e.g. Friday" value="${esc(d.exAns)}"></div>
+      </div>
+      <div class="stitle">Gaps 6–10</div>
+      <table class="gtbl">
+        <thead><tr><th style="width:50px">Gap</th><th>Row label</th><th>Correct answer</th><th>Accept also</th></tr></thead>
+        <tbody>${d.rows.map((r,i)=>`<tr>
+          <td><strong>${i+6}</strong></td>
+          <td><input type="text" data-ls2r="${i}" data-rk="label" placeholder="e.g. Cost of ticket: £" value="${esc(r.label)}"></td>
+          <td><input type="text" data-ls2r="${i}" data-rk="answer" placeholder="e.g. 5.50" value="${esc(r.answer)}"></td>
+          <td><input type="text" data-ls2r="${i}" data-rk="also" placeholder="Alternatives…" value="${esc(r.also)}"></td>
+        </tr>`).join('')}</tbody>
+      </table>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save form</button></div>
+    </div>
+  </div>`;
+}
+
+// ── LS3 ──
+function bLS3() {
+  const d = D().ls3;
+  document.getElementById('ls3-ac').innerHTML = auBlock(d.audio, d.context||'', 'data-ls3="audio"', 'data-ls3="context"',
+    'Dialogue recording. Candidate hears it twice.');
+  const ul = document.getElementById('ql-ls3');
+  ul.innerHTML = '';
+  d.questions.forEach((q, i) => {
+    const n = i+11, c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)"><span class="qn">${n}</span><div><div class="qt">Question ${n}</div></div>
+      <span class="qtag tmc">MC × 3</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fi"><label>Question text</label><input type="text" data-ls3q="${i}" data-qk="text" placeholder="Question…" value="${esc(q.text)}"></div>
+      <div class="ob"><div class="ob-lbl">Options</div>
+        ${optRow('A',q.optA,q.correct==='A')}
+        ${optRow('B',q.optB,q.correct==='B')}
+        ${optRow('C',q.optC,q.correct==='C')}
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save</button></div>
+    </div>`;
+    ul.appendChild(c);
+  });
+}
+
+// ── LS4 ──
+function bLS4() {
+  const d = D().ls4;
+  document.getElementById('ls4-ac').innerHTML = auBlock(d.audio, d.context||'', 'data-ls4="audio"', 'data-ls4="context"',
+    'One recording with all 5 short clips. Candidate hears it twice.');
+  const ul = document.getElementById('ql-ls4');
+  ul.innerHTML = '';
+  d.questions.forEach((q, i) => {
+    const n = i+16, c = document.createElement('div');
+    c.className = 'qcard';
+    c.innerHTML = `<div class="qch" onclick="toggleCard(this)"><span class="qn">${n}</span>
+      <div><div class="qt">Question ${n}</div><div class="qs">Clip ${i+1} of 5</div></div>
+      <span class="qtag tmc">MC × 3</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="fi"><label>Question text</label><input type="text" data-ls4q="${i}" data-qk="text" placeholder="e.g. What does the boy think about the film?" value="${esc(q.text)}"></div>
+      <div class="ob"><div class="ob-lbl">Options</div>
+        ${optRow('A',q.optA,q.correct==='A')}
+        ${optRow('B',q.optB,q.correct==='B')}
+        ${optRow('C',q.optC,q.correct==='C')}
+      </div>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save</button></div>
+    </div>`;
+    ul.appendChild(c);
+  });
+}
+
+// ── LS5 ──
+function bLS5() {
+  const d = D().ls5;
+  document.getElementById('ls5-ac').innerHTML = auBlock(d.audio, d.context||'', 'data-ls5="audio"', 'data-ls5="context"',
+    'Dialogue recording. Candidate hears it twice.');
+  document.getElementById('ls5-mc').innerHTML = `<div class="qcard open">
+    <div class="qch" onclick="toggleCard(this)"><span class="qn">⇄</span><div><div class="qt">Names and activities</div></div>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
+    </div>
+    <div class="qcb">
+      <div class="mgrid">
+        <div>
+          <div class="mch">Six names — Q 0 (example) + Q 21–25</div>
+          ${d.names.map((n,i)=>`<div class="mrow">
+            <span style="width:40px;font-size:10.5px;font-weight:700;color:var(--tm);flex-shrink:0">${i===0?'0 (ex)':'Q '+(i+20)}</span>
+            <input type="text" data-ls5n="${i}" placeholder="${i===0?'Example name…':'Name…'}" value="${esc(n)}">
+          </div>`).join('')}
+        </div>
+        <div>
+          <div class="mch">Eight activity options (A–H)</div>
+          ${d.activities.map((a,i)=>`<div class="mrow">
+            <span style="width:20px;font-size:12px;font-weight:700;color:var(--tm);flex-shrink:0">${String.fromCharCode(65+i)}</span>
+            <input type="text" data-ls5act="${i}" placeholder="Activity ${String.fromCharCode(65+i)}…" value="${esc(a)}">
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="sdiv"></div>
+      <div class="stitle">Correct answer key</div>
+      <table class="gtbl">
+        <thead><tr><th>Question</th><th>Correct option (A–H)</th></tr></thead>
+        <tbody>${d.answers.map((a,i)=>`<tr>
+          <td><strong>${i===0?'0 (example)':'Q '+(i+20)}</strong></td>
+          <td><input type="text" data-ls5ans="${i}" style="width:80px;text-transform:uppercase" placeholder="e.g. C" value="${esc(a)}"></td>
+        </tr>`).join('')}</tbody>
+      </table>
+      <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save matching</button></div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════
+// COLLECT ALL DOM → DB
+// ══════════════════════════════════════════
+function collect() {
+  if (!cv || !db.variants[cv]) return;
+  const d = db.variants[cv];
+
+  // RW1
+  document.querySelectorAll('#ql-rw1 .qcard').forEach((card, i) => {
+    if (!d.rw1[i]) return;
+    card.querySelectorAll('[data-key]').forEach(el => { d.rw1[i][el.dataset.key] = el.value || el.textContent || ''; });
+    const cor = card.querySelector('.orow.correct');
+    if (cor) d.rw1[i].correct = cor.dataset.opt || '';
+  });
+
+  // RW2 persons
+  document.querySelectorAll('[data-pi]').forEach(el => {
+    const i = +el.dataset.pi; if (!d.rw2.persons[i]) return;
+    d.rw2.persons[i][el.dataset.pk] = el.value;
+  });
+  document.querySelectorAll('[data-rw2q]').forEach(el => {
+    const i = +el.dataset.rw2q; if (!d.rw2.questions[i]) return;
+    d.rw2.questions[i][el.dataset.qk] = el.value;
+  });
+
+  // RW3
+  document.querySelectorAll('[data-rw3]').forEach(el => { d.rw3[el.dataset.rw3] = el.value; });
+  document.querySelectorAll('[data-rw3q]').forEach(el => {
+    const i = +el.dataset.rw3q; if (!d.rw3.questions[i]) return;
+    d.rw3.questions[i][el.dataset.qk] = el.value;
+  });
+  document.querySelectorAll('#ql-rw3 .qcard').forEach((card, i) => {
+    const cor = card.querySelector('.orow.correct');
+    if (cor && d.rw3.questions[i]) d.rw3.questions[i].correct = cor.dataset.opt || '';
+  });
+
+  // RW4
+  document.querySelectorAll('[data-rw4]').forEach(el => { d.rw4[el.dataset.rw4] = el.value; });
+  document.querySelectorAll('#ql-rw4 .qcard').forEach((card, i) => {
+    if (!d.rw4.gaps[i]) return;
+    ['A','B','C'].forEach(l => {
+      const inp = card.querySelector(`[data-key="opt${l}"]`);
+      if (inp) d.rw4.gaps[i]['opt'+l] = inp.value;
+    });
+    const cor = card.querySelector('.orow.correct');
+    if (cor) d.rw4.gaps[i].correct = cor.dataset.opt || '';
+  });
+
+  // RW5
+  document.querySelectorAll('[data-rw5]').forEach(el => { d.rw5[el.dataset.rw5] = el.value; });
+  document.querySelectorAll('[data-rw5a]').forEach(el => {
+    const i = +el.dataset.rw5a; if (!d.rw5.answers[i]) return;
+    d.rw5.answers[i][el.dataset.ak] = el.value;
+  });
+
+  // RW6
+  document.querySelectorAll('[data-rw6]').forEach(el => { d.rw6[el.dataset.rw6] = el.value; });
+
+  // RW7
+  document.querySelectorAll('[data-rw7]').forEach(el => { d.rw7[el.dataset.rw7] = el.value; });
+
+  // LS1
+  document.querySelectorAll('[data-ls1]').forEach(el => { d.ls1[el.dataset.ls1] = el.value; });
+  document.querySelectorAll('[data-ls1q]').forEach(el => {
+    const i = +el.dataset.ls1q; if (!d.ls1.questions[i]) return;
+    d.ls1.questions[i][el.dataset.qk] = el.value;
+  });
+
+  // LS2
+  document.querySelectorAll('[data-ls2]').forEach(el => { d.ls2[el.dataset.ls2] = el.value; });
+  document.querySelectorAll('[data-ls2r]').forEach(el => {
+    const i = +el.dataset.ls2r; if (!d.ls2.rows[i]) return;
+    d.ls2.rows[i][el.dataset.rk] = el.value;
+  });
+
+  // LS3
+  document.querySelectorAll('[data-ls3]').forEach(el => { d.ls3[el.dataset.ls3] = el.value; });
+  document.querySelectorAll('[data-ls3q]').forEach(el => {
+    const i = +el.dataset.ls3q; if (!d.ls3.questions[i]) return;
+    d.ls3.questions[i][el.dataset.qk] = el.value;
+  });
+  document.querySelectorAll('#ql-ls3 .qcard').forEach((card, i) => {
+    const cor = card.querySelector('.orow.correct');
+    if (cor && d.ls3.questions[i]) d.ls3.questions[i].correct = cor.dataset.opt || '';
+  });
+
+  // LS4
+  document.querySelectorAll('[data-ls4]').forEach(el => { d.ls4[el.dataset.ls4] = el.value; });
+  document.querySelectorAll('[data-ls4q]').forEach(el => {
+    const i = +el.dataset.ls4q; if (!d.ls4.questions[i]) return;
+    d.ls4.questions[i][el.dataset.qk] = el.value;
+  });
+  document.querySelectorAll('#ql-ls4 .qcard').forEach((card, i) => {
+    const cor = card.querySelector('.orow.correct');
+    if (cor && d.ls4.questions[i]) d.ls4.questions[i].correct = cor.dataset.opt || '';
+  });
+
+  // LS5
+  document.querySelectorAll('[data-ls5]').forEach(el => { d.ls5[el.dataset.ls5] = el.value; });
+  document.querySelectorAll('[data-ls5n]').forEach(el => { d.ls5.names[+el.dataset.ls5n] = el.value; });
+  document.querySelectorAll('[data-ls5act]').forEach(el => { d.ls5.activities[+el.dataset.ls5act] = el.value; });
+  document.querySelectorAll('[data-ls5ans]').forEach(el => { d.ls5.answers[+el.dataset.ls5ans] = el.value.toUpperCase(); });
+}
+
+// ══════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════
+function toggleCard(h) { h.closest('.qcard').classList.toggle('open'); }
+
+function markCorrect(btn) {
+  const row = btn.closest('.orow');
+  btn.closest('.ob').querySelectorAll('.orow').forEach(r => {
+    r.classList.remove('correct');
+    r.querySelector('.mkb').textContent = 'Mark correct';
+  });
+  row.classList.add('correct');
+  btn.textContent = '✓ Correct';
+  scheduleSave();
+}
+
+function markMC2(btn, letter) { _markMCBtn(btn, letter, 'rw2'); }
+function markLS1(btn, letter) { _markMCBtn(btn, letter, 'ls1'); }
+function _markMCBtn(btn, letter, section) {
+  const wrap = btn.parentElement;
+  wrap.querySelectorAll('.mkb').forEach(b => { b.style.cssText = ''; });
+  btn.style.cssText = 'background:#ECFDF5;border-color:#86EFAC;color:var(--ok)';
+  // Also update the hidden input
+  const card = btn.closest('.qcb');
+  const hidden = card.querySelector('input[type=hidden]');
+  if (hidden) hidden.value = letter;
+  scheduleSave();
+}
+
+let toastTimer;
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════
+// IMAGE PREVIEWS
+// Attaches to every input[type=url] in the
+// document via event delegation on main.
+// Works for all parts: signs, profiles,
+// illustrations, picture story, LS1 pics.
+// ══════════════════════════════════════════
+
+// Debounce timers per input (keyed by a data-uid)
+const _prevTimers = {};
+let _prevUid = 0;
+
+function getUid(el) {
+  if (!el.dataset.prevUid) el.dataset.prevUid = ++_prevUid;
+  return el.dataset.prevUid;
+}
+
+// Find or create the preview wrapper that lives right after the input
+function getPreviewWrap(input) {
+  // Check if next sibling is already our wrapper
+  let wrap = input.nextElementSibling;
+  if (wrap && wrap.classList.contains('img-prev-wrap')) return wrap;
+  // Insert after the input
+  wrap = document.createElement('div');
+  wrap.className = 'img-prev-wrap';
+  wrap.innerHTML = `
+    <div class="img-prev-inner">
+      <img class="img-prev-thumb" alt="Preview" style="display:none">
+      <button class="img-prev-dismiss" title="Clear preview" onclick="clearImgPreview(this)">✕</button>
+    </div>
+    <div class="img-prev-status loading" style="display:none"></div>`;
+  input.after(wrap);
+  return wrap;
+}
+
+function showImgPreview(input) {
+  const uid = getUid(input);
+  clearTimeout(_prevTimers[uid]);
+  const url = input.value.trim();
+
+  const wrap = getPreviewWrap(input);
+  const img = wrap.querySelector('.img-prev-thumb');
+  const status = wrap.querySelector('.img-prev-status');
+  const dismiss = wrap.querySelector('.img-prev-dismiss');
+
+  if (!url || !url.startsWith('http')) {
+    wrap.classList.remove('visible');
+    img.style.display = 'none';
+    return;
+  }
+
+  // Debounce 600 ms so we don't fire on every keystroke
+  _prevTimers[uid] = setTimeout(() => {
+    // Show loading state
+    wrap.classList.add('visible');
+    img.style.display = 'none';
+    status.style.display = 'flex';
+    status.className = 'img-prev-status loading';
+    status.textContent = 'Loading…';
+    dismiss.style.display = 'none';
+
+    const probe = new Image();
+    probe.onload = () => {
+      img.src = url;
+      img.style.display = 'block';
+      img.className = 'img-prev-thumb' + (probe.naturalHeight > probe.naturalWidth * 1.2 ? ' tall' : '');
+      status.style.display = 'flex';
+      status.className = 'img-prev-status ok';
+      status.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg> ${probe.naturalWidth} × ${probe.naturalHeight} px`;
+      dismiss.style.display = 'flex';
+    };
+    probe.onerror = () => {
+      img.style.display = 'none';
+      status.style.display = 'flex';
+      status.className = 'img-prev-status err';
+      status.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Could not load image`;
+      dismiss.style.display = 'none';
+    };
+    probe.src = url;
+  }, 600);
+}
+
+function clearImgPreview(dismissBtn) {
+  const wrap = dismissBtn.closest('.img-prev-wrap');
+  const img = wrap.querySelector('.img-prev-thumb');
+  const status = wrap.querySelector('.img-prev-status');
+  img.style.display = 'none';
+  img.src = '';
+  status.style.display = 'none';
+  dismissBtn.style.display = 'none';
+  wrap.classList.remove('visible');
+  // Also clear the input value
+  const input = wrap.previousElementSibling;
+  if (input && input.type === 'url') { input.value = ''; input.focus(); scheduleSave(); }
+}
+
+// Re-trigger previews for all URL inputs already rendered (called after buildAll)
+function refreshAllPreviews() {
+  document.querySelectorAll('input[type=url]').forEach(inp => {
+    if (inp.value.trim().startsWith('http')) showImgPreview(inp);
+  });
+}
+
+// Event delegation — catches inputs in dynamically built forms
+document.getElementById('main-area').addEventListener('input', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'url') {
+    showImgPreview(e.target);
+  }
+});
+
+// Also hook into buildAll to refresh after forms are rebuilt
+const _origBuildAll = buildAll;
+function buildAll() {
+  _origBuildAll();
+  // Give DOM a tick to paint, then load previews for pre-filled URLs
+  setTimeout(refreshAllPreviews, 60);
+}
 </script>
 </body>
 </html>
