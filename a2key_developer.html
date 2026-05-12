@@ -158,7 +158,14 @@ main{flex:1;overflow-y:auto;padding:22px 26px 48px}
 #toast.ok{background:var(--cb);color:#fff}
 #toast.err{background:#FEF2F2;border:1px solid #FECACA;color:var(--er)}
 #toast.show{opacity:1;transform:none}
-/* IMAGE PREVIEWS */
+/* AUDIO PLAYER PREVIEW */
+.au-player-wrap{margin-top:10px;display:none}
+.au-player-wrap.visible{display:block}
+.au-player-wrap audio{width:100%;height:36px;border-radius:6px;outline:none}
+.au-player-status{font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px}
+.au-player-status.ok{color:var(--ok)}
+.au-player-status.err{color:var(--er)}
+</style>
 .img-prev-wrap{margin-top:7px;display:none}
 .img-prev-wrap.visible{display:block}
 .img-prev-inner{position:relative;display:inline-flex;align-items:flex-start;gap:0}
@@ -714,7 +721,10 @@ function mcBtns(letters, correct, fn) {
   ).join('');
 }
 
+let _auId = 0;
 function auBlock(audio, ctx, dAu, dCtx, hint) {
+  const pid = 'auplayer-' + (++_auId);
+  const hasAudio = audio && audio.startsWith('http');
   return `<div class="au-blk">
     <div class="au-head">
       <div class="au-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
@@ -722,11 +732,19 @@ function auBlock(audio, ctx, dAu, dCtx, hint) {
     </div>
     <div class="fg fg2">
       <div class="fi"><label>Audio URL (MP3 / OGG)</label>
-        <input type="url" ${dAu} placeholder="https://…" value="${esc(audio)}">
+        <input type="url" ${dAu} placeholder="https://…" value="${esc(audio)}"
+          oninput="updateAuPlayer(this,'${pid}')">
         <span class="fh">${hint||'One recording for the entire part. Must be HTTPS.'}</span>
+        <div class="au-player-wrap${hasAudio?' visible':''}" id="${pid}">
+          <audio controls preload="metadata" ${hasAudio?`src="${esc(audio)}"`:''}></audio>
+          <div class="au-player-status ok" style="display:${hasAudio?'flex':'none'}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+            Track loaded — press play to verify
+          </div>
+        </div>
       </div>
       <div class="fi"><label>Context sentence (shown to candidate)</label>
-        <input type="text" ${dCtx} placeholder="You will hear…" value="${esc(ctx)}">
+        <input type="text" ${dCtx} placeholder="You will hear… (optional)" value="${esc(ctx)}">
       </div>
     </div>
   </div>`;
@@ -1291,6 +1309,40 @@ function toast(msg, type) {
 }
 
 // ══════════════════════════════════════════
+// AUDIO PLAYER PREVIEW
+// ══════════════════════════════════════════
+const _auTimers = {};
+function updateAuPlayer(input, pid) {
+  clearTimeout(_auTimers[pid]);
+  _auTimers[pid] = setTimeout(() => {
+    const url = input.value.trim();
+    const wrap = document.getElementById(pid);
+    if (!wrap) return;
+    const audio = wrap.querySelector('audio');
+    const status = wrap.querySelector('.au-player-status');
+    if (!url || !url.startsWith('http')) {
+      wrap.classList.remove('visible');
+      audio.src = '';
+      return;
+    }
+    wrap.classList.add('visible');
+    audio.src = url;
+    audio.load();
+    audio.oncanplay = () => {
+      status.style.display = 'flex';
+      status.className = 'au-player-status ok';
+      status.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg> Track loaded — press play to verify`;
+    };
+    audio.onerror = () => {
+      status.style.display = 'flex';
+      status.className = 'au-player-status err';
+      status.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Could not load audio`;
+    };
+    scheduleSave();
+  }, 700);
+}
+
+// ══════════════════════════════════════════
 // IMAGE PREVIEWS
 // Attaches to every input[type=url] in the
 // document via event delegation on main.
@@ -1326,9 +1378,17 @@ function getPreviewWrap(input) {
 }
 
 function showImgPreview(input) {
+  // Skip audio fields entirely — they have data-ls*="audio" attribute
+  if (input.dataset.ls1 === 'audio' || input.dataset.ls2 === 'audio' ||
+      input.dataset.ls3 === 'audio' || input.dataset.ls4 === 'audio' ||
+      input.dataset.ls5 === 'audio') return;
+
   const uid = getUid(input);
   clearTimeout(_prevTimers[uid]);
   const url = input.value.trim();
+
+  // Also skip by file extension
+  if (/\.(mp3|ogg|wav|m4a|aac|flac)(\?|$)/i.test(url)) return;
 
   const wrap = getPreviewWrap(input);
   const img = wrap.querySelector('.img-prev-thumb');
@@ -1343,7 +1403,6 @@ function showImgPreview(input) {
 
   // Debounce 600 ms so we don't fire on every keystroke
   _prevTimers[uid] = setTimeout(() => {
-    // Show loading state
     wrap.classList.add('visible');
     img.style.display = 'none';
     status.style.display = 'flex';
