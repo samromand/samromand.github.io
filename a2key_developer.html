@@ -1165,8 +1165,13 @@ function collect() {
     d.rw3.questions[i][el.dataset.qk] = el.value;
   });
   document.querySelectorAll('#ql-rw3 .qcard').forEach((card, i) => {
+    if (!d.rw3.questions[i]) return;
+    ['A','B','C'].forEach(l => {
+      const inp = card.querySelector(`[data-key="opt${l}"]`);
+      if (inp) d.rw3.questions[i]['opt'+l] = inp.value;
+    });
     const cor = card.querySelector('.orow.correct');
-    if (cor && d.rw3.questions[i]) d.rw3.questions[i].correct = cor.dataset.opt || '';
+    if (cor) d.rw3.questions[i].correct = cor.dataset.opt || '';
   });
 
   // RW4
@@ -1215,8 +1220,13 @@ function collect() {
     d.ls3.questions[i][el.dataset.qk] = el.value;
   });
   document.querySelectorAll('#ql-ls3 .qcard').forEach((card, i) => {
+    if (!d.ls3.questions[i]) return;
+    ['A','B','C'].forEach(l => {
+      const inp = card.querySelector(`[data-key="opt${l}"]`);
+      if (inp) d.ls3.questions[i]['opt'+l] = inp.value;
+    });
     const cor = card.querySelector('.orow.correct');
-    if (cor && d.ls3.questions[i]) d.ls3.questions[i].correct = cor.dataset.opt || '';
+    if (cor) d.ls3.questions[i].correct = cor.dataset.opt || '';
   });
 
   // LS4
@@ -1226,8 +1236,13 @@ function collect() {
     d.ls4.questions[i][el.dataset.qk] = el.value;
   });
   document.querySelectorAll('#ql-ls4 .qcard').forEach((card, i) => {
+    if (!d.ls4.questions[i]) return;
+    ['A','B','C'].forEach(l => {
+      const inp = card.querySelector(`[data-key="opt${l}"]`);
+      if (inp) d.ls4.questions[i]['opt'+l] = inp.value;
+    });
     const cor = card.querySelector('.orow.correct');
-    if (cor && d.ls4.questions[i]) d.ls4.questions[i].correct = cor.dataset.opt || '';
+    if (cor) d.ls4.questions[i].correct = cor.dataset.opt || '';
   });
 
   // LS5
