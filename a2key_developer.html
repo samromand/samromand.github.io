@@ -604,8 +604,8 @@ function emptyVariant() {
     rw7: {img1:'',img2:'',img3:'',note:''},
     ls1: {audio:'',context:'',
       questions: Array.from({length:5}, () => ({text:'',picA:'',picB:'',picC:'',correct:''}))},
-    ls2: {audio:'',context:'',title:'',exLbl:'',exAns:'',
-      rows: Array.from({length:5}, () => ({label:'',answer:'',also:''}))},
+    ls2: {audio:'',context:'',title:'',exLbl:'',exAns:'',image:'',
+      rows: Array.from({length:5}, () => ({label:'',suffix:'',answer:'',also:''}))},
     ls3: {audio:'',context:'',
       questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
     ls4: {audio:'',context:'',
@@ -1042,15 +1042,25 @@ function bLS2() {
         <div class="fi"><label>Example row label</label><input type="text" data-ls2="exLbl" placeholder="e.g. When:" value="${esc(d.exLbl)}"></div>
         <div class="fi"><label>Example row answer (pre-filled)</label><input type="text" data-ls2="exAns" placeholder="e.g. Friday" value="${esc(d.exAns)}"></div>
       </div>
+      <div class="fi" style="margin-bottom:14px">
+        <label>Illustration URL (optional) <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--tm)">— decorative image shown below the form</span></label>
+        <input type="url" data-ls2="image" placeholder="https://…" value="${esc(d.image||'')}">
+      </div>
       <div class="stitle">Gaps 6–10</div>
+      <div class="clt" style="margin-bottom:12px">
+        <strong>Row label</strong> = text before the gap (e.g. "Give money to:"). 
+        <strong>Text after gap</strong> = optional word printed after the blank (e.g. "teacher" in "(7) ___ teacher").
+      </div>
       <table class="gtbl">
-        <thead><tr><th style="width:50px">Gap</th><th>Row label</th><th>Correct answer</th><th>Accept also</th></tr></thead>
+        <thead><tr><th style="width:42px">Gap</th><th>Row label (before gap)</th><th style="width:130px">Text after gap</th><th>Correct answer</th><th>Accept also</th></tr></thead>
         <tbody>${d.rows.map((r,i)=>`<tr>
           <td><strong>${i+6}</strong></td>
-          <td><input type="text" data-ls2r="${i}" data-rk="label" placeholder="e.g. Cost of ticket: £" value="${esc(r.label)}"></td>
-          <td><input type="text" data-ls2r="${i}" data-rk="answer" placeholder="e.g. 5.50" value="${esc(r.answer)}"></td>
-          <td><input type="text" data-ls2r="${i}" data-rk="also" placeholder="Alternatives…" value="${esc(r.also)}"></td>
-        </tr>`).join('')}</tbody>
+          <td><input type="text" data-ls2r="${i}" data-rk="label" placeholder="e.g. Cost of ticket: £" value="${esc(r.label||'')}"></td>
+          <td><input type="text" data-ls2r="${i}" data-rk="suffix" placeholder="e.g. teacher" value="${esc(r.suffix||'')}"><span style="font-size:10px;color:var(--tm);display:block;margin-top:2px">leave blank if none</span></td>
+          <td><input type="text" data-ls2r="${i}" data-rk="answer" placeholder="e.g. 5.50" value="${esc(r.answer||'')}"></td>
+          <td><input type="text" data-ls2r="${i}" data-rk="also" placeholder="Alternatives…" value="${esc(r.also||'')}"></td>
+        </tr>`).join('')}
+        </tbody>
       </table>
       <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save form</button></div>
     </div>
