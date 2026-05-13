@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking Assessment Sheet</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{font-family:'Noto Sans',Arial,sans-serif;font-size:11px;color:#111;background:#ddd;padding:20px}
+
+.sheet{background:#fff;max-width:740px;margin:0 auto;padding:28px 36px 28px;box-shadow:0 2px 18px rgba(0,0,0,.14)}
+
+@media print{
+  body{background:#fff!important;padding:0!important}
+  .sheet{box-shadow:none!important;max-width:none!important;padding:16px 22px!important;margin:0!important}
+  .no-print{display:none!important}
+  @page{margin:10mm 12mm;size:A4}
+  *{color:#000!important;background:transparent!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .crit-head{background:#fff!important}
+  .hd{border-bottom-color:#000!important}
+  .crit{border-color:#000!important}
+  .mbox{border-color:#000!important}
+  .mbox .val{border-bottom-color:#000!important}
+  .desc-table td{border-bottom-color:#000!important;border-right-color:#000!important}
+  .sig-row{border-top-color:#000!important}
+  .sig-box .line{border-bottom-color:#000!important}
+  .shield{background:#000!important}
+}
+
+/* Header */
+.hd{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:2px solid #00686E;margin-bottom:12px;gap:16px}
+.hd-left{display:flex;align-items:center;gap:10px}
+.shield{width:28px;height:34px;flex-shrink:0;background:linear-gradient(180deg,#C00 50%,#FFD700 50%);border-radius:2px 2px 50% 50%}
+.hd-org .top{font-size:10px;font-weight:700;letter-spacing:.03em}
+.hd-org .bot{font-size:9px;color:#666}
+.hd-right{text-align:right}
+.hd-right h1{font-size:13px;font-weight:700;color:#00686E;margin-bottom:1px}
+.hd-right .sub{font-size:9px;color:#666}
+
+/* Meta */
+.meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.mbox{border:1px solid #bbb;border-radius:2px;padding:4px 7px}
+.mbox .lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:2px}
+.mbox .val{font-size:12px;font-weight:700;color:#111;border-bottom:1px solid #ccc;min-height:15px;padding-bottom:1px}
+
+/* Criterion block */
+.crit{margin-bottom:9px;border:1px solid #ccc;border-radius:2px;overflow:hidden}
+.crit-head{background:#00686E;color:#fff;padding:5px 9px;display:flex;align-items:center;justify-content:space-between}
+.crit-head-left .crit-name{font-size:10.5px;font-weight:700;letter-spacing:.02em}
+.crit-head-left .crit-role{font-size:8.5px;opacity:.85;margin-top:1px}
+.score-box{width:44px;height:32px;background:#fff;border-radius:2px;border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#bbb;flex-shrink:0}
+
+/* Descriptor table */
+.desc-table{width:100%;border-collapse:collapse}
+.desc-table td{padding:4px 7px;vertical-align:top;border-bottom:1px solid #eee;border-right:1px solid #eee;font-size:9.5px;line-height:1.35;color:#222}
+.desc-table td:first-child{width:32px;text-align:center;font-weight:700;font-size:10.5px;color:#00686E;background:#f5fbfb;border-right:1px solid #ccc}
+.desc-table tr:last-child td{border-bottom:none}
+
+/* Signatures */
+.sig-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:10px;padding-top:10px;border-top:1px solid #ccc}
+.sig-box .lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:16px}
+.sig-box .line{border-bottom:1px solid #777}
+
+/* Print button */
+.print-btn{display:block;margin:14px auto 0;padding:8px 24px;background:#00686E;color:#fff;border:none;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.print-btn:hover{background:#004F54}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <div class="hd">
+    <div class="hd-left">
+      <div class="shield"></div>
+      <div class="hd-org">
+        <div class="top">CAMBRIDGE ASSESSMENT</div>
+        <div class="bot">English</div>
+      </div>
+    </div>
+    <div class="hd-right">
+      <h1>Speaking Assessment Sheet</h1>
+      <div class="sub">A2 Key for Schools &nbsp;·&nbsp; Examiner's copy</div>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="mbox">
+      <div class="lbl">Candidate ID</div>
+      <div class="val" id="cid-val">——</div>
+    </div>
+    <div class="mbox">
+      <div class="lbl">Date</div>
+      <div class="val" id="date-val"></div>
+    </div>
+    <div class="mbox">
+      <div class="lbl">Examiner / Centre</div>
+      <div class="val">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- GLOBAL ACHIEVEMENT -->
+  <div class="crit">
+    <div class="crit-head">
+      <div class="crit-head-left">
+        <div class="crit-name">Global Achievement</div>
+        <div class="crit-role">Interlocutor &nbsp;·&nbsp; 0–5 marks (half marks permitted)</div>
+      </div>
+      <div class="score-box">__</div>
+    </div>
+    <table class="desc-table">
+      <tr><td>5</td><td>Handles communication in everyday situations despite hesitation. Constructs longer utterances but cannot use complex language except in well-rehearsed utterances.</td></tr>
+      <tr><td>4</td><td>Communicates successfully in most familiar everyday situations with occasional hesitation. Produces connected utterances, though range and complexity remain limited.</td></tr>
+      <tr><td>3</td><td>Conveys basic meaning in very familiar everyday situations. Utterances tend to be short — words or phrases — with frequent hesitation and pauses.</td></tr>
+      <tr><td>2</td><td>Conveys meaning only in the most predictable situations with considerable effort. Utterances are fragmented and heavily reliant on single words or set phrases.</td></tr>
+      <tr><td>1</td><td>Has difficulty conveying basic meaning even in very familiar everyday situations. Responses are limited to short phrases or isolated words with frequent hesitation and pauses.</td></tr>
+    </table>
+  </div>
+
+  <!-- GRAMMAR AND VOCABULARY -->
+  <div class="crit">
+    <div class="crit-head">
+      <div class="crit-head-left">
+        <div class="crit-name">Grammar and Vocabulary</div>
+        <div class="crit-role">Assessor &nbsp;·&nbsp; 0–5 marks (half marks permitted)</div>
+      </div>
+      <div class="score-box">__</div>
+    </div>
+    <table class="desc-table">
+      <tr><td>5</td><td>Shows a good degree of control of simple grammatical forms. Uses a range of appropriate vocabulary when talking about everyday situations.</td></tr>
+      <tr><td>4</td><td>Shows reasonable control of simple grammatical forms with only occasional errors. Uses adequate vocabulary for most everyday topics, with some repetition.</td></tr>
+      <tr><td>3</td><td>Shows sufficient control of simple grammatical forms. Uses appropriate vocabulary to talk about everyday situations.</td></tr>
+      <tr><td>2</td><td>Shows partial control of simple grammatical forms; errors are frequent. Uses a limited vocabulary, often relying on basic words and fixed expressions.</td></tr>
+      <tr><td>1</td><td>Shows only limited control of a few grammatical forms. Uses a vocabulary of isolated words and phrases.</td></tr>
+    </table>
+  </div>
+
+  <!-- PRONUNCIATION -->
+  <div class="crit">
+    <div class="crit-head">
+      <div class="crit-head-left">
+        <div class="crit-name">Pronunciation</div>
+        <div class="crit-role">Assessor &nbsp;·&nbsp; 0–5 marks (half marks permitted)</div>
+      </div>
+      <div class="score-box">__</div>
+    </div>
+    <table class="desc-table">
+      <tr><td>5</td><td>Is mostly intelligible and has some control of phonological features at both utterance and word levels.</td></tr>
+      <tr><td>4</td><td>Is generally intelligible; shows emerging control of word stress and basic intonation patterns, with occasional lapses.</td></tr>
+      <tr><td>3</td><td>Is mostly intelligible despite limited control of phonological features.</td></tr>
+      <tr><td>2</td><td>Is partially intelligible; phonological errors are frequent and sometimes impede understanding.</td></tr>
+      <tr><td>1</td><td>Has very limited control of phonological features and is often unintelligible.</td></tr>
+    </table>
+  </div>
+
+  <!-- INTERACTIVE COMMUNICATION -->
+  <div class="crit">
+    <div class="crit-head">
+      <div class="crit-head-left">
+        <div class="crit-name">Interactive Communication</div>
+        <div class="crit-role">Assessor &nbsp;·&nbsp; 0–5 marks (half marks permitted)</div>
+      </div>
+      <div class="score-box">__</div>
+    </div>
+    <table class="desc-table">
+      <tr><td>5</td><td>Maintains simple exchanges. Requires very little prompting and support.</td></tr>
+      <tr><td>4</td><td>Maintains most simple exchanges with minimal prompting. Responds adequately but occasionally needs support to keep the interaction going.</td></tr>
+      <tr><td>3</td><td>Maintains simple exchanges despite some difficulty. Requires prompting and support.</td></tr>
+      <tr><td>2</td><td>Manages only very brief exchanges; frequently loses the thread of the interaction and requires regular prompting.</td></tr>
+      <tr><td>1</td><td>Has considerable difficulty maintaining simple exchanges. Requires additional prompting and support.</td></tr>
+    </table>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="sig-row">
+    <div class="sig-box">
+      <div class="lbl">Assessor signature</div>
+      <div class="line"></div>
+    </div>
+    <div class="sig-box">
+      <div class="lbl">Interlocutor signature</div>
+      <div class="line"></div>
+    </div>
+  </div>
+
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">🖨&nbsp; Print sheet</button>
+
+<script>
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  var cid = p.get('candidateId') || '——';
+  document.getElementById('cid-val').textContent = cid;
+  document.title = 'Speaking Sheet — ' + cid;
+  var d = new Date();
+  document.getElementById('date-val').textContent =
+    d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  if(p.get('print')==='1') window.addEventListener('load', function(){ window.print(); });
+})();
+</script>
+</body>
+</html>
