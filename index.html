@@ -1,509 +1,292 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Математика 8 класс — Контрольные работы</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Cambridge Assessment English — Exam Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --ink: #1a1a2e;
-    --paper: #f5f0e8;
-    --accent-a: #c84b31;
-    --accent-g: #2d6a4f;
-    --muted: #8a8070;
-    --border: #d4ccc0;
-    --card-bg: #faf7f2;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cam-teal:#00686E;--cam-teal-dark:#004F54;--cam-teal-light:#E6F4F5;
+  --cam-teal-btn:#007B82;--cam-active:#007B82;
+  --text:#1A1A1A;--text-muted:#555;--border:#D0D0D0;
+  --header-h:56px;
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'Noto Sans',system-ui,sans-serif;
+  --bg-page:#fff;--bg-header:#fff;--bg-instr:#F8F8F8;--bg-panel:#F2F2F2;
+}
+[data-contrast="wob"]{
+  --text:#FFF;--text-muted:#BBB;--border:#555;
+  --bg-page:#000;--bg-header:#111;--bg-instr:#111;--bg-panel:#111;
+  --cam-teal-light:#0A2A2C;
+}
+[data-contrast="yob"]{
+  --text:#FFD700;--text-muted:#C8A800;--border:#664400;
+  --bg-page:#000;--bg-header:#111;--bg-instr:#111;--bg-panel:#111;
+  --cam-teal:#CC8800;--cam-teal-dark:#AA6600;--cam-teal-btn:#CC8800;
+  --cam-teal-light:#1A0E00;--cam-active:#CC8800;
+}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+html,body{min-height:100%;font-family:var(--sans);font-size:15px;color:var(--text);background:var(--bg-page);transition:background .2s,color .2s}
 
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Golos Text', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
+/* ── HEADER ── */
+#header{
+  height:var(--header-h);background:var(--bg-header);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none}
+.cam-shield{
+  width:38px;height:44px;
+  background:linear-gradient(180deg,#C00000 50%,#FFD700 50%);
+  border-radius:2px 2px 50% 50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;position:relative;overflow:hidden;
+}
+.cam-shield::after{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover;
+}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.01em}
+.cam-logo-text .bot{font-size:11px;color:var(--text-muted)}
+.header-sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+#header-title{font-size:14px;font-weight:600;color:var(--text)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.h-icon-btn{background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;opacity:.7;transition:opacity .15s}
+.h-icon-btn:hover{opacity:1}
+.h-icon-btn svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.8}
 
-  /* grain overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ── MAIN ── */
+#main{
+  margin-top:var(--header-h);
+  min-height:calc(100vh - var(--header-h));
+  background:var(--bg-page);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:48px 20px 80px;
+}
 
-  header {
-    padding: 2rem 3rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-    position: relative;
-    z-index: 1;
-  }
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:48px;max-width:560px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--cam-teal);margin-bottom:16px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{
+  content:'';display:block;width:24px;height:1px;background:var(--cam-teal);opacity:.5;
+}
+.hero-title{
+  font-family:var(--serif);
+  font-size:32px;font-weight:600;color:var(--text);
+  line-height:1.25;margin-bottom:12px;letter-spacing:-.01em;
+}
+.hero-sub{font-size:15px;color:var(--text-muted);line-height:1.6;max-width:420px;margin:0 auto}
 
-  .site-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
+/* ── CARDS ── */
+.cards{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  width:100%;max-width:580px;
+}
+@media(max-width:480px){.cards{grid-template-columns:1fr}}
 
-  .site-subtitle {
-    font-size: 0.85rem;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
+.card{
+  background:var(--bg-instr);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:28px 24px;
+  display:flex;flex-direction:column;
+  gap:16px;
+  cursor:pointer;
+  transition:border-color .18s, box-shadow .18s, transform .15s;
+  text-decoration:none;
+  position:relative;overflow:hidden;
+}
+.card:not(.card--disabled):hover{
+  border-color:var(--cam-teal);
+  box-shadow:0 0 0 3px rgba(0,104,110,.08);
+  transform:translateY(-2px);
+}
+.card:not(.card--disabled):active{transform:translateY(0)}
 
-  .teacher-btn {
-    margin-left: auto;
-    font-family: 'Golos Text', sans-serif;
-    font-size: 0.8rem;
-    color: var(--muted);
-    background: none;
-    border: 1px solid var(--border);
-    padding: 0.4rem 1rem;
-    border-radius: 2px;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .teacher-btn:hover { border-color: var(--ink); color: var(--ink); }
+.card--disabled{cursor:default;opacity:.72}
+.card--primary{border-color:var(--cam-teal)}
 
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4rem 2rem;
-    position: relative;
-    z-index: 1;
-  }
+/* accent stripe top */
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--cam-teal);transform:scaleX(0);transform-origin:left;
+  transition:transform .22s ease;
+}
+.card--primary::before{transform:scaleX(1)}
+.card:not(.card--disabled):hover::before{transform:scaleX(1)}
 
-  .hero {
-    text-align: center;
-    margin-bottom: 4rem;
-  }
+.card-icon{
+  width:44px;height:44px;border-radius:3px;
+  background:var(--cam-teal-light);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.card-icon svg{width:22px;height:22px;stroke:var(--cam-teal-dark);fill:none;stroke-width:1.8}
+.card--disabled .card-icon{background:var(--bg-panel)}
+.card--disabled .card-icon svg{stroke:var(--text-muted)}
 
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -0.03em;
-    margin-bottom: 1rem;
-  }
+.card-body{flex:1}
+.card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px}
+.card-desc{font-size:13px;color:var(--text-muted);line-height:1.5}
 
-  .hero h1 em {
-    font-style: italic;
-    color: var(--muted);
-  }
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:12px;border-top:1px solid var(--border);
+}
+.card-cta{
+  font-size:13px;font-weight:700;color:var(--cam-teal);
+  display:flex;align-items:center;gap:5px;
+}
+.card-cta svg{width:14px;height:14px;stroke:var(--cam-teal);fill:none;stroke-width:2.5;transition:transform .15s}
+.card:not(.card--disabled):hover .card-cta svg{transform:translateX(3px)}
+.card--disabled .card-cta{color:var(--text-muted)}
+.card--disabled .card-cta svg{stroke:var(--text-muted)}
 
-  .hero p {
-    font-size: 1rem;
-    color: var(--muted);
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.7;
-  }
+.wip-badge{
+  font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  background:var(--bg-panel);color:var(--text-muted);
+  border:1px solid var(--border);border-radius:2px;
+  padding:3px 8px;
+}
 
-  .subjects {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    width: 100%;
-    max-width: 800px;
-    border: 1px solid var(--border);
-  }
+/* ── FOOTER NOTE ── */
+.portal-note{
+  margin-top:40px;
+  font-size:12px;color:var(--text-muted);text-align:center;
+  max-width:400px;line-height:1.6;
+}
+.portal-note a{color:var(--cam-teal);text-decoration:none}
+.portal-note a:hover{text-decoration:underline}
 
-  .subject-card {
-    background: var(--card-bg);
-    padding: 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    border: none;
-    transition: background 0.2s;
-  }
-  .subject-card:first-child { border-right: 1px solid var(--border); }
-  .subject-card:hover { background: #fff; }
-
-  .subject-label {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .subject-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 700;
-    font-family: 'Playfair Display', serif;
-    flex-shrink: 0;
-  }
-  .icon-a { background: #fce8e4; color: var(--accent-a); }
-  .icon-g { background: #e4f0eb; color: var(--accent-g); }
-
-  .subject-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .subject-desc {
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .subject-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: auto;
-  }
-
-  .btn {
-    display: block;
-    padding: 0.75rem 1.25rem;
-    font-family: 'Golos Text', sans-serif;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: 2px;
-    transition: all 0.15s;
-    text-align: center;
-    cursor: pointer;
-    border: none;
-  }
-
-  .btn-primary-a {
-    background: var(--accent-a);
-    color: #fff;
-  }
-  .btn-primary-a:hover { background: #b03d26; }
-
-  .btn-primary-g {
-    background: var(--accent-g);
-    color: #fff;
-  }
-  .btn-primary-g:hover { background: #235a40; }
-
-  .btn-secondary {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--ink);
-  }
-  .btn-secondary:hover { border-color: var(--ink); background: #fff; }
-
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 3rem 0 2rem;
-    width: 100%;
-    max-width: 800px;
-  }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-  .divider span {
-    font-size: 0.75rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .info-strip {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    width: 100%;
-    max-width: 800px;
-    border: 1px solid var(--border);
-    background: var(--border);
-  }
-
-  .info-item {
-    background: var(--card-bg);
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .info-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .info-num.red { color: var(--accent-a); }
-  .info-num.green { color: var(--accent-g); }
-
-  .info-label {
-    font-size: 0.78rem;
-    color: var(--muted);
-    line-height: 1.4;
-  }
-
-  footer {
-    padding: 1.5rem 3rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.78rem;
-    color: var(--muted);
-    position: relative;
-    z-index: 1;
-  }
-
-  /* PIN modal */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(26,26,46,0.55);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.active { display: flex; }
-
-  .modal {
-    background: var(--paper);
-    border: 1px solid var(--border);
-    padding: 2.5rem;
-    width: 100%;
-    max-width: 360px;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .modal h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-  }
-
-  .modal p {
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .pin-input {
-    font-family: 'Golos Text', sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 0.2em;
-    text-align: center;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    background: #fff;
-    width: 100%;
-    border-radius: 2px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .pin-input:focus { border-color: var(--ink); }
-  .pin-input.error { border-color: var(--accent-a); animation: shake 0.3s; }
-
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    75% { transform: translateX(6px); }
-  }
-
-  .modal-actions {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .btn-modal-cancel {
-    flex: 1;
-    padding: 0.7rem;
-    background: none;
-    border: 1px solid var(--border);
-    font-family: 'Golos Text', sans-serif;
-    font-size: 0.875rem;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.15s;
-    color: var(--ink);
-  }
-  .btn-modal-cancel:hover { border-color: var(--ink); }
-
-  .btn-modal-confirm {
-    flex: 2;
-    padding: 0.7rem;
-    background: var(--ink);
-    color: #fff;
-    border: none;
-    font-family: 'Golos Text', sans-serif;
-    font-size: 0.875rem;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: background 0.15s;
-  }
-  .btn-modal-confirm:hover { background: #2d2d4e; }
-
-  .error-msg {
-    font-size: 0.8rem;
-    color: var(--accent-a);
-    display: none;
-  }
-  .error-msg.visible { display: block; }
+/* ── MODAL ── */
+#modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(255,255,255,.97);display:none;align-items:center;justify-content:center}
+[data-contrast="wob"] #modal-overlay,[data-contrast="yob"] #modal-overlay{background:rgba(0,0,0,.95)}
+#modal-overlay.show{display:flex}
+.modal-box{background:var(--bg-instr);border:1px solid var(--border);border-radius:4px;padding:24px;width:320px;max-width:90vw}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);line-height:1}
+.modal-close:hover{color:var(--text)}
+.opt-list{border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.opt-row{padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;font-size:14px;color:var(--text);background:var(--bg-instr);display:flex;align-items:center;justify-content:space-between;transition:background .1s}
+.opt-row:last-child{border-bottom:none}
+.opt-row:hover{background:#DCF0FF}
+[data-contrast="wob"] .opt-row:hover,[data-contrast="yob"] .opt-row:hover{background:var(--cam-teal-light)}
+.opt-check{color:var(--cam-teal);visibility:hidden}
+.opt-check.on{visibility:visible}
 </style>
+
+<script>
+window.openModal  = function(){ document.getElementById('modal-overlay').classList.add('show'); };
+window.closeModal = function(){ document.getElementById('modal-overlay').classList.remove('show'); };
+window.setContrast = function(val){
+  ['bow','wob','yob'].forEach(function(v){
+    document.getElementById('c-'+v).className = 'opt-check'+(v===val?' on':'');
+  });
+  val==='bow'
+    ? document.documentElement.removeAttribute('data-contrast')
+    : document.documentElement.setAttribute('data-contrast', val);
+};
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') window.closeModal(); });
+</script>
 </head>
 <body>
 
-<header>
-  <div class="site-title">КР · 8 класс</div>
-  <div class="site-subtitle">Алгебра и геометрия</div>
-  <button class="teacher-btn" onclick="openPinModal()">
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-      <rect x="1" y="5" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/>
-      <path d="M3.5 5V3.5a2.5 2.5 0 015 0V5" stroke="currentColor" stroke-width="1.2"/>
-    </svg>
-    Панель учителя
-  </button>
-</header>
+<!-- HEADER -->
+<div id="header">
+  <a class="cam-logo" href="#">
+    <div class="cam-shield"></div>
+    <div class="cam-logo-text">
+      <div class="top">Cambridge Assessment</div>
+      <div class="bot">English</div>
+    </div>
+  </a>
+  <div class="header-sep"></div>
+  <div id="header-title">Exam Portal</div>
+  <div class="header-right">
+    <button class="h-icon-btn" onclick="openModal()" title="Display settings" aria-label="Display settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" opacity=".4"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" opacity=".3"/></svg>
+    </button>
+  </div>
+</div>
 
-<main>
+<!-- MAIN -->
+<main id="main">
+
   <div class="hero">
-    <h1>Итоговые<br><em>контрольные</em><br>работы</h1>
-    <p>Тренировочные задания и контрольные варианты по всем темам курса алгебры и геометрии 8 класса, 3 триместр.</p>
+    <div class="hero-eyebrow">Online Testing</div>
+    <h1 class="hero-title">What would you like to do?</h1>
+    <p class="hero-sub">Select an option below to get started.</p>
   </div>
 
-  <div class="subjects">
-    <div class="subject-card">
-      <div class="subject-label">
-        <div class="subject-icon icon-a">A</div>
-        <div class="subject-name">Алгебра</div>
+  <div class="cards">
+
+    <!-- Take exam -->
+    <a class="card card--primary" href="https://samromand.github.io/exam_registration">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       </div>
-      <div class="subject-desc">
-        Рациональные дроби, квадратные корни, уравнения, неравенства, функции. 8 заданий, 90 минут.
+      <div class="card-body">
+        <div class="card-title">Take an exam</div>
+        <div class="card-desc">Register as a candidate and sit your assigned exam variant.</div>
       </div>
-      <div class="subject-actions">
-        <a href="algebra-practice.html" class="btn btn-primary-a">Режим практики</a>
-        <a href="algebra-test.html" class="btn btn-secondary">Контрольная работа</a>
+      <div class="card-footer">
+        <span class="card-cta">
+          Start
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+      </div>
+    </a>
+
+    <!-- Check results -->
+    <div class="card card--disabled">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Check results</div>
+        <div class="card-desc">View scores and feedback for a completed exam.</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-cta">
+          Coming soon
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+        <span class="wip-badge">In development</span>
       </div>
     </div>
 
-    <div class="subject-card">
-      <div class="subject-label">
-        <div class="subject-icon icon-g">Г</div>
-        <div class="subject-name">Геометрия</div>
-      </div>
-      <div class="subject-desc">
-        Четырёхугольники, площади, теорема Пифагора, подобие, окружность. 8 заданий, 90 минут.
-      </div>
-      <div class="subject-actions">
-        <a href="geometry-practice.html" class="btn btn-primary-g">Режим практики</a>
-        <a href="geometry-test.html" class="btn btn-secondary">Контрольная работа</a>
-      </div>
-    </div>
   </div>
 
-  <div class="divider"><span>Структура работы</span></div>
+  <p class="portal-note">
+    If you have any technical issues, please contact your exam administrator.
+  </p>
 
-  <div class="info-strip">
-    <div class="info-item">
-      <div class="info-num red">8</div>
-      <div class="info-label">заданий в каждой контрольной работе</div>
-    </div>
-    <div class="info-item">
-      <div class="info-num green">10</div>
-      <div class="info-label">максимальных баллов за работу</div>
-    </div>
-    <div class="info-item">
-      <div class="info-num" style="color:var(--muted)">90</div>
-      <div class="info-label">минут на выполнение работы</div>
-    </div>
-  </div>
 </main>
 
-<footer>
-  <span>Алгебра и геометрия · 8 класс · 3 триместр 2025–2026</span>
-  <span>Задания 7–8: развёрнутый ответ · проверяется учителем</span>
-</footer>
-
-<!-- PIN modal -->
-<div class="modal-overlay" id="pinModal">
-  <div class="modal">
-    <h2>Панель учителя</h2>
-    <p>Введите PIN-код для доступа к редактированию заданий.</p>
-    <input
-      type="password"
-      class="pin-input"
-      id="pinInput"
-      maxlength="8"
-      placeholder="••••••••"
-      onkeydown="if(event.key==='Enter') checkPin()"
-    >
-    <div class="error-msg" id="pinError">Неверный PIN-код. Попробуйте снова.</div>
-    <div class="modal-actions">
-      <button class="btn-modal-cancel" onclick="closePinModal()">Отмена</button>
-      <button class="btn-modal-confirm" onclick="checkPin()">Войти</button>
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">
+      Display settings
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Colour scheme</div>
+    <div class="opt-list">
+      <div class="opt-row" onclick="setContrast('bow')">Black on white <span class="opt-check on" id="c-bow">✓</span></div>
+      <div class="opt-row" onclick="setContrast('wob')">White on black <span class="opt-check" id="c-wob">✓</span></div>
+      <div class="opt-row" onclick="setContrast('yob')">Yellow on black <span class="opt-check" id="c-yob">✓</span></div>
     </div>
   </div>
 </div>
 
-<script>
-  const PIN = '10951538';
-
-  function openPinModal() {
-    document.getElementById('pinModal').classList.add('active');
-    setTimeout(() => document.getElementById('pinInput').focus(), 100);
-  }
-
-  function closePinModal() {
-    document.getElementById('pinModal').classList.remove('active');
-    document.getElementById('pinInput').value = '';
-    document.getElementById('pinError').classList.remove('visible');
-  }
-
-  function checkPin() {
-    const val = document.getElementById('pinInput').value;
-    if (val === PIN) {
-      closePinModal();
-      window.location.href = 'admin.html';
-    } else {
-      const input = document.getElementById('pinInput');
-      const err = document.getElementById('pinError');
-      input.classList.add('error');
-      err.classList.add('visible');
-      input.value = '';
-      setTimeout(() => input.classList.remove('error'), 300);
-      setTimeout(() => input.focus(), 50);
-    }
-  }
-
-  document.getElementById('pinModal').addEventListener('click', function(e) {
-    if (e.target === this) closePinModal();
-  });
-</script>
 </body>
 </html>
