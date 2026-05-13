@@ -1,0 +1,3061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A2 Key for Schools — Listening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cam-teal:#00686E;
+  --cam-teal-dark:#004F54;
+  --cam-teal-light:#E6F4F5;
+  --cam-teal-btn:#007B82;
+  --cam-nav-bg:#F2F2F2;
+  --cam-nav-border:#CACACA;
+  --cam-active:#007B82;
+  --cam-done-bg:#005C63;
+  --white:#FFFFFF;
+  --text:#1A1A1A;
+  --text-muted:#555;
+  --border:#D0D0D0;
+  --highlight-row:#DCF0FF;
+  --selected-option:#1A6FB5;
+  --header-h:56px;
+  --footer-h:52px;
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'Noto Sans',system-ui,sans-serif;
+  /* surface colours used broadly */
+  --bg-page:#fff;
+  --bg-header:#fff;
+  --bg-footer:#F2F2F2;
+  --bg-instr:#F8F8F8;
+  --bg-panel:#F2F2F2;
+  --bg-selected:#DCF0FF;
+  --nav-btn-active:#fff;
+  --bm-color:#E05C00;
+}
+
+/* ── WHITE ON BLACK ── */
+[data-contrast="wob"]{
+  --bm-color:#E05C00;
+  --text:#FFFFFF;
+  --text-muted:#BBBBBB;
+  --border:#555555;
+  --bg-page:#000000;
+  --bg-header:#111111;
+  --bg-footer:#111111;
+  --bg-instr:#111111;
+  --bg-panel:#111111;
+  --bg-selected:#1A3A3A;
+  --highlight-row:#1A3A3A;
+  --cam-nav-bg:#111111;
+  --cam-nav-border:#444444;
+  --cam-teal-light:#0A2A2C;
+  --nav-btn-active:#1A1A1A;
+  --selected-option:#6EC6CA;
+}
+[data-contrast="wob"] html,
+[data-contrast="wob"] body,
+[data-contrast="wob"] #main,
+[data-contrast="wob"] .exam-page,
+[data-contrast="wob"] .p2-left,
+[data-contrast="wob"] .p2-right,
+[data-contrast="wob"] .p3-left,
+[data-contrast="wob"] .p3-right,
+[data-contrast="wob"] .p6-left,
+[data-contrast="wob"] .p6-right,
+[data-contrast="wob"] .p7-wrap,
+[data-contrast="wob"] .p4-wrap,
+[data-contrast="wob"] .p5-wrap{
+  background:var(--bg-page);color:var(--text);
+}
+
+/* ── YELLOW ON BLACK ── */
+[data-contrast="yob"]{
+  --text:#FFD700;
+  --text-muted:#C8A800;
+  --border:#664400;
+  --bg-page:#000000;
+  --bg-header:#111111;
+  --bg-footer:#111111;
+  --bg-instr:#111111;
+  --bg-panel:#111111;
+  --bg-selected:#2A1A00;
+  --highlight-row:#2A1A00;
+  --cam-nav-bg:#111111;
+  --cam-nav-border:#554400;
+  --cam-teal:#CC8800;
+  --cam-teal-dark:#AA6600;
+  --cam-teal-btn:#CC8800;
+  --cam-teal-light:#1A0E00;
+  --cam-active:#CC8800;
+  --nav-btn-active:#1A1A00;
+  --selected-option:#CC8800;
+  --bm-color:#FFFFFF;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);font-size:15px;color:var(--text);background:var(--bg-page)}
+
+/* Global theme application */
+body{transition:background .2s,color .2s}
+#header{background:var(--bg-header)!important;border-bottom-color:var(--border)!important}
+#footer{background:var(--bg-footer)!important;border-top-color:var(--cam-nav-border)!important}
+#main{background:var(--bg-page)!important}
+.instr-bar{background:var(--bg-instr)!important;border-bottom-color:var(--border)!important}
+.p2-left,.p2-right,.p3-left,.p3-right,.p6-left,.p6-right,.p7-wrap,.p4-wrap,.p5-wrap{background:var(--bg-page)}
+.p1-opt:hover,.p2-opt-radio:hover,.p3-opt:hover{background:var(--bg-instr)!important}
+.p1-opt.selected,.p2-opt-radio.selected,.p3-opt.selected{background:var(--bg-selected)!important}
+.p6-textarea,.p7-textarea{background:var(--bg-page)!important;color:var(--text)!important}
+.f-q-pill{background:var(--bg-footer)!important;color:var(--text)!important}
+.f-part-btn.active{background:var(--nav-btn-active)!important}
+.p1-sign{background:var(--bg-page)!important;color:var(--text)!important}
+.p2-left,.p3-left,.p6-left{border-right-color:var(--border)!important}
+.instr-bar .qrange,.instr-bar .qinstr{color:var(--text)!important}
+#notes-panel{background:var(--bg-panel)!important;border-left-color:var(--border)!important}
+#modal-overlay{background-color:color-mix(in srgb, var(--bg-page) 97%, transparent)!important}
+
+/* 1. Modal buttons & rows */
+.opt-list{background:var(--bg-instr)!important;border-color:var(--border)!important}
+.opt-row{background:var(--bg-instr)!important;color:var(--text)!important;border-bottom-color:var(--border)!important}
+.opt-row:hover{background:var(--bg-selected)!important}
+.opt-row.primary{background:var(--cam-teal-dark)!important;color:#fff!important}
+.opt-row.primary:hover{filter:brightness(1.15)}
+.modal-title,.modal-back,.modal-close{color:var(--text)!important}
+.modal-back{color:var(--text)!important}
+.opt-row .opt-check{color:var(--text)!important}
+
+/* 2. Highlight/Note tooltip */
+#hl-tooltip{background:var(--bg-instr)!important;border-color:var(--border)!important}
+#hl-tooltip button{background:var(--bg-instr)!important;color:var(--text)!important}
+#hl-tooltip button:hover{background:var(--bg-selected)!important}
+.hl-divider{background:var(--border)!important}
+
+/* 3. Nav stripes — redrawn by drawOverlay via JS using --text color */
+/* (handled in drawOverlay via getComputedStyle) */
+
+/* 4. Part 4/5 gap fills */
+.p4-gap-input{background:var(--bg-instr)!important;border-color:var(--border)!important;color:var(--text)!important}
+.p4-gap.open .p4-gap-input{background:var(--cam-teal-light)!important;border-color:var(--cam-active)!important}
+.p4-gap.bookmarked .p4-gap-input{border-color:var(--bm-color)!important}
+.p5-gap-box{background:var(--bg-instr)!important;color:var(--text)!important}
+.p5-gap-box::placeholder{color:var(--text-muted)!important}
+.p5-gap-box:focus{background:var(--cam-teal-light)!important}
+.p5-gap.bookmarked .p5-gap-box{border-color:var(--bm-color)!important}
+.p5-gap.bookmarked .p5-gap-bm{border-left-color:var(--bm-color)!important}
+
+/* 5. Placeholders in parts 6&7 */
+.p6-textarea::placeholder,.p7-textarea::placeholder{color:var(--text-muted)!important}
+.p6-textarea{background:var(--bg-instr)!important;color:var(--text)!important;border-color:var(--cam-active)!important}
+.p7-textarea{background:var(--bg-instr)!important;color:var(--text)!important;border-color:var(--cam-active)!important}
+
+/* ── AUDIO STATUS ── */
+@keyframes audioPulse {
+  0%,100%{opacity:1} 50%{opacity:.4}
+}
+#audio-status{
+  color:var(--cam-teal-dark);
+}
+[data-contrast="wob"] #audio-status,[data-contrast="yob"] #audio-status{
+  color:var(--cam-active)!important;
+}
+#audio-status-text{overflow:hidden;text-overflow:ellipsis}
+/* Transition overlay inner card */
+#audio-transition > div{
+  background:var(--bg-page)!important;
+}
+
+/* Timer */
+#timer-display{color:var(--text)!important}
+#timer-display svg{stroke:var(--text)!important}
+/* Size scaling for timer */
+[data-size="large"] #timer-display{font-size:15.3px!important}
+[data-size="large"] #timer-display svg{width:19px!important;height:19px!important}
+[data-size="xl"] #timer-display{font-size:18.2px!important}
+[data-size="xl"] #timer-display svg{width:22px!important;height:22px!important}
+
+/* Submit modal */
+#submit-modal{background-color:color-mix(in srgb, var(--bg-page) 97%, transparent)!important}
+#submit-modal .modal-title,#submit-modal .modal-back,#submit-modal .modal-close{color:var(--text)!important}
+#submit-modal button:not([disabled]){background:var(--bg-instr)!important;color:var(--text)!important;border-color:var(--border)!important}
+#submit-modal button[disabled]{background:#555!important;color:#999!important;border:none!important}
+[data-size="large"] #submit-modal{font-size:17px}
+[data-size="xl"] #submit-modal{font-size:20px}
+
+/* 6. Cambridge logo text */
+.cam-logo-text .top{color:var(--text)!important}
+.cam-logo-text .bot{color:var(--text-muted)!important}
+.cid-label{color:var(--text-muted)!important}
+.header-icons svg{stroke:var(--text)!important}
+
+/* Nav part-btn text, footer part counts */
+.f-part-btn{color:var(--text)!important}
+.f-part-btn.active{color:var(--cam-active)!important}
+.f-part-count{color:var(--text-muted)!important}
+.f-sep{background:var(--cam-nav-border)!important}
+
+/* Note popup */
+#note-popup{background:var(--bg-instr)!important;border-color:var(--border)!important}
+#note-text{background:var(--bg-page)!important;color:var(--text)!important;border-color:var(--border)!important}
+#note-text::placeholder{color:var(--text-muted)!important}
+#note-cancel-btn{background:var(--bg-selected)!important;color:var(--text)!important}
+
+/* Notes panel items */
+.note-item{background:var(--bg-instr)!important;border-bottom-color:var(--border)!important;color:var(--text)!important}
+.note-item:hover{background:var(--bg-selected)!important}
+#notes-panel-header{border-bottom-color:var(--border)!important}
+#notes-panel-title,#notes-panel-close{color:var(--text)!important}
+
+/* Resize buttons */
+.resize-btn{background:var(--bg-panel)!important}
+[data-contrast="wob"] .resize-btn{background:#555!important}
+[data-contrast="wob"] .resize-btn svg{stroke:#fff!important}
+[data-contrast="yob"] .resize-btn{background:#664400!important}
+[data-contrast="yob"] .resize-btn svg{stroke:#FFD700!important}
+
+[data-contrast="wob"] .ls-audio-placeholder{background:var(--cam-teal-light)!important;border-color:var(--cam-teal)!important;color:var(--text)!important}
+[data-contrast="wob"] .ls2-form{background:var(--bg-instr)!important;border-color:var(--border)!important}
+[data-contrast="wob"] .ls1-pic-ph,[data-contrast="wob"] .ls2-row{background:var(--bg-page)!important}
+[data-contrast="yob"] .ls-audio-placeholder{background:var(--cam-teal-light)!important;border-color:var(--cam-teal)!important;color:var(--text)!important}
+[data-contrast="yob"] .ls2-form{background:var(--bg-instr)!important;border-color:var(--border)!important}
+[data-contrast="yob"] .ls5-act-lbl{background:var(--cam-teal-dark)!important}
+[data-contrast="yob"] .ls5-select{background:var(--bg-instr)!important;color:var(--text)!important;border-color:var(--border)!important}
+[data-contrast="wob"] .ls5-select{background:var(--bg-instr)!important;color:var(--text)!important;border-color:var(--border)!important}
+
+
+/* ── HEADER ── */
+#header{
+  height:var(--header-h);
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 20px;
+  gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  flex-shrink:0;
+}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cam-shield{
+  width:38px;height:44px;
+  background: linear-gradient(180deg,#C00000 50%,#FFD700 50%);
+  border-radius:2px 2px 50% 50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;letter-spacing:-.5px;
+  flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.cam-shield::after{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover;
+}
+.cam-logo-text{line-height:1.2}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:#1A1A1A;letter-spacing:.01em}
+.cam-logo-text .bot{font-size:11px;color:#555;font-weight:400}
+#header-title{font-size:14px;font-weight:600;color:var(--text);margin-left:4px}
+.header-sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+.cid-label{font-size:12px;color:var(--text-muted)}
+.header-icons{margin-left:auto;display:flex;align-items:center;gap:18px}
+.header-icons svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.8;cursor:pointer;opacity:.7;transition:opacity .15s}
+.header-icons svg:hover{opacity:1}
+
+/* ── MAIN SCROLL AREA ── */
+#main-wrap{
+  position:fixed;
+  top:var(--header-h);
+  bottom:var(--footer-h);
+  left:0;right:0;
+  display:flex;
+}
+#main{
+  flex:1;
+  overflow-y:auto;
+  background:#fff;
+  min-width:0;
+}
+/* ── NOTES PANEL ── */
+#notes-panel{
+  width:280px;
+  flex-shrink:0;
+  background:#F2F2F2;
+  border-left:1px solid var(--cam-nav-border);
+  display:flex;flex-direction:column;
+  transition:width .2s ease;
+  overflow:hidden;
+}
+#notes-panel.collapsed{width:0;border-left:none}
+#notes-panel-header{
+  padding:16px 16px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--cam-nav-border);
+  flex-shrink:0;
+}
+#notes-panel-title{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap}
+#notes-panel-close{
+  background:none;border:none;cursor:pointer;
+  color:var(--text-muted);font-size:18px;line-height:1;padding:0 2px;
+}
+#notes-panel-close:hover{color:var(--text)}
+#notes-panel-empty{
+  padding:32px 20px;text-align:center;
+  color:var(--text-muted);font-size:14px;line-height:1.6;
+}
+#notes-panel-empty .np-icon{font-size:28px;margin-bottom:12px;opacity:.4}
+#notes-list{
+  flex:1;overflow-y:auto;padding:8px 0;
+}
+.note-item{
+  padding:12px 16px;
+  border-bottom:1px solid #E0E0E0;
+  cursor:pointer;
+}
+.note-item:hover{background:#E8E8E8}
+.note-item .ni-quote{
+  font-size:13px;font-style:italic;color:var(--text-muted);
+  margin-bottom:6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding-left:8px;border-left:3px solid #E8B840;
+}
+.note-item .ni-text{font-size:13px;color:var(--text);line-height:1.5}
+.note-item .ni-del{
+  margin-top:6px;font-size:11px;color:#C00;cursor:pointer;
+  background:none;border:none;padding:0;
+  display:flex;align-items:center;gap:4px;
+}
+.note-item .ni-del:hover{text-decoration:underline}
+.note-item.active-note{
+  background:#E0EEF0;
+  animation:noteFlash .4s ease 3;
+}
+@keyframes noteFlash{
+  0%{background:#E0EEF0} 50%{background:#A8D4D8} 100%{background:#E0EEF0}
+}
+/* Note input popup */
+#note-popup{
+  position:fixed;z-index:310;
+  background:#fff;border:1px solid var(--border);border-radius:6px;
+  box-shadow:0 4px 20px rgba(0,0,0,.15);
+  padding:14px;width:260px;display:none;
+}
+#note-popup.show{display:block}
+#note-popup textarea{
+  width:100%;height:80px;resize:none;
+  border:1px solid var(--border);border-radius:4px;
+  padding:8px;font-family:var(--sans);font-size:13px;
+  outline:none;
+}
+#note-popup textarea:focus{border-color:var(--cam-active)}
+#note-popup-btns{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+#note-popup-btns button{
+  padding:6px 14px;border-radius:4px;font-size:13px;font-weight:600;
+  cursor:pointer;border:none;
+}
+#note-save-btn{background:var(--cam-teal);color:#fff}
+#note-save-btn:hover{background:var(--cam-teal-dark)}
+#note-cancel-btn{background:#E8E8E8;color:var(--text)}
+#note-cancel-btn:hover{background:#D0D0D0}
+/* Notes toggle button in header */
+#notes-toggle-btn{
+  display:flex;align-items:center;gap:6px;
+  background:none;border:1px solid var(--border);border-radius:4px;
+  padding:4px 10px;font-size:12px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:.15s;margin-left:12px;
+}
+#notes-toggle-btn:hover{background:#F0F0F0}
+#notes-toggle-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+
+/* ── INSTRUCTION BAR ── */
+.instr-bar{
+  background:#F8F8F8;
+  border-bottom:1px solid var(--border);
+  padding:12px 24px 11px;
+}
+.instr-bar .qrange{font-size:14px;font-weight:700;color:var(--text)}
+.instr-bar .qinstr{font-size:14px;color:var(--text);margin-top:2px}
+.instr-bar .qinstr strong{font-weight:700}
+
+/* ── PAGES ── */
+.exam-page{display:none;padding:0 0 40px}
+.exam-page.active{display:block}
+/* Part 3 uses normal scroll — layout handled below */
+
+/* ── PART 1 ── */
+.p1-single{
+  padding:28px 32px 32px;
+  max-width:680px;
+}
+/* Image/text sign — top */
+.p1-sign-wrap{margin-bottom:20px}
+.p1-sign{
+  display:inline-block;
+  padding:16px 22px;
+  font-family:var(--serif);
+  background:#fff;
+  line-height:1.5;
+  border:1.5px solid #888;
+  max-width:420px;
+}
+.p1-sign.style-notice{font-style:italic;text-align:center}
+.p1-sign.style-bold{font-weight:700;text-align:center;font-size:16px}
+.p1-sign.style-email{border:1px solid var(--border);padding:0;max-width:380px}
+.email-header{background:#E8E8E8;padding:8px 12px;font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:4px 8px}
+.email-header .el{font-weight:700;color:#333}
+.email-body{padding:12px;font-size:14px;line-height:1.6;color:var(--text)}
+/* Image inside sign: no extra border, just display naturally */
+.p1-sign-img{
+  display:block;
+  max-width:420px;
+  max-height:220px;
+  object-fit:contain;
+  border:1px solid var(--border);
+  border-radius:2px;
+}
+/* Question number row */
+.p1-question{
+  font-size:15px;font-weight:700;color:var(--text);
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
+.p1-qnum{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:28px;height:28px;
+  border:2px solid transparent; /* no border by default */
+  font-size:13px;font-weight:700;flex-shrink:0;
+  line-height:1;transition:border-color .15s;
+}
+.p1-qnum.active-q{border-color:var(--cam-active)}
+.p1-options{display:flex;flex-direction:column;gap:0}
+.p1-opt{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;
+  cursor:pointer;
+  transition:background .1s;
+  border-radius:3px;
+}
+.p1-opt:hover{background:#F5F5F5}
+.p1-opt.selected{background:var(--highlight-row)}
+.p1-opt input[type=radio]{
+  width:18px;height:18px;
+  accent-color:var(--selected-option);
+  flex-shrink:0;cursor:pointer;
+}
+.p1-opt label{font-size:15px;color:var(--text);cursor:pointer;line-height:1.4}
+.q-bookmark{
+  margin-left:auto;flex-shrink:0;cursor:pointer;
+}
+.q-bookmark svg{width:18px;height:22px;fill:none;stroke:#ccc;stroke-width:1.5;transition:.15s}
+.q-bookmark.marked svg{fill:var(--bm-color);stroke:var(--bm-color)}
+.q-bookmark:hover svg{stroke:var(--bm-color)}
+
+/* ── PART 2 ── */
+.p2-layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  position:relative;
+  height:100%;
+}
+.p2-left{
+  padding:24px;border-right:1px solid var(--border);
+  overflow-y:auto;height:100%;
+}
+.p2-right{
+  padding:24px;
+  overflow-y:auto;height:100%;
+}
+.p2-title{font-size:20px;font-weight:700;margin-bottom:18px;color:var(--text)}
+.p2-person{margin-bottom:16px}
+/* Card layout: photo left, text right */
+.p2-person-card{display:flex;gap:14px;align-items:flex-start}
+.p2-person-photo-wrap{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  width:80px;
+}
+.p2-person-photo{
+  width:80px;height:80px;
+  object-fit:cover;
+  border-radius:6px;
+  border:1px solid var(--border);
+  display:block;
+}
+.p2-person-photo-name{
+  font-size:12px;font-weight:700;
+  color:var(--text);text-align:center;
+  line-height:1.2;
+}
+.p2-person-body{flex:1;min-width:0}
+.p2-person-name{font-size:15px;font-weight:700;margin-bottom:5px;color:var(--text)}
+.p2-person-text{font-size:14px;line-height:1.65;color:var(--text)}
+.p2-divider{height:1px;background:var(--border);margin:14px 0}
+.p2-question{
+  padding:12px 0;
+  border-bottom:1px solid #EBEBEB;
+}
+.p2-question:last-child{border-bottom:none}
+.p2-qrow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.p2-qnum-box{
+  width:26px;height:26px;border:2px solid transparent;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+  transition:border-color .15s;
+}
+.p2-qnum-box.active-q{border-color:var(--cam-active)}
+.p2-qtext{font-size:14px;font-weight:700;color:var(--text);flex:1;line-height:1.4}
+.p2-options-row{display:flex;gap:0;padding-left:34px}
+.p2-opt-radio{
+  flex:1;display:flex;align-items:center;gap:7px;
+  padding:7px 10px;cursor:pointer;border-radius:4px;
+  transition:background .1s;
+}
+.p2-opt-radio:hover{background:#F5F5F5}
+.p2-opt-radio.selected{background:var(--highlight-row)}
+.p2-opt-radio input[type=radio]{width:17px;height:17px;accent-color:var(--selected-option);cursor:pointer;flex-shrink:0}
+.p2-opt-radio label{font-size:14px;cursor:pointer;color:var(--text)}
+/* resize handle */
+.p2-resize{
+  position:absolute;left:50%;top:0;bottom:0;
+  width:8px;transform:translateX(-50%);
+  cursor:col-resize;z-index:10;
+  display:flex;align-items:center;justify-content:center;
+}
+.p2-resize-handle{
+  width:8px;height:48px;background:#C8C8C8;border-radius:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+}
+.p2-resize-handle::before,.p2-resize-handle::after{content:'↔';font-size:10px;color:#888}
+.p2-resize-handle::before{content:''}
+.p2-resize-handle::after{content:''}
+.resize-btn{
+  background:#C8C8C8;border:none;border-radius:3px;width:24px;height:36px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  position:absolute;left:50%;transform:translateX(-50%);top:50%;margin-top:-18px;
+  z-index:10;
+}
+.resize-btn svg{width:14px;height:14px;fill:none;stroke:#555;stroke-width:2}
+
+/* ── PART 3 ── */
+.p3-layout{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  position:relative;
+  height:100%;
+}
+.p3-left{
+  padding:24px;border-right:1px solid var(--border);
+  overflow-y:auto;height:100%;
+}
+.p3-right{
+  padding:24px;
+  overflow-y:auto;height:100%;
+}
+.p3-article-title{font-size:19px;font-weight:700;margin-bottom:4px}
+.p3-article-byline{font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:16px}
+.p3-article-text{font-size:14px;line-height:1.7;color:var(--text)}
+.p3-article-text p{margin-bottom:12px}
+.p3-article-img{width:100%;object-fit:contain;border-radius:2px;margin-top:14px}
+.p3-question{padding:14px 0;border-bottom:1px solid #EBEBEB}
+.p3-question:last-child{border-bottom:none}
+.p3-qhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.p3-qnum-box{width:26px;height:26px;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:border-color .15s}
+.p3-qnum-box.active-q{border-color:var(--cam-active)}
+.p3-qtext{font-size:14px;font-weight:700;line-height:1.4;color:var(--text)}
+.p3-opts{padding-left:34px}
+.p3-opt{display:flex;align-items:center;gap:9px;padding:7px 8px;cursor:pointer;border-radius:4px;transition:background .1s}
+.p3-opt:hover{background:#F5F5F5}
+.p3-opt.selected{background:var(--highlight-row)}
+.p3-opt input[type=radio]{width:17px;height:17px;accent-color:var(--selected-option);cursor:pointer;flex-shrink:0}
+.p3-opt label{font-size:14px;cursor:pointer;color:var(--text)}
+
+/* ── PART 4 ── */
+.p4-wrap{padding:24px}
+.p4-title{font-size:19px;font-weight:700;margin-bottom:18px}
+.p4-text{font-size:15px;line-height:2.2;color:var(--text);max-width:760px}
+.p4-gap{
+  display:inline-flex;align-items:center;
+  position:relative;
+  margin:0 3px;
+  vertical-align:middle;
+}
+/* The clickable rectangle — shows number when empty, answer when filled */
+.p4-gap-input{
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1.5px solid #888;
+  border-radius:3px;
+  background:#fff;
+  min-width:150px;height:32px;
+  padding:0 10px;
+  font-family:var(--sans);font-size:14px;
+  cursor:pointer;
+  color:var(--text);
+  font-weight:600;
+  transition:border-color .15s;
+  user-select:none;
+  gap:6px;
+}
+.p4-gap-input .p4-gap-num{
+  font-size:15px;color:var(--text-muted);font-style:normal;font-weight:700;
+}
+.p4-gap-input .p4-gap-val{
+  font-size:15px;font-weight:700;color:var(--text);
+}
+.p4-gap.open .p4-gap-input{border-color:var(--cam-active);background:var(--cam-teal-light)}
+/* Orange border when bookmarked */
+.p4-gap.bookmarked .p4-gap-input{border-color:var(--bm-color)}
+.p4-gap.bookmarked.open .p4-gap-input{border-color:var(--bm-color);background:#FFF7F0}
+/* Dropdown opens ABOVE, left-aligned with the rectangle */
+.p4-dropdown{
+  position:absolute;
+  bottom:calc(100% + 3px);
+  left:0;
+  transform:none;
+  background:#1A1A1A;
+  border-radius:4px;
+  display:none;
+  z-index:52;
+  white-space:nowrap;
+  box-shadow:0 -4px 16px rgba(0,0,0,.25);
+  overflow:hidden;
+  align-items:center;
+}
+.p4-gap.open .p4-dropdown{display:flex}
+/* X button to clear */
+.p4-clear-btn{
+  padding:8px 10px;
+  font-family:var(--sans);font-size:14px;font-weight:700;
+  color:#fff;background:#444;border:none;cursor:pointer;
+  border-right:1px solid #555;
+  transition:background .1s;flex-shrink:0;
+}
+.p4-clear-btn:hover{background:#C00}
+.p4-opt-btn{
+  padding:8px 15px;
+  font-family:var(--sans);font-size:14px;font-weight:600;
+  color:#fff;background:#1A1A1A;border:none;cursor:pointer;
+  transition:background .1s;
+  border-right:1px solid #333;
+}
+.p4-opt-btn:last-child{border-right:none}
+.p4-opt-btn:hover,.p4-opt-btn.active-sel{background:var(--cam-active)}
+/* Overlay: z-index 49, below dropdown (52) and bookmark (51) */
+.p4-close-overlay{position:fixed;inset:0;z-index:49;display:none}
+.p4-close-overlay.visible{display:block}
+/* Bookmark button inside dropdown */
+.p4-bm-btn{
+  padding:8px 10px;
+  font-family:var(--sans);font-size:14px;
+  color:#fff;background:#555;border:none;cursor:pointer;
+  border-left:1px solid #666;
+  transition:background .1s;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.p4-bm-btn:hover{background:var(--bm-color)}
+.p4-bm-btn.active-sel{background:var(--bm-color)}
+
+/* ── PART 5 ── */
+.p5-wrap{padding:24px;max-width:760px}
+.p5-meta{font-size:14px;color:var(--text-muted);margin-bottom:4px}
+.p5-meta strong{color:var(--text);font-weight:700}
+.p5-from-to{margin-bottom:16px}
+.p5-from-row{display:flex;gap:8px;margin-bottom:4px;font-size:15px}
+.p5-from-row span:first-child{font-weight:700;min-width:40px}
+.p5-body{font-size:15px;line-height:2.1;color:var(--text)}
+.p5-gap{
+  display:inline-flex;align-items:center;
+  position:relative;margin:0 2px;vertical-align:middle;
+}
+.p5-gap-box{
+  border:1.5px solid var(--cam-active);
+  border-radius:3px;
+  min-width:130px;padding:3px 30px 3px 10px; /* right padding reserves space for bookmark */
+  font-family:var(--sans);font-size:15px;
+  background:#fff;outline:none;
+  text-align:left;color:var(--text);font-weight:700;
+  width:100%;
+  box-sizing:border-box;
+}
+.p5-gap-box::placeholder{
+  color:var(--text-muted);font-weight:700;font-size:15px;opacity:1;
+}
+.p5-gap-box:focus{background:var(--cam-teal-light);border-color:var(--cam-teal-dark)}
+.p5-gap-bm{
+  position:absolute;
+  right:0;top:0;bottom:0;
+  width:26px;
+  cursor:pointer;
+  display:none;
+  align-items:center;justify-content:center;
+  z-index:2;
+  border-left:1.5px solid var(--cam-active);
+  border-radius:0 3px 3px 0;
+  background:#E8F4F5;
+  transition:background .15s;
+}
+.p5-gap-bm:hover{background:#C8E8EC}
+.p5-gap-bm svg{fill:none;stroke:#888;stroke-width:1.5;transition:.15s}
+.p5-gap-bm.marked{background:color-mix(in srgb, var(--bm-color) 15%, var(--bg-instr));border-left-color:var(--bm-color)}
+.p5-gap-bm.marked svg{fill:var(--bm-color);stroke:var(--bm-color)}
+/* Bookmark border when bookmarked */
+.p5-gap.bookmarked .p5-gap-box{border-color:var(--bm-color)}
+.p5-gap.bookmarked .p5-gap-bm{border-left-color:var(--bm-color)}
+.p5-example-word{
+  font-weight:700;color:var(--text);
+  border-bottom:2px solid var(--text);
+  padding:0 2px;
+}
+.p5-gap-num{display:none}
+
+/* ── PART 6 ── */
+.p6-layout{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:calc(100vh - var(--header-h) - var(--footer-h) - 80px);position:relative}
+.p6-left{padding:24px;border-right:1px solid var(--border)}
+.p6-right{padding:24px;display:flex;flex-direction:column;position:relative}
+.p6-scenario{font-size:15px;line-height:1.65;color:var(--text);margin-bottom:16px}
+.p6-say-label{font-size:15px;font-weight:700;margin-bottom:8px}
+.p6-bullets{list-style:disc;padding-left:22px;margin-bottom:16px}
+.p6-bullets li{font-size:15px;line-height:1.65;color:var(--text);margin-bottom:4px}
+.p6-write-label{font-size:15px;color:var(--text);margin-top:8px}
+.p6-write-label strong{font-weight:700}
+.p6-textarea-wrap{position:relative;flex:1;display:flex;flex-direction:column;margin-top:12px}
+.p6-textarea{
+  flex:1;
+  border:1.5px solid var(--cam-active);
+  border-radius:2px;
+  padding:14px;
+  font-family:var(--sans);font-size:15px;
+  line-height:1.5;
+  resize:none;outline:none;
+  color:var(--text);
+  min-height:300px;
+  width:100%;
+}
+.p6-textarea:focus{border-color:var(--cam-teal-dark)}
+/* Bookmark top-right of textarea */
+.p67-bm{
+  position:absolute;
+  top:0;right:0;
+  width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:5;
+}
+.p67-bm svg{fill:none;stroke:#ccc;stroke-width:1.5;transition:.15s}
+.p67-bm.marked svg{fill:var(--bm-color);stroke:var(--bm-color)}
+.p67-bm:hover svg{stroke:var(--bm-color)}
+
+/* ── PART 7 ── */
+.p7-wrap{padding:24px}
+.p7-pics{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px; /* visible gap between pictures */
+  margin:16px 0;
+  max-width:680px;
+}
+.p7-pics img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:2px;border:1px solid var(--border)}
+.p7-pics .pic-placeholder{
+  width:100%;aspect-ratio:4/3;background:#E8E8E8;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:#999;border:1px dashed #ccc;border-radius:2px;
+}
+.p7-textarea-wrap{position:relative;max-width:680px}
+.p7-textarea{
+  width:100%;
+  border:1.5px solid var(--cam-active);
+  border-radius:2px;
+  padding:14px;
+  font-family:var(--sans);font-size:15px;
+  line-height:1.5;resize:none;outline:none;
+  color:var(--text);min-height:200px;
+}
+.p7-textarea:focus{border-color:var(--cam-teal-dark)}
+.p6-wordcount,.p7-wordcount{font-size:12px;color:var(--text-muted);margin-top:5px;text-align:right}
+
+/* ── MODALS (Messages, Options) ── */
+#modal-overlay{
+  position:fixed;inset:0;background:rgba(240,242,245,0.97);
+  z-index:400;display:none;flex-direction:column;
+  font-family:var(--sans);
+}
+#modal-overlay.show{display:flex}
+.modal-header{
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 24px 20px;position:relative;flex-shrink:0;
+}
+.modal-back{
+  position:absolute;left:24px;
+  background:none;border:none;cursor:pointer;
+  font-size:15px;font-weight:600;color:var(--text);
+  display:flex;align-items:center;gap:6px;
+}
+.modal-back:hover{opacity:.7}
+.modal-title{font-size:22px;font-weight:400;color:var(--text)}
+.modal-close{
+  position:absolute;right:24px;top:24px;
+  background:none;border:none;cursor:pointer;
+  font-size:22px;font-weight:700;color:var(--text);line-height:1;
+}
+.modal-close:hover{opacity:.7}
+.modal-body{flex:1;overflow-y:auto;padding:0 80px 40px;max-width:900px;width:100%;margin:0 auto}
+/* Option list rows */
+.opt-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.opt-row{
+  display:flex;align-items:center;gap:16px;
+  padding:20px 24px;
+  cursor:pointer;border-bottom:1px solid var(--border);
+  transition:background .12s;
+}
+.opt-row:last-child{border-bottom:none}
+.opt-row:hover{background:#F5F5F5}
+.opt-row.primary{background:var(--cam-teal-dark);color:#fff}
+.opt-row.primary:hover{background:#003B40}
+.opt-row .opt-icon{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.opt-row .opt-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.opt-row.primary .opt-icon svg{stroke:#fff}
+.opt-row .opt-label{flex:1;font-size:16px;font-weight:400}
+.opt-row .opt-arrow{font-size:18px;color:inherit;opacity:.6}
+/* Check row */
+.opt-row .opt-check{width:28px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text)}
+/* Contrast preview thumbnails */
+.contrast-thumb{
+  width:54px;height:36px;border-radius:4px;border:1px solid var(--border);
+  display:flex;flex-direction:column;justify-content:center;gap:3px;padding:6px 8px;flex-shrink:0;
+}
+.contrast-thumb span{display:block;height:3px;border-radius:1px}
+/* Messages empty state */
+.messages-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:60vh;color:var(--text-muted);font-size:16px;gap:12px;
+}
+.messages-empty svg{width:40px;height:40px;stroke:var(--text-muted);fill:none;stroke-width:1.5;opacity:.4}
+/* ── TEXT SIZE ── */
+/* Only scroll content zooms — fixed wrapper, header, footer stay untouched */
+[data-size="large"] #main{zoom:1.18}
+[data-size="large"] #notes-panel{zoom:1.18}
+[data-size="large"] #hl-tooltip,[data-size="large"] #note-popup,
+[data-size="large"] #modal-overlay{zoom:1.18}
+
+[data-size="xl"] #main{zoom:1.4}
+[data-size="xl"] #notes-panel{zoom:1.4}
+[data-size="xl"] #hl-tooltip,[data-size="xl"] #note-popup,
+[data-size="xl"] #modal-overlay{zoom:1.4}
+
+/* Header: scale text only */
+[data-size="large"] .cam-logo-text .top{font-size:15.3px}
+[data-size="large"] .cam-logo-text .bot{font-size:13px}
+[data-size="large"] .cid-label{font-size:14.2px}
+[data-size="large"] .header-icons svg{width:26px;height:26px}
+[data-size="xl"] .cam-logo-text .top{font-size:18.2px}
+[data-size="xl"] .cam-logo-text .bot{font-size:15.4px}
+[data-size="xl"] .cid-label{font-size:16.8px}
+[data-size="xl"] .header-icons svg{width:30px;height:30px}
+
+/* Footer: scale text, allow wrapping */
+[data-size="large"] .f-part-btn{font-size:15.3px}
+[data-size="large"] .f-q-pill{font-size:14.2px;width:28px;height:28px}
+[data-size="large"] .f-part-count{font-size:13.6px}
+[data-size="xl"] .f-part-btn{font-size:18.2px}
+[data-size="xl"] .f-q-pill{font-size:16.8px;width:32px;height:32px}
+[data-size="xl"] .f-part-count{font-size:16.1px}
+
+/* Footer part buttons: wrap text but keep label + pills on same row (inline-flex) */
+[data-size="large"] .f-part-btn,
+[data-size="xl"] .f-part-btn{
+  white-space:normal;
+  flex-wrap:wrap;
+  justify-content:center;
+  padding:3px 5px;min-width:0;
+}
+[data-size="large"] #footer,[data-size="xl"] #footer{gap:1px;padding:0 6px}
+
+mark.hl{
+  background:var(--cam-teal);color:#fff;
+  border-radius:2px;padding:0 2px;
+  cursor:pointer;
+}
+mark.note-hl{
+  background:#E8B840;color:#1A1A1A;
+  border-radius:2px;padding:0 2px;
+  cursor:pointer;border-bottom:2px solid #C8941C;
+}
+#hl-tooltip{
+  position:fixed;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:6px;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+  display:none;
+  z-index:300;
+  overflow:hidden;
+  flex-direction:column;
+  align-items:stretch;
+  min-width:110px;
+}
+#hl-tooltip.show{display:flex}
+#hl-tooltip button{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:9px 16px;border:none;background:#fff;cursor:pointer;
+  color:var(--text);text-align:left;
+  display:flex;align-items:center;gap:8px;
+  transition:background .1s;
+}
+#hl-tooltip button:hover{background:#F5F5F5}
+#hl-tooltip button svg{flex-shrink:0}
+#hl-tooltip .hl-divider{height:1px;background:var(--border)}
+/* Allow selection in article texts, question texts, option labels */
+.p2-person-text,.p3-article-text,.p1-sign,
+.p2-qtext,.p3-qtext,.p4-text,.p5-body,
+.p1-opt label,.p2-opt-radio label,.p3-opt label{
+  user-select:text;-webkit-user-select:text
+}
+/* mark.hl inside options must be clickable — keep pointer-events on marks */
+.p1-opt label mark,.p2-opt-radio label mark,.p3-opt label mark{
+  pointer-events:auto;
+}
+/* Instruction bar: no selection */
+.instr-bar{user-select:none;-webkit-user-select:none}
+
+/* ── FOOTER ── */
+:root { --footer-h: 56px; }
+#footer{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--footer-h);
+  background:var(--cam-nav-bg);
+  border-top:1px solid var(--cam-nav-border);
+  display:flex;align-items:center;
+  padding:0 10px;
+  gap:2px;
+  z-index:300;
+  overflow:visible;
+}
+/* Stripe + bookmark canvas — absolute, sits at very top of footer */
+#f-overlay{
+  position:absolute;
+  top:-1px; left:0; right:0;
+  height:20px;
+  pointer-events:none;
+  z-index:10;
+}
+.f-sep{width:1px;height:24px;background:var(--cam-nav-border);flex-shrink:0;margin:0 2px}
+.f-spacer{flex:1}
+
+/* ── PART BUTTON ── */
+.f-part-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 7px;
+  border-radius:3px;
+  border:1px solid transparent;
+  background:transparent;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  color:var(--text);
+  cursor:pointer;
+  white-space:nowrap;
+  transition:.12s;
+  flex-shrink:0;
+  position:relative;
+}
+.f-part-btn:hover{background:#E8E8E8}
+.f-part-btn.active{
+  background:#fff;
+  border-color:var(--cam-nav-border);
+  color:var(--cam-active);
+  box-shadow:0 1px 3px rgba(0,0,0,.1);
+}
+.f-part-count{font-size:11.5px;font-weight:400;color:var(--text-muted)}
+.f-part-btn.active .f-part-count{display:none}
+.f-part-btn.done .f-part-label::before{content:'✓ ';color:var(--cam-active)}
+
+/* ── PILLS ── */
+.f-q-pills{display:none;gap:3px;align-items:center}
+.f-part-btn.active .f-q-pills{display:inline-flex}
+
+.f-q-pill{
+  position:relative;
+  width:26px; height:26px;
+  border-radius:3px;
+  border:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:var(--text-muted);
+  cursor:pointer;background:transparent;transition:.12s;flex-shrink:0;
+}
+.f-q-pill:hover{background:#E8E8E8}
+.f-q-pill.current{
+  border:1.5px solid var(--cam-active);
+  color:var(--cam-active);
+  background:#fff;
+}
+
+/* nav arrows */
+.f-nav-btn{
+  width:44px;height:36px;
+  display:flex;align-items:center;justify-content:center;
+  border:none;border-radius:3px;cursor:pointer;
+  flex-shrink:0;transition:.12s;
+}
+.f-nav-prev{background:#808080;margin-left:4px}
+.f-nav-prev:hover{background:#666}
+.f-nav-prev:disabled{opacity:.4;cursor:not-allowed}
+.f-nav-next{background:var(--cam-teal-btn);margin-left:2px}
+.f-nav-next:hover{background:var(--cam-teal-dark)}
+.f-nav-btn svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.5}
+.f-submit-btn{
+  width:36px;height:36px;border:none;border-radius:3px;
+  background:#E8E8E8;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  margin-left:2px;transition:.12s;
+}
+.f-submit-btn:hover{background:#D0D0D0}
+.f-submit-btn svg{width:17px;height:17px;fill:none;stroke:#555;stroke-width:2.5}
+
+/* ── LISTENING — AUDIO PLACEHOLDER ── */
+.ls-audio-placeholder{
+  display:flex;align-items:center;gap:10px;
+  background:var(--cam-teal-light);
+  border:1px dashed var(--cam-teal);
+  border-radius:6px;
+  padding:12px 18px;
+  font-size:14px;font-weight:600;color:var(--cam-teal-dark);
+  max-width:540px;
+  margin-bottom:4px;
+}
+.ls-audio-placeholder svg{flex-shrink:0;stroke:var(--cam-teal-dark);opacity:.7}
+
+/* ── PART 1 — Picture MC ── */
+.ls1-pics{
+  display:flex;gap:20px;
+  margin:16px 0 8px;
+  max-width:900px;
+}
+.ls1-pic-opt{
+  flex:1;
+  border:2.5px solid var(--border);
+  border-radius:6px;
+  overflow:hidden;cursor:pointer;
+  transition:border-color .15s,background .1s;
+  display:flex;flex-direction:column;
+  background:var(--bg-page);
+}
+.ls1-pic-opt:hover{border-color:var(--cam-teal)}
+.ls1-pic-opt.selected{border-color:var(--selected-option);background:#EEF6FF}
+.ls1-pic-img{
+  width:100%;aspect-ratio:4/3;object-fit:cover;display:block;
+}
+.ls1-pic-ph{
+  width:100%;aspect-ratio:4/3;background:#E8E8E8;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:#999;
+}
+/* Radio dot at bottom center */
+.ls1-pic-radio{
+  display:flex;align-items:center;justify-content:center;
+  padding:8px 0 6px;
+}
+.ls1-pic-radio input[type=radio]{
+  width:18px;height:18px;
+  accent-color:var(--selected-option);
+  cursor:pointer;
+  pointer-events:none;
+}
+
+/* ── PART 2 — Note / Form Fill ── */
+.ls2-context{font-size:15px;color:var(--text-muted);margin-bottom:16px;max-width:700px}
+.ls2-form-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:20px}
+.ls2-inline-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--border);max-width:700px;
+}
+.ls2-inline-row:last-of-type{border-bottom:none}
+.ls2-row-example{color:var(--text-muted)}
+.ls2-row-bm{/* no left border — input border-color handles the indication */}
+.ls2-row-lbl{font-size:15px;font-weight:600;color:inherit;min-width:180px;flex-shrink:0}
+.ls2-row-input-area{display:flex;align-items:center;gap:8px;flex:1}
+.ls2-inp{
+  border:1.5px solid var(--border);border-radius:4px;
+  padding:6px 12px;font-family:var(--sans);font-size:15px;font-weight:600;
+  background:var(--bg-page);color:var(--text);outline:none;
+  min-width:150px;max-width:260px;
+  transition:border-color .15s,background .15s;
+}
+.ls2-inp:focus{background:var(--cam-teal-light);border-color:var(--cam-active)}
+.ls2-inp-bm{border-color:var(--bm-color)!important}
+.ls2-inline-suffix{font-size:15px;font-weight:600;color:var(--text);flex-shrink:0}
+.ls2-row-bm-cell{width:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ls2-image-full{
+  display:block;width:100%;max-width:700px;
+  border:1px solid var(--border);border-radius:4px;
+  margin-top:24px;object-fit:contain;
+}
+
+/* ── PART 5 — Matching (drag & drop) ── */
+.ls5-layout{display:grid;grid-template-columns:1fr 1fr;gap:32px;max-width:860px}
+.ls5-section-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:16px}
+.ls5-person-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.ls5-person-row:last-child{border-bottom:none}
+.ls5-bm{border-left:3px solid var(--bm-color);padding-left:10px}
+.ls5-person-name{font-size:15px;color:var(--text);min-width:72px;flex-shrink:0}
+/* Example row — greyed, non-interactive */
+.ls5-example-row{opacity:.6}
+/* .ls5-example-name — inherits same font as .ls5-person-name */
+.ls5-example-slot,.ls5-tag-example{cursor:default!important;pointer-events:none!important}
+/* Drop slot */
+.ls5-drop-slot{
+  flex:1;max-width:220px;min-height:38px;
+  border:2px dashed var(--border);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .15s,background .1s;padding:2px 4px;
+}
+.ls5-drop-slot.ls5-slot-filled{border-style:solid;border-color:var(--cam-active);background:var(--cam-teal-light)}
+.ls5-drop-slot.ls5-slot-dragover{border-color:var(--selected-option);background:var(--bg-selected)}
+.ls5-slot-ph{font-size:13px;color:var(--text-muted);font-weight:400}
+.ls5-row-bm-cell{width:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+/* Right: tag column */
+.ls5-tags{
+  display:flex;flex-direction:column;gap:6px;
+  border:2px dashed transparent;border-radius:6px;padding:4px;
+  transition:border-color .15s,background .1s;min-height:40px;
+}
+.ls5-tags.ls5-bank-dragover{border-color:var(--border);background:var(--bg-instr)}
+/* Tags shared */
+.ls5-tag{
+  border:1.5px solid var(--border);border-radius:4px;padding:7px 14px;
+  font-size:14px;font-weight:500;color:var(--text);background:var(--bg-page);
+  cursor:grab;user-select:none;transition:box-shadow .1s;
+}
+.ls5-tag:active{cursor:grabbing}
+.ls5-tag:hover:not(.ls5-tag-hidden){box-shadow:0 2px 8px rgba(0,0,0,.12)}
+/* Hidden = invisible but keeps layout space so column stays stable */
+.ls5-tag-hidden{visibility:hidden;pointer-events:none}
+/* Dragging = actually removed from flow so drag ghost looks clean */
+.ls5-tag-dragging{display:none}
+/* Placed in slot */
+.ls5-tag-placed{
+  border:none;padding:5px 12px;font-size:14px;font-weight:600;
+  color:var(--cam-teal-dark);background:transparent;cursor:grab;
+}
+.ls5-tag-placed:active{cursor:grabbing}
+.example-filled{
+  display:inline-block;padding:3px 10px;
+  background:var(--cam-teal-light);border:1.5px solid var(--cam-active);
+  border-radius:3px;font-size:15px;font-weight:700;color:var(--cam-teal-dark);
+}
+[data-contrast="wob"] .example-filled{
+  background:#003A3E;border-color:#6EC6CA;color:#6EC6CA;
+}
+[data-contrast="yob"] .example-filled{
+  background:#1A0E00;border-color:#CC8800;color:#FFD700;
+}
+[data-contrast="wob"] .ls5-tag-example{color:#6EC6CA!important}
+[data-contrast="yob"] .ls5-tag-example{color:#FFD700!important}
+
+/* Part 3 — single scroll page (no split) */
+#pg-ls3{padding:0}
+.ls3-wrap{padding:24px;max-width:760px}
+.ls3-single{display:flex;flex-direction:column;gap:0}
+.ls3-question{
+  padding:20px 0;
+  border-bottom:1px solid var(--border);
+  cursor:default;
+}
+.ls3-question:last-child{border-bottom:none}
+.ls3-question.ls3-active .p3-qnum-box{border-color:var(--cam-active);color:var(--cam-active)}
+.ls3-qhead{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:10px;
+}
+.ls3-qtext{
+  font-size:15px;font-weight:700;color:var(--text);flex:1;line-height:1.4;
+}
+.ls3-opts{
+  display:flex;flex-direction:column;gap:0;
+  padding-left:36px;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="cam-logo">
+    <div class="cam-shield">
+      <svg width="22" height="28" viewBox="0 0 22 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%">
+        <path d="M11 2L20 6V16C20 22 11 26 11 26C11 26 2 22 2 16V6L11 2Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+        <text x="11" y="18" text-anchor="middle" font-size="9" font-weight="bold" fill="white" font-family="serif">C</text>
+      </svg>
+    </div>
+    <div class="cam-logo-text">
+      <div class="top">CAMBRIDGE</div>
+      <div class="bot">English</div>
+    </div>
+  </div>
+  <div class="header-sep"></div>
+  <div class="cid-label">Candidate ID</div>
+  <div class="header-icons">
+    <!-- Timer -->
+    <div id="timer-display" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap">
+      <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--text);fill:none;stroke-width:2;flex-shrink:0;cursor:default;opacity:1">
+        <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+      </svg>
+      <span id="timer-label">Time remaining: 30 min</span>
+    </div>
+    <div class="header-sep" style="height:20px"></div>
+    <!-- Audio status indicator -->
+    <div id="audio-status" style="display:none;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--cam-teal-dark)">
+      <svg id="audio-status-icon" viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0">
+        <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/>
+        <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+      </svg>
+      <span id="audio-status-text"></span>
+    </div>
+    <div id="audio-status-sep" class="header-sep" style="height:20px;display:none"></div>
+    <svg viewBox="0 0 24 24" style="cursor:default"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+    <!-- Bell → Messages -->
+    <svg viewBox="0 0 24 24" onclick="openModal('messages')" title="Messages"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <!-- Menu → Options -->
+    <svg viewBox="0 0 24 24" onclick="openModal('options')" title="Options"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <!-- Edit → Notes -->
+    <svg viewBox="0 0 24 24" onclick="toggleNotesPanel()" title="Notes"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  </div>
+</div>
+
+<!-- MAIN WRAP -->
+<div id="main-wrap">
+<div id="main">
+
+  <!-- ═══ PART 1 — Picture MC ═══ -->
+  <div class="exam-page active" id="pg-ls1">
+    <div class="instr-bar">
+      <div class="qrange">Questions 1–5</div>
+      <div class="qinstr">For each question, choose the correct picture.</div>
+    </div>
+    <div id="p1-items"></div>
+  </div>
+
+  <!-- ═══ PART 2 — Note / Form Fill ═══ -->
+  <div class="exam-page" id="pg-ls2">
+    <div class="instr-bar">
+      <div class="qrange">Questions 6–10</div>
+      <div class="qinstr">For each question, write the correct answer in the gap. Write <strong>one word</strong> or a <strong>number</strong> or a <strong>date</strong> or a <strong>time</strong>.</div>
+    </div>
+    <div class="p5-wrap" id="ls2-wrap"></div>
+  </div>
+
+  <!-- ═══ PART 3 — Dialogue MC ═══ -->
+  <div class="exam-page" id="pg-ls3">
+    <div class="instr-bar">
+      <div class="qrange">Questions 11–15</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div class="ls3-wrap" id="ls3-wrap"></div>
+  </div>
+
+  <!-- ═══ PART 4 — Short Clips MC ═══ -->
+  <div class="exam-page" id="pg-ls4">
+    <div class="instr-bar">
+      <div class="qrange">Questions 16–20</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div id="p4-items"></div>
+  </div>
+
+  <!-- ═══ PART 5 — Matching ═══ -->
+  <div class="exam-page" id="pg-ls5">
+    <div class="instr-bar">
+      <div class="qrange">Questions 21–26</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div class="p5-wrap" id="ls5-wrap" style="position:relative"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- NOTES PANEL -->
+<div id="notes-panel" class="collapsed">
+  <div id="notes-panel-header">
+    <span id="notes-panel-title">Notes</span>
+    <button id="notes-panel-close" onclick="toggleNotesPanel()" title="Close">✕</button>
+  </div>
+  <div id="notes-panel-empty">
+    <div class="np-icon">✏️</div>
+    Your private notes<br>will show here<br><br>
+    <span style="font-size:12px">Select text to create<br>notes and highlights</span>
+  </div>
+  <div id="notes-list" style="display:none"></div>
+</div>
+
+</div><!-- /main-wrap -->
+
+<!-- NOTE INPUT POPUP -->
+<div id="note-popup">
+  <textarea id="note-text" placeholder="Add a note…"></textarea>
+  <div id="note-popup-btns">
+    <button id="note-cancel-btn" onclick="cancelNote()">Cancel</button>
+    <button id="note-save-btn" onclick="saveNote()">Save</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  <svg id="f-overlay" aria-hidden="true"></svg>
+  <button class="f-part-btn active" data-part="1" onclick="goToPart(1)">
+    <span class="f-part-label">Part 1</span>
+    <span class="f-part-count" id="fp1-count">0 of 5</span>
+    <div class="f-q-pills" id="fp1-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="2" onclick="goToPart(2)">
+    <span class="f-part-label">Part 2</span>
+    <span class="f-part-count" id="fp2-count">0 of 5</span>
+    <div class="f-q-pills" id="fp2-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="3" onclick="goToPart(3)">
+    <span class="f-part-label">Part 3</span>
+    <span class="f-part-count" id="fp3-count">0 of 5</span>
+    <div class="f-q-pills" id="fp3-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="4" onclick="goToPart(4)">
+    <span class="f-part-label">Part 4</span>
+    <span class="f-part-count" id="fp4-count">0 of 5</span>
+    <div class="f-q-pills" id="fp4-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="5" onclick="goToPart(5)">
+    <span class="f-part-label">Part 5</span>
+    <span class="f-part-count" id="fp5-count">0 of 5</span>
+    <div class="f-q-pills" id="fp5-pills"></div>
+  </button>
+  <div class="f-spacer"></div>
+  <button class="f-nav-btn f-nav-prev" id="btn-prev" onclick="navigate(-1)" disabled>
+    <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+  </button>
+  <button class="f-nav-btn f-nav-next" id="btn-next" onclick="navigate(1)">
+    <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+  </button>
+  <button class="f-submit-btn" title="Submit exam" onclick="submitExam()">
+    <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+  </button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA — loaded from JSONBin (same BIN as developer platform)
+// ══════════════════════════════════════════════════════════
+const BIN         = '6a022b31c0954111d80b71d2';
+const ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
+const KEY = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+
+let examData = null;
+let variantId = null;
+let candidateId = null;
+
+// Exam state
+const answers = {}; // { qNum: 'A'|'B'|'C'|text }
+const bookmarks = new Set();
+let currentPart = 1;
+let currentQ = 1; // within part for parts with multiple Qs
+
+// Part→question mapping (Listening: 5 parts, Q1–26)
+const PART_QS = { 1:[1,2,3,4,5], 2:[6,7,8,9,10], 3:[11,12,13,14,15],
+                  4:[16,17,18,19,20], 5:[21,22,23,24,25] };
+
+// ── BOOT ──
+window.addEventListener('DOMContentLoaded', async () => {
+  const params = new URLSearchParams(location.search);
+  variantId   = params.get('variant') || params.get('v') || null;
+  candidateId = params.get('candidateId') || null;
+
+  // Show candidate ID in header
+  const cidEl = document.querySelector('.cid-label');
+  if (cidEl) cidEl.textContent = candidateId ? 'Candidate ID: ' + candidateId : 'Candidate ID';
+
+  // Load from localStorage first
+  const local = localStorage.getItem('a2kfs_db');
+  let db = local ? JSON.parse(local) : null;
+
+  // Try JSONBin
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN}/latest`, {
+      headers: { 'X-Master-Key': KEY }
+    });
+    if (r.ok) { const d = await r.json(); const rec = d.record || d; if (rec && rec.variants) db = rec; }
+  } catch(e) {}
+
+  if (!db || !db.variants) return showError('Could not load exam data.');
+  const ids = Object.keys(db.variants);
+  if (!ids.length) return showError('No exam variants found.');
+  variantId = variantId && db.variants[variantId] ? variantId : ids[0];
+  examData = db.variants[variantId];
+
+  // Ensure all Listening data structures exist (in case variant has no ls data yet)
+  if (!examData.ls1) examData.ls1 = { audio:'', context:'', questions: Array.from({length:5}, () => ({text:'',picA:'',picB:'',picC:'',correct:''})) };
+  if (!examData.ls2) examData.ls2 = { audio:'', context:'', title:'', exLbl:'', exAns:'', image:'', rows: Array.from({length:5}, () => ({label:'',suffix:'',answer:'',also:''})) };
+  if (!examData.ls3) examData.ls3 = { audio:'', context:'', questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''})) };
+  if (!examData.ls4) examData.ls4 = { audio:'', context:'', questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''})) };
+  if (!examData.ls5) examData.ls5 = { audio:'', context:'', namesTitle:'People', actsTitle:'Help with', names: Array(7).fill(''), activities: Array(8).fill(''), answers: Array(6).fill('') };
+
+  buildAll();
+  buildFooter();
+  goToPart(1);
+  // Timer starts when user clicks Play in the audio intro overlay
+  document.getElementById('audio-intro').style.display = 'flex';
+});
+
+// ── FINAL SUBMIT ──
+async function finalSubmit() {
+  const btn = document.getElementById('final-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${ANSWERS_BIN}/latest`, {
+      headers: { 'X-Master-Key': KEY }
+    });
+    const raw = r.ok ? await r.json() : {};
+    const store = (raw.record || raw);
+    if (!store.candidates) store.candidates = [];
+    const idx = store.candidates.findIndex(c => c.candidateId === candidateId);
+    if (idx !== -1) {
+      store.candidates[idx].lsAnswers   = Object.assign({}, answers);
+      store.candidates[idx].lsSubmitted = new Date().toISOString();
+      if (!Array.isArray(store.candidates[idx].progress)) store.candidates[idx].progress = [];
+      if (!store.candidates[idx].progress.includes('listening')) store.candidates[idx].progress.push('listening');
+    }
+    await fetch(`https://api.jsonbin.io/v3/b/${ANSWERS_BIN}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': KEY },
+      body: JSON.stringify(store)
+    });
+  } catch(e) { console.error('finalSubmit error:', e); }
+  const p = new URLSearchParams({ candidateId: candidateId||'', variant: variantId||'', completed: 'listening' });
+  window.location.href = 'https://samromand.github.io/exam_home?' + p.toString();
+}
+
+function showError(msg) {
+  document.getElementById('main').innerHTML = `<div style="padding:40px;font-size:16px;color:#C00">${msg}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// BUILDERS
+// ══════════════════════════════════════════════════════════
+function buildAll() {
+  buildP1(); buildP2(); buildP3(); buildP4(); buildP5();
+}
+
+// ── PART 1 — Picture MC ──
+function buildP1() {
+  const container = document.getElementById('p1-items');
+  container.innerHTML = '';
+  (examData.ls1?.questions || []).forEach((q, i) => {
+    const qNum = i + 1;
+    const div = document.createElement('div');
+    div.className = 'p1-single';
+    div.id = `p1-item-${qNum}`;
+    div.style.display = 'none';
+
+    // Question text row
+    const qText = q.text ? `<span>${esc(q.text)}</span>` : '';
+    const questionRow = `<div class="p1-question">
+      <span class="p1-qnum">${qNum}</span>
+      ${qText}
+      <span class="q-bookmark" id="bm-${qNum}" onclick="toggleBookmark(${qNum})" title="Bookmark">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      </span>
+    </div>`;
+
+    // Picture options A / B / C — image + radio dot at bottom
+    const picsHtml = `<div class="ls1-pics">
+      ${['A','B','C'].map(l => {
+        const url = q['pic'+l] || '';
+        const sel = answers[qNum] === l;
+        return `<div class="ls1-pic-opt${sel?' selected':''}" id="p1-opt-${qNum}-${l}" onclick="selectP1(${qNum},'${l}',event)">
+          ${url
+            ? `<img class="ls1-pic-img" src="${esc(url)}" alt="Option ${l}" onerror="this.outerHTML='<div class=\\'ls1-pic-ph\\'>Picture ${l}</div>'">`
+            : `<div class="ls1-pic-ph">Picture ${l}</div>`}
+          <div class="ls1-pic-radio">
+            <input type="radio" name="ls1q${qNum}"${sel?' checked':''}>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+    div.innerHTML = questionRow + picsHtml;
+    container.appendChild(div);
+  });
+  showP1Question(currentQ);
+}
+
+// ── ACTIVE QUESTION HIGHLIGHT ──
+function setActiveQ(qNum) {
+  currentQ = qNum;
+  document.querySelectorAll('.p1-qnum, .p3-qnum-box').forEach(el => el.classList.remove('active-q'));
+  const p1 = document.querySelector(`#p1-item-${qNum} .p1-qnum`);
+  if (p1) p1.classList.add('active-q');
+  const p3 = document.getElementById(`p3-qnum-${qNum}`);
+  if (p3) p3.classList.add('active-q');
+  const p4 = document.querySelector(`#p4-item-${qNum} .p1-qnum`);
+  if (p4) p4.classList.add('active-q');
+  // Highlight Part 3 question row
+  document.querySelectorAll('.ls3-question').forEach(el => el.classList.remove('ls3-active'));
+  const ls3q = document.getElementById(`ls3-q-${qNum}`);
+  if (ls3q) ls3q.classList.add('ls3-active');
+  updateFooterPills();
+}
+
+function showP1Question(qNum) {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`p1-item-${i}`);
+    if (el) el.style.display = (i === qNum) ? 'block' : 'none';
+  }
+  document.getElementById('main').scrollTop = 0;
+  setActiveQ(qNum);
+}
+
+function showP4Question(qNum) {
+  for (let i = 16; i <= 20; i++) {
+    const el = document.getElementById(`p4-item-${i}`);
+    if (el) el.style.display = (i === qNum) ? 'block' : 'none';
+  }
+  document.getElementById('main').scrollTop = 0;
+  setActiveQ(qNum);
+}
+
+function selectP1(qNum, letter, event) {
+  if (event && event.target.closest('mark')) return;
+  if (answers[qNum] === letter) {
+    delete answers[qNum];
+    ['A','B','C'].forEach(l => {
+      const el = document.getElementById(`p1-opt-${qNum}-${l}`);
+      if (el) { el.classList.remove('selected'); const r = el.querySelector('input[type=radio]'); if (r) r.checked = false; }
+    });
+  } else {
+    answers[qNum] = letter;
+    ['A','B','C'].forEach(l => {
+      const el = document.getElementById(`p1-opt-${qNum}-${l}`);
+      if (el) { el.classList.toggle('selected', l === letter); const r = el.querySelector('input[type=radio]'); if (r) r.checked = (l === letter); }
+    });
+  }
+  setActiveQ(qNum);
+}
+
+// ── PART 2 — Note / Form Fill ──
+function buildP2() {
+  const d = examData.ls2;
+  const wrap = document.getElementById('ls2-wrap');
+
+  let html = '';
+  if (d.context) html += `<div class="ls2-context">${esc(d.context)}</div>`;
+
+  // Form title
+  html += `<div class="ls2-form-title">${esc(d.title||'Notes')}</div>`;
+
+  // Example row
+  if (d.exLbl) {
+    html += `<div class="ls2-inline-row ls2-row-example">
+      <div class="ls2-row-lbl">${esc(d.exLbl)}</div>
+      <div class="ls2-row-input-area"><span class="example-filled">${esc(d.exAns||'')}</span></div>
+      <div class="ls2-row-bm-cell"></div>
+    </div>`;
+  }
+
+  // 5 gap rows (Q6–10) — label | input box | suffix | bookmark
+  (d.rows || []).forEach((row, i) => {
+    const qNum = i + 6;
+    const isBm = bookmarks.has(qNum);
+    const label = esc(row.label || `Question ${qNum}`);
+    const suffix = row.suffix ? `<span class="ls2-inline-suffix">${esc(row.suffix)}</span>` : '';
+    html += `<div class="ls2-inline-row${isBm?' ls2-row-bm':''}">
+      <div class="ls2-row-lbl">${label}</div>
+      <div class="ls2-row-input-area">
+        <input class="ls2-inp${isBm?' ls2-inp-bm':''}" type="text" id="ls2-inp-${qNum}" maxlength="40"
+          placeholder="${qNum}"
+          onkeydown="return ls2KeyFilter(event)"
+          oninput="answerLS2(${qNum},this.value)"
+          onfocus="ls2Focus(${qNum})" onblur="ls2Blur(${qNum})"
+          value="${esc(answers[qNum]||'')}"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        ${suffix}
+      </div>
+      <div class="ls2-row-bm-cell">
+        <span class="q-bookmark" id="bm-${qNum}"
+          onmousedown="ls2ToggleBm(${qNum},event)" title="Bookmark"
+          style="display:${isBm?'flex':'none'}">
+          <svg viewBox="0 0 24 24" width="16" height="20"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </span>
+      </div>
+    </div>`;
+  });
+
+  // Image full width at bottom
+  if (d.image) html += `<img class="ls2-image-full" src="${esc(d.image)}" alt="" onerror="this.style.display='none'">`;
+
+  wrap.innerHTML = html;
+}
+
+// Allowed: a-z A-Z 0-9 space . : - / ' # £ $ % + ( ) & am/pm etc.
+const LS2_ALLOWED = /^[a-zA-Z0-9 .\-:/'#£$%+()\&]$/;
+function ls2KeyFilter(e) {
+  if (e.key.length > 1) return true;   // control keys (backspace, arrows, etc.)
+  if (e.ctrlKey || e.metaKey) return true;
+  if (LS2_ALLOWED.test(e.key)) return true;
+  e.preventDefault();
+  return false;
+}
+function answerLS2(qNum, val) {
+  // Strip any chars that slipped through (e.g. paste)
+  const clean = val.replace(/[^a-zA-Z0-9 .\-:/'#£$%+()\&]/g, '');
+  if (clean !== val) {
+    const inp = document.getElementById(`ls2-inp-${qNum}`);
+    if (inp) { const pos = inp.selectionStart - (val.length - clean.length); inp.value = clean; inp.setSelectionRange(Math.max(0,pos), Math.max(0,pos)); }
+  }
+  if (clean) answers[qNum] = clean;
+  else delete answers[qNum];
+  updateFooterPills();
+}
+function ls2Focus(qNum) {
+  currentQ = qNum;
+  const bm = document.getElementById(`bm-${qNum}`);
+  if (bm) bm.style.display = 'flex';
+  updateFooterPills();
+}
+function ls2Blur(qNum) {
+  if (!bookmarks.has(qNum)) {
+    const bm = document.getElementById(`bm-${qNum}`);
+    if (bm) bm.style.display = 'none';
+  }
+}
+function ls2ToggleBm(qNum, e) {
+  e.preventDefault();
+  toggleBookmark(qNum);
+  const bm = document.getElementById(`bm-${qNum}`);
+  if (bm) bm.style.display = 'flex';
+  const inp = document.getElementById(`ls2-inp-${qNum}`);
+  if (inp) inp.classList.toggle('ls2-inp-bm', bookmarks.has(qNum));
+}
+
+// ── PART 3 — Dialogue MC ──
+function buildP3() {
+  const d = examData.ls3;
+  const wrap = document.getElementById('ls3-wrap');
+
+  let html = `<div class="ls3-single">`;
+
+  if (d.context) html += `<div class="ls2-context" style="margin-bottom:20px">${esc(d.context).replace(/\n/g,'<br>')}</div>`;
+
+  // All 5 questions in a single scrollable list (Q11–15)
+  (d.questions || []).forEach((q, i) => {
+    const qNum = i + 11;
+    html += `<div class="ls3-question" id="ls3-q-${qNum}" onclick="setActiveQ(${qNum})">
+      <div class="ls3-qhead">
+        <div class="p3-qnum-box" id="p3-qnum-${qNum}">${qNum}</div>
+        <div class="ls3-qtext">${esc(q.text||'Question '+qNum)}</div>
+        <span class="q-bookmark" id="bm-${qNum}" onclick="toggleBookmark(${qNum});event.stopPropagation()">
+          <svg viewBox="0 0 24 24" width="16" height="20"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </span>
+      </div>
+      <div class="ls3-opts">
+        ${['A','B','C'].map(l => `
+          <div class="p3-opt" id="p3-opt-${qNum}-${l}" onclick="selectP3(${qNum},'${l}',event)">
+            <input type="radio" name="ls3q${qNum}" id="ls3r${qNum}${l}"${answers[qNum]===l?' checked':''}>
+            <label for="ls3r${qNum}${l}">${esc(q['opt'+l]||l)}</label>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+
+function selectP3(qNum, letter, event) {
+  if (event && event.target.closest('mark')) return;
+  if (answers[qNum] === letter) {
+    delete answers[qNum];
+    ['A','B','C'].forEach(l => {
+      const el = document.getElementById(`p3-opt-${qNum}-${l}`);
+      if (el) { el.classList.remove('selected'); const r = el.querySelector('input'); if(r) r.checked=false; }
+    });
+  } else {
+    answers[qNum] = letter;
+    ['A','B','C'].forEach(l => {
+      const el = document.getElementById(`p3-opt-${qNum}-${l}`);
+      if (el) { el.classList.toggle('selected', l === letter); const r = el.querySelector('input'); if(r) r.checked=(l===letter); }
+    });
+  }
+  setActiveQ(qNum);
+}
+
+// ── PART 4 — Short Clips MC ──
+function buildP4() {
+  const container = document.getElementById('p4-items');
+  container.innerHTML = '';
+  (examData.ls4.questions || []).forEach((q, i) => {
+    const qNum = i + 16;
+    const div = document.createElement('div');
+    div.className = 'p1-single';
+    div.id = `p4-item-${qNum}`;
+    div.style.display = 'none';
+
+    const qText = q.text ? `<span>${esc(q.text)}</span>` : '';
+    const questionRow = `<div class="p1-question">
+      <span class="p1-qnum">${qNum}</span>
+      ${qText}
+      <span class="q-bookmark" id="bm-${qNum}" onclick="toggleBookmark(${qNum})" title="Bookmark">
+        <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+      </span>
+    </div>`;
+
+    div.innerHTML = questionRow + `
+      <div class="p1-options">
+        ${['A','B','C'].map(l => `
+          <div class="p1-opt${answers[qNum]===l?' selected':''}" id="p4opt-${qNum}-${l}" onclick="selectP4LS(${qNum},'${l}',event)">
+            <input type="radio" name="ls4q${qNum}" id="ls4r${qNum}${l}"${answers[qNum]===l?' checked':''}>
+            <label for="ls4r${qNum}${l}">${esc(q['opt'+l]||'Option '+l)}</label>
+          </div>`).join('')}
+      </div>`;
+    container.appendChild(div);
+  });
+  showP4Question(PART_QS[4][0]);
+}
+
+function selectP4LS(qNum, letter, event) {
+  if (event && event.target.closest('mark')) return;
+  if (answers[qNum] === letter) {
+    delete answers[qNum];
+    ['A','B','C'].forEach(l => {
+      const el = document.getElementById(`p4opt-${qNum}-${l}`);
+      if (el) { el.classList.remove('selected'); const r=el.querySelector('input');if(r)r.checked=false; }
+    });
+  } else {
+    answers[qNum] = letter;
+    ['A','B','C'].forEach(l => {
+      const el = document.getElementById(`p4opt-${qNum}-${l}`);
+      if (el) { el.classList.toggle('selected', l===letter); const r=el.querySelector('input');if(r)r.checked=(l===letter); }
+    });
+  }
+  setActiveQ(qNum);
+}
+
+function toggleBookmark(qNum) {
+  if (bookmarks.has(qNum)) bookmarks.delete(qNum);
+  else bookmarks.add(qNum);
+  const isMarked = bookmarks.has(qNum);
+  const el = document.getElementById(`bm-${qNum}`);
+  if (el) {
+    el.classList.toggle('marked', isMarked);
+    // For Part 5 bookmarks that have opacity managed via inline style
+    if (el.style.opacity !== undefined && el.style.opacity !== '') {
+      el.style.opacity = isMarked ? '1' : '0';
+    }
+  }
+  updateFooterPills();
+}
+
+// ── PART 5 — Matching (drag & drop) ──
+function buildP5() {
+  const d = examData.ls5;
+  const wrap = document.getElementById('ls5-wrap');
+  wrap.innerHTML = d.context ? `<div class="ls2-context">${esc(d.context)}</div>` : '';
+
+  const acts = (d.activities || Array(8).fill(''));
+  const names = d.names || Array(7).fill('');
+  const namesTitle = d.namesTitle || 'People';
+  const actsTitle = d.actsTitle || 'Help with';
+  // answers for Q0 (example) come from d.answers[0]
+  const exampleAns = (d.answers && d.answers[0]) ? d.answers[0] : '';
+  const exampleAnsText = exampleAns ? (acts[exampleAns.charCodeAt(0)-65] || exampleAns) : '';
+
+  const layout = document.createElement('div');
+  layout.className = 'ls5-layout';
+
+  // LEFT: People + drop slots
+  const leftDiv = document.createElement('div');
+  leftDiv.className = 'ls5-left';
+  leftDiv.innerHTML = `<div class="ls5-section-title">${esc(namesTitle)}</div>`;
+
+  // Example row (index 0 — non-interactive)
+  if (names[0] || exampleAns) {
+    const exRow = document.createElement('div');
+    exRow.className = 'ls5-person-row ls5-example-row';
+    exRow.innerHTML = `
+      <div class="ls5-person-name ls5-example-name">${esc(names[0]||'Example')}</div>
+      <div class="ls5-drop-slot ls5-slot-filled ls5-example-slot">
+        <div class="ls5-tag ls5-tag-placed ls5-tag-example">${esc(exampleAnsText||exampleAns)}</div>
+      </div>
+      <div style="width:24px;flex-shrink:0"></div>`;
+    leftDiv.appendChild(exRow);
+  }
+
+  // Questions 21–25 (names index 1–5)
+  const usedLtrs = new Set(Object.values(answers));
+  for (let i = 1; i <= 5; i++) {
+    const qNum = i + 20;
+    const isBm = bookmarks.has(qNum);
+    const sel = answers[qNum] || '';
+    const selText = sel ? (acts[sel.charCodeAt(0)-65] || sel) : '';
+    const row = document.createElement('div');
+    row.className = `ls5-person-row${isBm?' ls5-bm':''}`;
+    row.id = `ls5-row-${qNum}`;
+    row.innerHTML = `
+      <div class="ls5-person-name">${esc(names[i]||'Person '+i)}</div>
+      <div class="ls5-drop-slot${sel?' ls5-slot-filled':''}" id="ls5-slot-${qNum}"
+        data-qnum="${qNum}"
+        ondragover="ls5DragOver(event)" ondrop="ls5Drop(event)" ondragleave="ls5DragLeave(event)">
+        ${sel
+          ? `<div class="ls5-tag ls5-tag-placed" draggable="true"
+               data-ltr="${sel}" data-from="${qNum}"
+               ondragstart="ls5DragStart(event)" ondragend="ls5DragEnd(event)"
+               ondblclick="ls5RemoveTag(${qNum})"
+               title="Double-click to remove">${esc(selText)}</div>`
+          : `<span class="ls5-slot-ph">${qNum}</span>`}
+      </div>
+      <div class="ls5-row-bm-cell">
+        <span class="q-bookmark" id="bm-${qNum}" onclick="toggleBookmark(${qNum})" title="Bookmark"
+          style="opacity:${isBm?1:0};transition:opacity .15s">
+          <svg viewBox="0 0 24 24" width="16" height="20"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+        </span>
+      </div>`;
+    row.addEventListener('mouseenter', () => {
+      const bm = row.querySelector('.q-bookmark');
+      if (bm && !bookmarks.has(qNum)) bm.style.opacity='0.35';
+    });
+    row.addEventListener('mouseleave', () => {
+      const bm = row.querySelector('.q-bookmark');
+      if (bm && !bookmarks.has(qNum)) bm.style.opacity='0';
+    });
+    leftDiv.appendChild(row);
+  }
+
+  // RIGHT: Activity tags in a column (draggable)
+  const rightDiv = document.createElement('div');
+  rightDiv.className = 'ls5-right';
+  rightDiv.innerHTML = `<div class="ls5-section-title">${esc(actsTitle)}</div>
+    <div class="ls5-tags" id="ls5-tags"
+      ondragover="ls5BankDragOver(event)" ondrop="ls5BankDrop(event)" ondragleave="ls5BankDragLeave(event)">
+      ${acts.map((a, ai) => {
+        const ltr = String.fromCharCode(65+ai);
+        const used = usedLtrs.has(ltr) || ltr === exampleAns;
+        return `<div class="ls5-tag${used?' ls5-tag-hidden':''}" draggable="${!used}" id="ls5-tag-${ltr}" data-ltr="${ltr}"
+          ondragstart="ls5DragStart(event)" ondragend="ls5DragEnd(event)">
+          ${esc(a || ltr)}
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  layout.appendChild(leftDiv);
+  layout.appendChild(rightDiv);
+  wrap.appendChild(layout);
+}
+
+let _ls5DragLtr = null;
+let _ls5DragFrom = null;
+let _ls5DragEl = null;
+let _ls5Dropped = false; // track if drop landed on a valid slot/bank
+
+function ls5DragStart(event) {
+  _ls5DragEl = event.currentTarget;
+  _ls5DragLtr = event.currentTarget.dataset.ltr;
+  _ls5DragFrom = event.currentTarget.dataset.from ? +event.currentTarget.dataset.from : null;
+  _ls5Dropped = false;
+  event.dataTransfer.effectAllowed = 'move';
+  event.dataTransfer.setData('text/plain', _ls5DragLtr);
+  // Hide the tag immediately (not just opacity — actually hide it so layout collapses)
+  setTimeout(() => { if (_ls5DragEl) _ls5DragEl.classList.add('ls5-tag-dragging'); }, 0);
+}
+
+function ls5DragEnd(event) {
+  if (_ls5DragEl) _ls5DragEl.classList.remove('ls5-tag-dragging');
+  // If not dropped on a valid target, return to bank
+  if (!_ls5Dropped && _ls5DragLtr) {
+    const fromQ = _ls5DragFrom;
+    if (fromQ) {
+      // Was dragged from a slot but dropped nowhere → return tag to bank
+      delete answers[fromQ];
+      ls5RefreshSlot(fromQ);
+      ls5ReturnToBank(_ls5DragLtr);
+    }
+    // If dragged from bank and dropped nowhere → already visible (just unhide)
+    const bankTag = document.getElementById(`ls5-tag-${_ls5DragLtr}`);
+    if (bankTag) bankTag.classList.remove('ls5-tag-dragging');
+  }
+  _ls5DragEl = null;
+  _ls5DragLtr = null;
+  _ls5DragFrom = null;
+  _ls5Dropped = false;
+}
+
+function ls5DragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  event.currentTarget.classList.add('ls5-slot-dragover');
+}
+function ls5DragLeave(event) {
+  event.currentTarget.classList.remove('ls5-slot-dragover');
+}
+function ls5BankDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+  event.currentTarget.classList.add('ls5-bank-dragover');
+}
+function ls5BankDragLeave(event) {
+  event.currentTarget.classList.remove('ls5-bank-dragover');
+}
+function ls5BankDrop(event) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('ls5-bank-dragover');
+  _ls5Dropped = true;
+  const ltr = _ls5DragLtr;
+  const fromQ = _ls5DragFrom;
+  if (!ltr || !fromQ) return; // only accept drags FROM slots
+  delete answers[fromQ];
+  ls5RefreshSlot(fromQ);
+  ls5ReturnToBank(ltr);
+  updateFooterPills();
+}
+function ls5Drop(event) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('ls5-slot-dragover');
+  _ls5Dropped = true;
+  const ltr = _ls5DragLtr;
+  const fromQ = _ls5DragFrom;
+  const toQ = +event.currentTarget.dataset.qnum;
+  if (!ltr) return;
+  const existingLtr = answers[toQ];
+  if (existingLtr && existingLtr !== ltr) {
+    if (fromQ) {
+      // Swap: displaced tag goes to source slot
+      answers[fromQ] = existingLtr;
+      ls5RefreshSlot(fromQ);
+      const bankTag = document.getElementById(`ls5-tag-${existingLtr}`);
+      if (bankTag) bankTag.classList.add('ls5-tag-hidden');
+    } else {
+      ls5ReturnToBank(existingLtr);
+    }
+  } else if (fromQ && fromQ !== toQ) {
+    delete answers[fromQ];
+    ls5RefreshSlot(fromQ);
+  }
+  answers[toQ] = ltr;
+  ls5RefreshSlot(toQ);
+  // Hide the bank tag
+  const bankTag = document.getElementById(`ls5-tag-${ltr}`);
+  if (bankTag) bankTag.classList.add('ls5-tag-hidden');
+  updateFooterPills();
+}
+function ls5ReturnToBank(ltr) {
+  const bankTag = document.getElementById(`ls5-tag-${ltr}`);
+  if (bankTag) { bankTag.classList.remove('ls5-tag-hidden','ls5-tag-used','ls5-tag-dragging'); }
+}
+function ls5RefreshSlot(qNum) {
+  const slot = document.getElementById(`ls5-slot-${qNum}`);
+  if (!slot) return;
+  const ltr = answers[qNum];
+  const acts = examData.ls5.activities || Array(8).fill('');
+  if (ltr) {
+    const text = acts[ltr.charCodeAt(0)-65] || ltr;
+    slot.classList.add('ls5-slot-filled');
+    slot.innerHTML = `<div class="ls5-tag ls5-tag-placed" draggable="true"
+      data-ltr="${ltr}" data-from="${qNum}"
+      ondragstart="ls5DragStart(event)" ondragend="ls5DragEnd(event)"
+      ondblclick="ls5RemoveTag(${qNum})"
+      title="Double-click to remove">${esc(text)}</div>`;
+  } else {
+    slot.classList.remove('ls5-slot-filled');
+    slot.innerHTML = `<span class="ls5-slot-ph">${qNum}</span>`;
+  }
+}
+function ls5RemoveTag(qNum) {
+  const ltr = answers[qNum];
+  if (!ltr) return;
+  delete answers[qNum];
+  ls5ReturnToBank(ltr);
+  ls5RefreshSlot(qNum);
+  updateFooterPills();
+}
+function selectLS5() {}
+
+
+
+// ══════════════════════════════════════════════════════════
+// FOOTER / NAVIGATION
+// ══════════════════════════════════════════════════════════
+function buildFooter() {
+  // Parts 1 & 4 have per-question pills; others show all Qs
+  [[1,5,'fp1-pills'],[2,5,'fp2-pills'],[3,5,'fp3-pills'],[4,5,'fp4-pills'],[5,5,'fp5-pills']].forEach(([part, count, id]) => {
+    const start = PART_QS[part][0];
+    const el = document.getElementById(id);
+    let html = '';
+    for (let i = 0; i < count; i++) {
+      const q = start + i;
+      html += `<span class="f-q-pill" id="fp-pill-${q}" onclick="event.stopPropagation();goToPartQ(${part},${q})">${q}</span>`;
+    }
+    el.innerHTML = html;
+  });
+}
+
+function updateFooterPills() {
+  Object.entries(PART_QS).forEach(([part, qs]) => {
+    qs.forEach(q => {
+      const pill = document.getElementById(`fp-pill-${q}`);
+      if (!pill) return;
+      const isCurrent   = (q === currentQ && parseInt(part) === currentPart);
+      const isAnswered  = !!answers[q];
+      const isBookmarked = bookmarks.has(q);
+      let cls = 'f-q-pill';
+      if (isCurrent)    cls += ' current';
+      if (isAnswered)   cls += ' answered';
+      if (isBookmarked) cls += ' bookmarked';
+      pill.className = cls;
+    });
+  });
+
+  [[1,'fp1-count',5],[2,'fp2-count',5],[3,'fp3-count',5],[4,'fp4-count',5],[5,'fp5-count',5]]
+    .forEach(([part, id, total]) => {
+      const answered = PART_QS[part].filter(q => answers[q]).length;
+      const el = document.getElementById(id);
+      if (el) el.textContent = `${answered} of ${total}`;
+    });
+
+  document.querySelectorAll('.f-part-btn').forEach(btn => {
+    const p = +btn.dataset.part;
+    const isActive = (p === currentPart);
+    btn.classList.toggle('active', isActive);
+    const qs = PART_QS[p];
+    const answeredCount = qs.filter(q => answers[q]).length;
+    const allDone = answeredCount === qs.length && qs.length > 0;
+    btn.classList.toggle('done', allDone);
+    const hasBookmark = qs.some(q => bookmarks.has(q)) && !isActive;
+    btn.classList.toggle('has-bookmark', hasBookmark);
+    const countEl = btn.querySelector('.f-part-count');
+    if (countEl) countEl.style.display = (allDone && !isActive) ? 'none' : '';
+  });
+
+  requestAnimationFrame(drawOverlay);
+}
+
+// Draws black stripes (answered) and orange bookmarks at the very top of the footer
+function drawOverlay() {
+  const footer = document.getElementById('footer');
+  const svg = document.getElementById('f-overlay');
+  if (!svg || !footer) return;
+
+  const fRect = footer.getBoundingClientRect();
+  svg.setAttribute('width', fRect.width);
+  svg.setAttribute('height', '18');
+  svg.setAttribute('viewBox', `0 0 ${fRect.width} 18`);
+  svg.style.cssText = `position:absolute;top:0;left:0;pointer-events:none;z-index:10;overflow:visible`;
+  svg.innerHTML = '';
+
+  const STRIPE_H = 3;
+  const STRIPE_Y = 2;     // 2px from top of footer
+  const BM_W = 9;
+  const BM_H = 13;
+  const BM_Y = STRIPE_Y;  // bookmark starts at same y as stripe
+
+  const stripeColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#1A1A1A';
+
+  // Helper: draw stripe
+  const drawStripe = (x, w) => {
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x', x); r.setAttribute('y', STRIPE_Y);
+    r.setAttribute('width', w); r.setAttribute('height', STRIPE_H);
+    r.setAttribute('rx', '1.5'); r.setAttribute('fill', stripeColor);
+    svg.appendChild(r);
+  };
+
+  const bmColor = getComputedStyle(document.documentElement).getPropertyValue('--bm-color').trim() || '#E05C00';
+  // Helper: draw bookmark ribbon (pointing down)
+  const drawBookmark = (cx) => {
+    const x = cx - BM_W/2;
+    const d = `M${x},${BM_Y} h${BM_W} v${BM_H * 0.7} l${-BM_W/2},${BM_H * 0.3} l${-BM_W/2},${-BM_H * 0.3} z`;
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d', d); p.setAttribute('fill', bmColor);
+    svg.appendChild(p);
+  };
+
+  // Active part — draw per-pill stripes and bookmarks
+  const activePart = currentPart;
+  if (activePart <= 5) {
+    const qs = PART_QS[activePart];
+    qs.forEach(q => {
+      const pill = document.getElementById(`fp-pill-${q}`);
+      if (!pill) return;
+      const pRect = pill.getBoundingClientRect();
+      const x = pRect.left - fRect.left;
+      const w = pRect.width;
+
+      if (answers[q]) drawStripe(x, w);
+      if (bookmarks.has(q)) drawBookmark(x + w / 2);
+    });
+  }
+
+  // All parts — draw stripe if done, bookmark if has bookmarks (including active part for p6/p7)
+  document.querySelectorAll('.f-part-btn').forEach(btn => {
+    const p = +btn.dataset.part;
+    const qs = PART_QS[p];
+    const allDone = qs.filter(q => answers[q]).length === qs.length && qs.length > 0;
+    // Show bookmark on inactive parts only (active part shows per-pill bookmarks above)
+    const hasBookmark = qs.some(q => bookmarks.has(q)) && (p !== activePart);
+
+    if (allDone) {
+      if (p === activePart) {
+        const lbl = btn.querySelector('.f-part-label');
+        if (lbl) {
+          const lRect = lbl.getBoundingClientRect();
+          drawStripe(lRect.left - fRect.left, lRect.width);
+        }
+      } else {
+        const bRect = btn.getBoundingClientRect();
+        drawStripe(bRect.left - fRect.left, bRect.width);
+      }
+    }
+    if (hasBookmark) {
+      const bRect = btn.getBoundingClientRect();
+      drawBookmark(bRect.left - fRect.left + bRect.width / 2);
+    }
+  });
+}
+
+function goToPart(part, q) {
+  currentPart = part;
+  currentQ = q || PART_QS[part][0];
+  document.querySelectorAll('.exam-page').forEach(el => el.classList.remove('active'));
+  document.getElementById(`pg-ls${part}`).classList.add('active');
+  if (part === 1) showP1Question(currentQ);
+  if (part === 4) showP4Question(currentQ);
+  const main = document.getElementById('main');
+  main.style.overflowY = 'auto';
+  main.style.height = '';
+  main.scrollTop = 0;
+  document.getElementById('btn-prev').disabled = (part === 1 && currentQ === 1);
+  document.getElementById('btn-next').disabled = false;
+  updateFooterPills();
+}
+
+function goToPartQ(part, q) {
+  goToPart(part, q);
+  requestAnimationFrame(() => {
+    if (part === 1 || part === 4) setActiveQ(q);
+    if (part === 2) {
+      const inp = document.getElementById(`ls2-inp-${q}`);
+      if (inp) inp.focus();
+    }
+    if (part === 3) {
+      setActiveQ(q);
+      const target = document.getElementById(`ls3-q-${q}`);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (part === 5) {
+      setActiveQ(q);
+      const row = document.getElementById(`ls5-row-${q}`);
+      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+}
+
+function navigate(dir) {
+  // Part 1: navigate per question (Q1–5)
+  if (currentPart === 1) {
+    const newQ = currentQ + dir;
+    if (newQ < 1) return;
+    if (newQ > 5) { goToPart(2); return; }
+    currentQ = newQ;
+    showP1Question(currentQ);
+    document.getElementById('btn-prev').disabled = (currentQ === 1);
+    updateFooterPills();
+    return;
+  }
+  // Part 4: navigate per question (Q16–20)
+  if (currentPart === 4) {
+    const newQ = currentQ + dir;
+    if (newQ < 16) { goToPart(3); return; }
+    if (newQ > 20) { goToPart(5); return; }
+    currentQ = newQ;
+    showP4Question(currentQ);
+    document.getElementById('btn-prev').disabled = false;
+    updateFooterPills();
+    return;
+  }
+  // Other parts: navigate by part
+  const newPart = currentPart + dir;
+  if (newPart < 1 || newPart > 5) return;
+  if (newPart === 1) { goToPart(1, 5); return; } // coming back to P1 → last question
+  if (newPart === 4) { goToPart(4, dir > 0 ? 16 : 20); return; } // entering P4
+  goToPart(newPart);
+}
+
+// ══════════════════════════════════════════════════════════
+// AUDIO SEQUENCER
+// ══════════════════════════════════════════════════════════
+let _audioEl = null;
+let _audioPhase = null;   // 'playing'|'check'|'move'|'done'
+let _audioCountdown = null;
+
+const AUDIO_CHECK_SECS = { 1:60, 2:60, 3:60, 4:60, 5:60 };
+const AUDIO_MOVE_SECS  = 5;
+
+function startAudioSequence() {
+  document.getElementById('audio-intro').style.display = 'none';
+  // Start main timer immediately
+  const tl = document.getElementById('timer-label');
+  if (tl) tl.innerHTML = formatTime(_timeLeft);
+  startTimer();
+  // Step 0: play the exam introduction audio, then 5s prep for Part 1
+  _runIntroAudio();
+}
+
+const INTRO_AUDIO_URL = 'https://samromand.github.io/A2%20Key%20TK_00.mp3';
+const INTRO_PREP_SECS = 5;
+
+function _runIntroAudio() {
+  _audioPhase = 'intro';
+  _showStatus('▶', 'Listening test introduction', true);
+
+  const audio = new Audio(INTRO_AUDIO_URL);
+  audio.addEventListener('ended', () => _startPrepCountdown());
+  audio.addEventListener('error', () => _startPrepCountdown());
+  audio.play().catch(() => _startPrepCountdown());
+}
+
+function _startPrepCountdown() {
+  _audioPhase = 'prep';
+  let secs = INTRO_PREP_SECS;
+  _showStatus('⏱', `Prepare for Part 1 — ${secs}s`, false);
+
+  _clearAudioCountdown();
+  _audioCountdown = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      _clearAudioCountdown();
+      _runAudioPart(1);
+    } else {
+      _showStatus('⏱', `Prepare for Part 1 — ${secs}s`, false);
+    }
+  }, 1000);
+}
+
+function _runAudioPart(part) {
+  if (_audioEl) { try { _audioEl.pause(); } catch(e) {} _audioEl = null; }
+  _audioPhase = 'playing';
+  _showStatus('▶', `Audio for Part ${part} is playing`, true);
+
+  const url = _getAudioUrl(part);
+  if (url) {
+    _audioEl = new Audio(url);
+    _audioEl.addEventListener('ended', () => _startCheckCountdown(part));
+    _audioEl.addEventListener('error', () => _startCheckCountdown(part));
+    _audioEl.play().catch(() => _startCheckCountdown(part));
+  } else {
+    // No audio URL yet — go straight to check phase
+    _startCheckCountdown(part);
+  }
+}
+
+function _getAudioUrl(part) {
+  if (!examData) return '';
+  return examData[`ls${part}`]?.audio || '';
+}
+
+function _startCheckCountdown(part) {
+  if (_audioEl) { try { _audioEl.pause(); } catch(e) {} _audioEl = null; }
+  _audioPhase = 'check';
+  let secs = AUDIO_CHECK_SECS[part] || 60;
+
+  _showStatus('⏱', `Part ${part}: check your answers — ${secs}s`, false);
+
+  _clearAudioCountdown();
+  _audioCountdown = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      _clearAudioCountdown();
+      if (part < 5) _startMovePause(part);
+      else _finishAudioSequence();
+    } else {
+      _showStatus('⏱', `Part ${part}: check your answers — ${secs}s`, false);
+    }
+  }, 1000);
+}
+
+function _startMovePause(part) {
+  _audioPhase = 'move';
+  const nextPart = part + 1;
+  let secs = AUDIO_MOVE_SECS;
+
+  _showStatus('▶', `Now move to Part ${nextPart}`, false);
+
+  _clearAudioCountdown();
+  _audioCountdown = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      _clearAudioCountdown();
+      _runAudioPart(nextPart);
+    }
+  }, 1000);
+}
+
+function _finishAudioSequence() {
+  _audioPhase = 'done';
+  _showStatus('✓', 'Use remaining time to check all answers', false);
+}
+
+function _showStatus(icon, text, pulse) {
+  const el  = document.getElementById('audio-status');
+  const txt = document.getElementById('audio-status-text');
+  const sep = document.getElementById('audio-status-sep');
+  const ico = document.getElementById('audio-status-icon');
+  if (!el) return;
+  el.style.display = 'flex';
+  if (sep) sep.style.display = '';
+  if (txt) txt.textContent = text;
+  if (ico) {
+    ico.style.animation = pulse ? 'audioPulse 1.2s ease-in-out infinite' : 'none';
+    // Swap icon SVG path depending on type
+    if (icon === '✓') {
+      ico.innerHTML = '<polyline points="20,6 9,17 4,12"/>';
+    } else if (icon === '⏱') {
+      ico.innerHTML = '<circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>';
+    } else {
+      ico.innerHTML = '<polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>';
+    }
+  }
+}
+
+function _clearAudioCountdown() {
+  if (_audioCountdown) { clearInterval(_audioCountdown); _audioCountdown = null; }
+}
+
+// Legacy stubs (not used but kept to avoid any reference errors)
+function _hideTransition() {}
+function _hideStatus() {}
+function _showTransition() {}
+
+// ══════════════════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════════════════
+const EXAM_DURATION = 30 * 60; // 30 minutes in seconds
+let _timeLeft = EXAM_DURATION;
+let _timerInterval = null;
+let _timerBlinkInterval = null;
+let _timerExpired = false;
+
+function formatTime(secs) {
+  if (secs >= 60) {
+    return `Time remaining: ${Math.ceil(secs / 60)} min`;
+  } else {
+    return `Time remaining: <span id="timer-sec">${secs} sec</span>`;
+  }
+}
+
+function startTimer() {
+  _timerInterval = setInterval(() => {
+    _timeLeft--;
+    const labelEl = document.getElementById('timer-label');
+    if (!labelEl) return;
+
+    if (_timeLeft <= 0) {
+      clearInterval(_timerInterval);
+      if (_timerBlinkInterval) clearInterval(_timerBlinkInterval);
+      _timerExpired = true;
+      labelEl.innerHTML = 'Time remaining: <span id="timer-sec">0 sec</span>';
+      setTimeout(() => openExpiredModal(), 800);
+      return;
+    }
+
+    labelEl.innerHTML = formatTime(_timeLeft);
+
+    if (_timeLeft < 60 && !_timerBlinkInterval) {
+      // Blink only the "X sec" span at 500ms
+      _timerBlinkInterval = setInterval(() => {
+        const sec = document.getElementById('timer-sec');
+        if (sec) sec.style.opacity = sec.style.opacity === '0' ? '1' : '0';
+      }, 500);
+    }
+  }, 1000);
+}
+
+// ══════════════════════════════════════════════════════════
+// SUBMIT MODAL
+// ══════════════════════════════════════════════════════════
+function submitExam() {
+  if (_timerExpired) { openExpiredModal(); return; }
+  // Update summary text
+  const total = Object.values(PART_QS).flat().length;
+  const answered = Object.values(PART_QS).flat().filter(q => answers[q]).length;
+  const unanswered = total - answered;
+  document.getElementById('submit-summary-text').innerHTML =
+    `You have answered <strong>${answered}</strong> of <strong>${total}</strong> questions.` +
+    (unanswered > 0 ? `<br><span style="color:#C00">⚠ ${unanswered} question${unanswered!==1?'s are':' is'} unanswered.</span>` : '<br>✓ All questions answered.') +
+    `<br><br>This action <strong>cannot be undone</strong>.`;
+  document.getElementById('submit-manual').style.display = 'flex';
+  document.getElementById('submit-expired').style.display = 'none';
+  document.getElementById('submit-modal').style.display = 'flex';
+}
+
+function openExpiredModal() {
+  document.getElementById('submit-manual').style.display = 'none';
+  document.getElementById('submit-expired').style.display = 'flex';
+  document.getElementById('submit-modal').style.display = 'flex';
+}
+
+function closeSubmitModal() {
+  if (_timerExpired) return; // can't dismiss if time expired
+  document.getElementById('submit-modal').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════════
+// PDF GENERATION
+// ══════════════════════════════════════════════════════════
+function generatePDF() {
+  const cidLabel = candidateId || document.querySelector('.cid-label')?.textContent?.replace('Candidate ID:','').trim() || 'Candidate';
+  const variantLabel = variantId || '—';
+  const now = new Date().toLocaleString();
+
+  const partsMap = {1:'Part 1 — Picture MC',2:'Part 2 — Note Fill',3:'Part 3 — Dialogue MC',4:'Part 4 — Short Clips MC',5:'Part 5 — Matching'};
+
+  function buildTable() {
+    let rows = '';
+    Object.entries(partsMap).forEach(([part, label]) => {
+      const qs = PART_QS[+part];
+      rows += `<tr><td colspan="2" class="part-header">${label}</td></tr>`;
+      qs.forEach(q => {
+        const ans = answers[q];
+        rows += `<tr>
+          <td class="qnum">${q}</td>
+          <td class="qans ${ans?'answered':'blank'}">${ans ? esc(String(ans)) : '—'}</td>
+        </tr>`;
+      });
+    });
+    return rows;
+  }
+
+  const style = `<style>
+    body{font-family:Arial,sans-serif;font-size:13px;color:#111;padding:30px;max-width:560px;margin:0 auto}
+    h1{font-size:18px;margin-bottom:4px}
+    .meta{color:#555;font-size:12px;margin-bottom:20px;border-bottom:1px solid #ddd;padding-bottom:10px}
+    table{width:100%;border-collapse:collapse}
+    .part-header{background:#f0f0f0;font-weight:700;padding:6px 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+    .qnum{padding:5px 10px;border-bottom:1px solid #eee;width:50px;color:#666}
+    .qans{padding:5px 10px;border-bottom:1px solid #eee;font-weight:700}
+    .blank{color:#bbb;font-weight:400}
+    .footer{margin-top:20px;font-size:11px;color:#999}
+    @media print{body{padding:0}}
+  </style>`;
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Listening — ${cidLabel}</title>${style}</head><body>
+  <h1>A2 Key for Schools — Listening (Parts 1–5)</h1>
+  <div class="meta">
+    Candidate ID: <strong>${esc(cidLabel)}</strong> &nbsp;|&nbsp;
+    Variant: <strong>${esc(variantLabel)}</strong> &nbsp;|&nbsp;
+    ${now}
+  </div>
+  <table>${buildTable()}</table>
+  <div class="footer">Generated automatically. Final submission pending.</div>
+  </body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) setTimeout(() => win.print(), 600);
+}
+
+// Timer initialised after data loads (see boot section above)
+
+
+// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// RESIZABLE PANELS — none needed for Listening
+// (Part 3 uses single-scroll layout)
+// ══════════════════════════════════════════════════════════
+
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+window.addEventListener('resize', () => requestAnimationFrame(drawOverlay));
+</script>
+
+<!-- ══ SUBMIT MODAL ══ -->
+<div id="submit-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(240,242,245,0.97);flex-direction:column;font-family:var(--sans)">
+
+  <!-- MANUAL SUBMIT -->
+  <div id="submit-manual" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <button class="modal-back" onclick="closeSubmitModal()">‹ Back</button>
+      <span class="modal-title">Submit exam</span>
+      <button class="modal-close" onclick="closeSubmitModal()">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;min-height:60vh">
+      <div style="text-align:center;max-width:480px">
+        <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:12px">Are you sure?</div>
+        <div style="font-size:15px;color:var(--text-muted);line-height:1.6" id="submit-summary-text"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:400px">
+        <button onclick="generatePDF()" style="padding:13px 20px;background:var(--bg-instr);border:1px solid var(--border);border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          Listening answer sheet (Parts 1–5)
+        </button>
+        <button id="final-submit-btn" onclick="finalSubmit()" style="padding:14px 24px;background:var(--cam-teal-dark);border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;color:#fff">
+          Submit &amp; return to exam home
+        </button>
+        <button onclick="closeSubmitModal()" style="padding:12px 24px;background:transparent;border:1px solid var(--border);border-radius:6px;font-size:15px;cursor:pointer;color:var(--text)">
+          Cancel — continue exam
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIME EXPIRED -->
+  <div id="submit-expired" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <span class="modal-title">Time's up</span>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;min-height:60vh">
+      <div style="text-align:center;max-width:480px">
+        <div style="font-size:48px;margin-bottom:16px">⏰</div>
+        <div style="font-size:20px;font-weight:700;margin-bottom:12px">Time has expired</div>
+        <div style="font-size:15px;color:var(--text-muted);line-height:1.6">Your exam time has ended. You can no longer make changes to your answers.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:400px">
+        <button onclick="generatePDF()" style="padding:13px 20px;background:var(--bg-instr);border:1px solid var(--border);border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+          Listening answer sheet (Parts 1–5)
+        </button>
+        <button onclick="finalSubmit()" style="padding:14px 24px;background:var(--cam-teal-dark);border:none;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;color:#fff">
+          Submit &amp; return to exam home
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /submit-modal -->
+<div id="modal-overlay">
+
+  <!-- MESSAGES -->
+  <div id="modal-messages" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <span class="modal-title">Messages</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="messages-empty">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        No messages
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTIONS -->
+  <div id="modal-options" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <span class="modal-title">Options</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row primary" onclick="closeModal();submitExam()">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg></div>
+          <span class="opt-label">Go to submission page</span>
+          <span class="opt-arrow">›</span>
+        </div>
+        <div class="opt-row" onclick="openSubpage('contrast')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20V2z" fill="currentColor" stroke="none"/></svg></div>
+          <span class="opt-label">Contrast</span>
+          <span class="opt-arrow">›</span>
+        </div>
+        <div class="opt-row" onclick="openSubpage('textsize')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div>
+          <span class="opt-label">Text size</span>
+          <span class="opt-arrow">›</span>
+        </div>
+        <div class="opt-row" onclick="openSubpage('time')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-5.52 0-10-4.48-10-10 0-2.12.66-4.09 1.78-5.72M6.53 6.53A9.95 9.95 0 0112 4c5.52 0 10 4.48 10 10 0 1.75-.45 3.4-1.24 4.83M1 1l22 22"/></svg></div>
+          <span class="opt-label">Remaining time</span>
+          <span class="opt-arrow">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTRAST SUBPAGE -->
+  <div id="modal-contrast" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <button class="modal-back" onclick="openSubpage(null)">‹ Options</button>
+      <span class="modal-title">Contrast</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row" id="contrast-bow" onclick="setContrast('bow')">
+          <span class="opt-check" id="contrast-bow-check">✓</span>
+          <span class="opt-label">Black on white</span>
+          <div class="contrast-thumb" style="background:#fff"><span style="background:#222"></span><span style="background:#444"></span><span style="background:#333;width:60%"></span></div>
+        </div>
+        <div class="opt-row" id="contrast-wob" onclick="setContrast('wob')">
+          <span class="opt-check" id="contrast-wob-check" style="visibility:hidden">✓</span>
+          <span class="opt-label">White on black</span>
+          <div class="contrast-thumb" style="background:#000"><span style="background:#fff"></span><span style="background:#eee"></span><span style="background:#ddd;width:60%"></span></div>
+        </div>
+        <div class="opt-row" id="contrast-yob" onclick="setContrast('yob')">
+          <span class="opt-check" id="contrast-yob-check" style="visibility:hidden">✓</span>
+          <span class="opt-label">Yellow on black</span>
+          <div class="contrast-thumb" style="background:#000"><span style="background:#FFD700"></span><span style="background:#FFC400"></span><span style="background:#FFB300;width:60%"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEXT SIZE SUBPAGE -->
+  <div id="modal-textsize" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <button class="modal-back" onclick="openSubpage(null)">‹ Options</button>
+      <span class="modal-title">Text size</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row" id="size-regular" onclick="setTextSize('regular')">
+          <span class="opt-check" id="size-regular-check">✓</span>
+          <span class="opt-label">Regular</span>
+        </div>
+        <div class="opt-row" id="size-large" onclick="setTextSize('large')">
+          <span class="opt-check" id="size-large-check" style="visibility:hidden">✓</span>
+          <span class="opt-label">Large</span>
+        </div>
+        <div class="opt-row" id="size-xl" onclick="setTextSize('xl')">
+          <span class="opt-check" id="size-xl-check" style="visibility:hidden">✓</span>
+          <span class="opt-label">Extra large</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIME SUBPAGE -->
+  <div id="modal-time" style="display:none;flex-direction:column;flex:1">
+    <div class="modal-header">
+      <button class="modal-back" onclick="openSubpage(null)">‹ Options</button>
+      <span class="modal-title">Remaining time</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row" id="time-show" onclick="setTimeVis('show')">
+          <span class="opt-check" id="time-show-check">✓</span>
+          <span class="opt-label">Show</span>
+        </div>
+        <div class="opt-row" id="time-hide" onclick="setTimeVis('hide')">
+          <span class="opt-check" id="time-hide-check" style="visibility:hidden">✓</span>
+          <span class="opt-label">Hide</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /modal-overlay -->
+<div id="hl-tooltip">
+  <button id="hl-btn-note" onclick="startNote()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+    Note
+  </button>
+  <div class="hl-divider"></div>
+  <button id="hl-btn-highlight" onclick="applyHighlight()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    </svg>
+    Highlight
+  </button>
+  <div class="hl-divider"></div>
+  <button id="hl-btn-remove" onclick="removeHighlight()" style="display:none">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/>
+    </svg>
+    Delete Highlight
+  </button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// HIGHLIGHT SYSTEM
+// ══════════════════════════════════════════════════════════
+
+// Selectable zones: texts, questions, options (not labels — those use user-select:none)
+const SELECTABLE_SELECTOR = [
+  // R&W parts (kept for any shared logic)
+  '.p1-sign','.p1-sign-img-wrap',
+  '.p2-person-text','.p2-qtext',
+  '.p3-article-text','.p3-qtext',
+  '.p1-opt','.p2-opt-radio','.p3-opt',
+  '.p4-text','.p5-body',
+  '.p6-scenario','.p7-wrap',
+  // Listening parts
+  '.ls2-context','.ls2-form-title','.ls2-row-lbl',
+  '.ls3-qtext','.ls3-opts','.ls3-single',
+  '.p1-question','.p1-options',
+  '.ls5-section-title','.ls5-tags','.ls5-left',
+].join(',');
+
+let _hlRange = null;
+let _hlTargetMark = null;
+
+function isInSelectableZone(node) {
+  if (!node) return false;
+  const el = node.nodeType === 3 ? node.parentElement : node;
+  return !!el.closest(SELECTABLE_SELECTOR) && !el.closest('.instr-bar');
+}
+
+// Track whether the user dragged (vs just clicked)
+let _mouseDownX = 0, _mouseDownY = 0, _wasDrag = false;
+
+document.addEventListener('mousedown', e => {
+  _mouseDownX = e.clientX;
+  _mouseDownY = e.clientY;
+  _wasDrag = false;
+});
+
+document.addEventListener('mousemove', e => {
+  if (!_wasDrag) {
+    const dx = e.clientX - _mouseDownX;
+    const dy = e.clientY - _mouseDownY;
+    if (Math.sqrt(dx*dx + dy*dy) > 4) _wasDrag = true;
+  }
+});
+
+document.addEventListener('mouseup', e => {
+  setTimeout(() => {
+    const sel = window.getSelection();
+
+    // Clicked on an existing highlight?
+    const mark = e.target.closest('mark.hl');
+    if (mark && !_wasDrag) {
+      _hlTargetMark = mark;
+      _hlRange = null;
+      showTooltip(e.clientX, e.clientY, true);
+      return;
+    }
+
+    // Hide tooltip if clicking outside
+    if (!e.target.closest('#hl-tooltip')) hideTooltip();
+
+    // Only show highlight tooltip if this was a drag (not a plain click)
+    if (!_wasDrag) return;
+
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    if (range.collapsed) return;
+
+    if (!isInSelectableZone(range.startContainer) ||
+        !isInSelectableZone(range.endContainer)) return;
+
+    _hlRange = range.cloneRange();
+    _hlTargetMark = null;
+    showTooltip(e.clientX, e.clientY, false);
+  }, 10);
+});
+
+let _notes = []; // [{id, quote, text, markEl}]
+let _noteIdCounter = 0;
+let _pendingNoteRange = null;
+let _pendingNoteQuote = '';
+
+function toggleNotesPanel() {
+  const panel = document.getElementById('notes-panel');
+  panel.classList.toggle('collapsed');
+}
+
+function showTooltip(cx, cy, isExisting) {
+  const tip = document.getElementById('hl-tooltip');
+  const noteBtn = document.getElementById('hl-btn-note');
+  const hlBtn = document.getElementById('hl-btn-highlight');
+  const rmBtn = document.getElementById('hl-btn-remove');
+  noteBtn.style.display = isExisting ? 'none' : 'flex';
+  hlBtn.style.display = isExisting ? 'none' : 'flex';
+  document.querySelectorAll('#hl-tooltip .hl-divider').forEach((d,i) => {
+    d.style.display = isExisting ? (i===0?'none':'block') : 'block';
+  });
+  rmBtn.style.display = isExisting ? 'flex' : 'none';
+  tip.classList.add('show');
+  const TW = tip.offsetWidth || 140, TH = tip.offsetHeight || 100;
+  let left = cx + 8, top = cy - TH - 8;
+  if (left + TW > window.innerWidth - 8) left = cx - TW - 8;
+  if (top < 8) top = cy + 16;
+  tip.style.left = left + 'px';
+  tip.style.top  = top  + 'px';
+}
+
+function startNote() {
+  if (!_hlRange) return;
+  _pendingNoteQuote = _hlRange.toString().trim().slice(0, 80);
+  _pendingNoteRange = _hlRange.cloneRange();
+  hideTooltip();
+
+  const popup = document.getElementById('note-popup');
+  const textarea = document.getElementById('note-text');
+  textarea.value = '';
+  popup.classList.add('show');
+  // Position below cursor
+  const tip = document.getElementById('hl-tooltip');
+  popup.style.left = (parseInt(tip.style.left)||200) + 'px';
+  popup.style.top  = (parseInt(tip.style.top)||200) + 'px';
+  setTimeout(() => textarea.focus(), 50);
+}
+
+function saveNote() {
+  const text = document.getElementById('note-text').value.trim();
+  if (!_pendingNoteRange) { cancelNote(); return; }
+
+  // Apply yellow note highlight
+  let markEl;
+  try {
+    markEl = document.createElement('mark');
+    markEl.className = 'note-hl';
+    const id = ++_noteIdCounter;
+    markEl.dataset.noteId = id;
+    markEl.onclick = () => scrollToNote(id);
+    _pendingNoteRange.surroundContents(markEl);
+    _notes.push({ id, quote: _pendingNoteQuote, text, markEl });
+  } catch(e) {
+    try {
+      const frag = _pendingNoteRange.extractContents();
+      markEl = document.createElement('mark');
+      markEl.className = 'note-hl';
+      const id = ++_noteIdCounter;
+      markEl.dataset.noteId = id;
+      markEl.onclick = () => scrollToNote(id);
+      markEl.appendChild(frag);
+      _pendingNoteRange.insertNode(markEl);
+      _notes.push({ id, quote: _pendingNoteQuote, text, markEl });
+    } catch(e2) {}
+  }
+
+  window.getSelection().removeAllRanges();
+  document.getElementById('note-popup').classList.remove('show');
+  _pendingNoteRange = null;
+  renderNotes();
+  // Open panel if closed
+  document.getElementById('notes-panel').classList.remove('collapsed');
+}
+
+function cancelNote() {
+  document.getElementById('note-popup').classList.remove('show');
+  _pendingNoteRange = null;
+}
+
+function renderNotes() {
+  const list = document.getElementById('notes-list');
+  const empty = document.getElementById('notes-panel-empty');
+  if (_notes.length === 0) {
+    empty.style.display = 'block'; list.style.display = 'none'; return;
+  }
+  empty.style.display = 'none'; list.style.display = 'block';
+  list.innerHTML = _notes.map(n => `
+    <div class="note-item" id="note-item-${n.id}" onclick="scrollToNote(${n.id})">
+      <div class="ni-quote">${esc(n.quote)}</div>
+      ${n.text ? `<div class="ni-text">${esc(n.text)}</div>` : ''}
+      <button class="ni-del" onclick="event.stopPropagation();deleteNote(${n.id})">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/><path d="M10,11v6M14,11v6"/></svg>
+        Delete
+      </button>
+    </div>`).join('');
+}
+
+function scrollToNote(id) {
+  // Open panel if closed
+  document.getElementById('notes-panel').classList.remove('collapsed');
+  const n = _notes.find(x => x.id === id);
+  if (n && n.markEl) {
+    n.markEl.scrollIntoView({ behavior:'smooth', block:'center' });
+    // Flash the mark in the text
+    n.markEl.style.transition = 'outline .1s';
+    let flashes = 0;
+    const flash = setInterval(() => {
+      n.markEl.style.outline = flashes % 2 === 0 ? '3px solid #E8B840' : 'none';
+      if (++flashes >= 6) { clearInterval(flash); n.markEl.style.outline = 'none'; }
+    }, 180);
+  }
+  // Highlight in panel list
+  document.querySelectorAll('.note-item').forEach(el => el.classList.remove('active-note'));
+  const item = document.getElementById(`note-item-${id}`);
+  if (item) {
+    item.classList.add('active-note');
+    item.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    setTimeout(() => item.classList.remove('active-note'), 2000);
+  }
+}
+
+function deleteNote(id) {
+  const idx = _notes.findIndex(n => n.id === id);
+  if (idx === -1) return;
+  const n = _notes[idx];
+  if (n.markEl && n.markEl.parentNode) {
+    while (n.markEl.firstChild) n.markEl.parentNode.insertBefore(n.markEl.firstChild, n.markEl);
+    n.markEl.parentNode.removeChild(n.markEl);
+  }
+  _notes.splice(idx, 1);
+  renderNotes();
+}
+
+function removeHighlight() {
+  if (!_hlTargetMark) return;
+  // If it's a note highlight, delete the note too
+  if (_hlTargetMark.classList.contains('note-hl')) {
+    const id = +_hlTargetMark.dataset.noteId;
+    deleteNote(id);
+  } else {
+    const parent = _hlTargetMark.parentNode;
+    while (_hlTargetMark.firstChild) parent.insertBefore(_hlTargetMark.firstChild, _hlTargetMark);
+    parent.removeChild(_hlTargetMark);
+    parent.normalize();
+  }
+  hideTooltip();
+}
+
+// Clicking an existing note-hl or hl shows "Delete Highlight" in tooltip
+document.addEventListener('click', e => {
+  const mark = e.target.closest('mark.hl, mark.note-hl');
+  if (mark && !_wasDrag) {
+    _hlTargetMark = mark;
+    _hlRange = null;
+    showTooltip(e.clientX, e.clientY, true);
+  }
+});
+
+function hideTooltip() {
+  document.getElementById('hl-tooltip').classList.remove('show');
+  _hlRange = null;
+  _hlTargetMark = null;
+}
+
+function applyHighlight() {
+  if (!_hlRange) return;
+  try {
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    _hlRange.surroundContents(mark);
+  } catch(e) {
+    try {
+      const frag = _hlRange.extractContents();
+      const mark = document.createElement('mark');
+      mark.className = 'hl';
+      mark.appendChild(frag);
+      _hlRange.insertNode(mark);
+    } catch(e2) {}
+  }
+  window.getSelection().removeAllRanges();
+  hideTooltip();
+}
+
+// Restrict note textarea to English (ASCII printable) only
+document.getElementById('note-text').addEventListener('keydown', e => {
+  // Allow control keys: backspace, delete, arrows, enter, tab, etc.
+  if (e.key.length > 1) return;
+  // Allow only ASCII printable (32-126): letters, digits, punctuation, spaces
+  if (e.key.charCodeAt(0) < 32 || e.key.charCodeAt(0) > 126) {
+    e.preventDefault();
+  }
+});
+// Also strip any non-ASCII on paste
+document.getElementById('note-text').addEventListener('input', e => {
+  const el = e.target;
+  const clean = el.value.replace(/[^\x20-\x7E\n]/g, '');
+  if (clean !== el.value) {
+    const pos = el.selectionStart - (el.value.length - clean.length);
+    el.value = clean;
+    el.setSelectionRange(pos, pos);
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); hideTooltip(); cancelNote(); } });
+
+// ══════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════
+const MODAL_PAGES = ['messages','options','contrast','textsize','time'];
+let _currentContrast = 'bow', _currentSize = 'regular', _currentTimeVis = 'show';
+
+function openModal(page) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('show');
+  MODAL_PAGES.forEach(p => {
+    const el = document.getElementById(`modal-${p}`);
+    if (el) el.style.display = p === page ? 'flex' : 'none';
+  });
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+function openSubpage(sub) {
+  if (!sub) { openModal('options'); return; }
+  openModal(sub);
+}
+function setContrast(val) {
+  _currentContrast = val;
+  ['bow','wob','yob'].forEach(v => {
+    document.getElementById(`contrast-${v}-check`).style.visibility = v===val?'visible':'hidden';
+  });
+  // Apply theme
+  if (val === 'bow') {
+    document.documentElement.removeAttribute('data-contrast');
+  } else {
+    document.documentElement.setAttribute('data-contrast', val);
+  }
+  // Redraw SVG overlay (stripes/bookmarks) after theme change
+  requestAnimationFrame(drawOverlay);
+}
+function setTextSize(val) {
+  _currentSize = val;
+  ['regular','large','xl'].forEach(v => {
+    document.getElementById(`size-${v}-check`).style.visibility = v===val?'visible':'hidden';
+  });
+  const root = document.documentElement;
+  if (val === 'regular') {
+    root.removeAttribute('data-size');
+  } else {
+    root.setAttribute('data-size', val);
+  }
+  requestAnimationFrame(() => requestAnimationFrame(drawOverlay));
+}
+function setTimeVis(val) {
+  _currentTimeVis = val;
+  ['show','hide'].forEach(v => {
+    document.getElementById(`time-${v}-check`).style.visibility = v===val?'visible':'hidden';
+  });
+  document.getElementById('timer-display').style.display = val === 'show' ? 'flex' : 'none';
+  // Also hide/show the separator next to it
+  const sep = document.querySelector('#timer-display + .header-sep');
+  if (sep) sep.style.display = val === 'show' ? '' : 'none';
+}
+function nl2html(s) {
+  return String(s||'')
+    .split(/\n/)
+    .filter(line => line.trim() !== '')
+    .map(para => `<p style="margin-bottom:15px">${esc(para)}</p>`)
+    .join('');
+}
+
+function nl2inline(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\n/g, '<br style="display:block;margin-bottom:16px">');
+}
+</script>
+
+<!-- ══ AUDIO INTRO OVERLAY ══ -->
+<div id="audio-intro" style="display:none;position:fixed;inset:0;z-index:600;background:rgba(240,242,245,0.98);flex-direction:column;align-items:center;justify-content:center;font-family:var(--sans)">
+  <div style="max-width:480px;width:100%;text-align:center;padding:40px 32px">
+    <div style="font-size:48px;margin-bottom:20px">🎧</div>
+    <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:16px">Audio Listening Test</div>
+    <div style="font-size:15px;color:var(--text-muted);line-height:1.7;margin-bottom:32px">
+      You will be listening to an audio clip during this test.<br>
+      You will <strong>not</strong> be permitted to pause or rewind the audio<br>
+      while answering the questions.
+    </div>
+    <button id="audio-play-btn" onclick="startAudioSequence()"
+      style="padding:14px 36px;background:var(--cam-teal-btn);color:#fff;border:none;border-radius:6px;font-family:var(--sans);font-size:16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:background .15s"
+      onmouseover="this.style.background='var(--cam-teal-dark)'" onmouseout="this.style.background='var(--cam-teal-btn)'">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="white" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>
+      Play
+    </button>
+  </div>
+</div>
+
+<!-- ══ AUDIO TRANSITION OVERLAY ══ -->
+<div id="audio-transition" style="display:none;position:fixed;inset:0;z-index:550;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;font-family:var(--sans)">
+  <div style="max-width:400px;width:100%;text-align:center;padding:40px 32px;background:var(--bg-page);border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.3)">
+    <div id="audio-trans-icon" style="font-size:36px;margin-bottom:16px"></div>
+    <div id="audio-trans-msg" style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px"></div>
+    <div id="audio-trans-sub" style="font-size:15px;color:var(--text-muted);line-height:1.5"></div>
+  </div>
+</div>
+
+</body>
+</html>
