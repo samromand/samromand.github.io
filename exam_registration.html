@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Registration — Candidate Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cam-teal:#00686E;--cam-teal-dark:#004F54;--cam-teal-light:#E6F4F5;
+  --cam-teal-btn:#007B82;--cam-active:#007B82;--white:#FFFFFF;
+  --text:#1A1A1A;--text-muted:#555;--border:#D0D0D0;
+  --header-h:56px;
+  --serif:'Source Serif 4',Georgia,serif;--sans:'Noto Sans',system-ui,sans-serif;
+  --bg-page:#fff;--bg-header:#fff;--bg-instr:#F8F8F8;--bg-panel:#F2F2F2;--bg-selected:#DCF0FF;
+}
+[data-contrast="wob"]{
+  --text:#FFF;--text-muted:#BBB;--border:#555;
+  --bg-page:#000;--bg-header:#111;--bg-instr:#111;--bg-panel:#111;--bg-selected:#1A3A3A;
+  --cam-teal-light:#0A2A2C;
+}
+[data-contrast="yob"]{
+  --text:#FFD700;--text-muted:#C8A800;--border:#664400;
+  --bg-page:#000;--bg-header:#111;--bg-instr:#111;--bg-panel:#111;--bg-selected:#2A1A00;
+  --cam-teal:#CC8800;--cam-teal-dark:#AA6600;--cam-teal-btn:#CC8800;--cam-teal-light:#1A0E00;--cam-active:#CC8800;
+}
+html,body{min-height:100%;font-family:var(--sans);font-size:15px;color:var(--text);background:var(--bg-page);transition:background .2s,color .2s}
+#header{height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;position:fixed;top:0;left:0;right:0;z-index:300}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cam-shield{width:38px;height:44px;background:linear-gradient(180deg,#C00000 50%,#FFD700 50%);border-radius:2px 2px 50% 50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden}
+.cam-shield::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.01em}
+.cam-logo-text .bot{font-size:11px;color:var(--text-muted)}
+.header-sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+#header-title{font-size:14px;font-weight:600;color:var(--text)}
+.header-icons{margin-left:auto;display:flex;align-items:center;gap:14px}
+.h-icon-btn{background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;opacity:.7;transition:opacity .15s}
+.h-icon-btn:hover{opacity:1}
+.h-icon-btn svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.8}
+#main{margin-top:var(--header-h);min-height:calc(100vh - var(--header-h));background:var(--bg-page);display:flex;align-items:flex-start;justify-content:center;padding:48px 20px 80px}
+.reg-card{width:100%;max-width:540px}
+.progress-bar{display:flex;align-items:center;margin-bottom:32px}
+.pb-step{display:flex;align-items:center;gap:8px;flex:1}
+.pb-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid var(--border);color:var(--text-muted);background:var(--bg-page);flex-shrink:0;transition:all .25s}
+.pb-dot.active{border-color:var(--cam-active);background:var(--cam-active);color:#fff}
+.pb-dot.done{border-color:var(--cam-teal);background:var(--cam-teal);color:#fff}
+.pb-dot.done svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5}
+.pb-text{font-size:12px;font-weight:600;color:var(--text-muted);white-space:nowrap}
+.pb-text.active{color:var(--cam-active)}
+.pb-text.done{color:var(--cam-teal)}
+.pb-line{flex:1;height:2px;background:var(--border);margin:0 8px;border-radius:1px;transition:background .25s}
+.pb-line.done{background:var(--cam-teal)}
+.step-header{margin-bottom:28px}
+.step-pill{display:inline-flex;align-items:center;background:var(--cam-teal-light);color:var(--cam-teal-dark);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:2px;margin-bottom:10px}
+.step-title{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--text-muted);line-height:1.5}
+.panel{background:var(--bg-instr);border:1px solid var(--border);border-radius:4px;padding:28px;margin-bottom:16px}
+.panel-title{font-size:13px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.panel-title::before{content:'';width:3px;height:16px;background:var(--cam-teal);border-radius:1px;display:inline-block}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.field-row.single{grid-template-columns:1fr}
+.field-group{display:flex;flex-direction:column;gap:6px}
+.field-label{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.04em}
+.field-label span{color:#C00;margin-left:2px}
+.field-input{height:40px;border:1px solid var(--border);border-radius:3px;padding:0 12px;font-family:var(--sans);font-size:14px;color:var(--text);background:var(--bg-page);outline:none;transition:border-color .15s}
+.field-input:focus{border-color:var(--cam-active);box-shadow:0 0 0 2px rgba(0,120,130,.12)}
+.field-input::placeholder{color:var(--text-muted);opacity:.6}
+.field-input.mono{font-family:'Courier New',monospace;letter-spacing:.06em;text-transform:uppercase}
+.btn-primary{width:100%;height:44px;background:var(--cam-teal-btn);color:#fff;border:none;border-radius:3px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,opacity .15s;letter-spacing:.01em}
+.btn-primary:hover{background:var(--cam-teal-dark)}
+.btn-primary:active{opacity:.85}
+.btn-primary:disabled{background:#9DBFC2;cursor:not-allowed}
+.btn-primary svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;flex-shrink:0}
+.btn-go{width:100%;height:48px;background:var(--cam-teal-dark);color:#fff;border:none;border-radius:3px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s}
+.btn-go:hover{background:#003A3E}
+.btn-go svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5;flex-shrink:0}
+.candidate-block{background:var(--bg-page);border:1px solid var(--border);border-left:4px solid var(--cam-teal);border-radius:2px;padding:16px 18px;display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.cand-avatar{width:48px;height:48px;border-radius:50%;background:var(--cam-teal-light);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--cam-teal-dark);flex-shrink:0}
+.cand-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.cand-id-row{display:flex;align-items:center;gap:8px}
+.cand-id-label{font-size:12px;color:var(--text-muted)}
+.cand-id-val{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--cam-teal-dark);background:var(--cam-teal-light);padding:2px 10px;border-radius:2px;letter-spacing:.12em}
+.variant-block{background:var(--bg-page);border:1px solid var(--border);border-radius:2px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.var-label{font-size:13px;color:var(--text-muted)}
+.var-badge{display:flex;align-items:center;gap:8px}
+.var-badge-id{font-family:'Courier New',monospace;font-size:16px;font-weight:700;color:var(--cam-teal-dark);letter-spacing:.08em}
+.var-badge-check{width:20px;height:20px;border-radius:50%;background:var(--cam-teal);display:flex;align-items:center;justify-content:center}
+.var-badge-check svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5}
+.var-info{font-size:13px;color:var(--text-muted);margin-bottom:16px}
+.var-info strong{color:var(--text)}
+.field-error{font-size:12px;color:#C00;margin-top:5px;display:none}
+.status-msg{background:#FFF3CD;border:1px solid #FFCD00;border-radius:3px;padding:10px 14px;font-size:13px;color:#7A5800;margin-top:12px;display:none;align-items:center;gap:8px}
+.status-msg.show{display:flex}
+.status-msg svg{width:16px;height:16px;flex-shrink:0;stroke:#7A5800;fill:none;stroke-width:2}
+.status-msg.err{background:#FEE2E2;border-color:#FCA5A5;color:#7F1D1D}
+.status-msg.err svg{stroke:#DC2626}
+.success-banner{background:var(--cam-teal-light);border:1px solid #A0CED0;border-radius:3px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:13px;color:var(--cam-teal-dark)}
+.success-banner svg{width:18px;height:18px;flex-shrink:0;stroke:var(--cam-teal);fill:none;stroke-width:2}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.section-hidden{display:none!important}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+#modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(255,255,255,.97);display:none;align-items:center;justify-content:center}
+[data-contrast="wob"] #modal-overlay,[data-contrast="yob"] #modal-overlay{background:rgba(0,0,0,.95)}
+#modal-overlay.show{display:flex}
+.modal-box{background:var(--bg-instr);border:1px solid var(--border);border-radius:4px;padding:24px;width:340px;max-width:90vw}
+.modal-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px}
+.opt-list{border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.opt-row{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;font-size:14px;color:var(--text);background:var(--bg-instr);display:flex;align-items:center;justify-content:space-between;transition:background .1s}
+.opt-row:last-child{border-bottom:none}
+.opt-row:hover{background:var(--bg-selected)}
+.opt-check{color:var(--cam-teal);visibility:hidden;font-size:16px}
+.opt-check.visible{visibility:visible}
+.modal-close-btn{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);line-height:1}
+.modal-close-btn:hover{color:var(--text)}
+@media(max-width:480px){.field-row{grid-template-columns:1fr}.panel{padding:20px 18px}#main{padding:28px 16px 60px}}
+</style>
+
+<script>
+// All functions on window so onclick="" attributes always work
+window.openModal  = function() { document.getElementById('modal-overlay').classList.add('show'); };
+window.closeModal = function() { document.getElementById('modal-overlay').classList.remove('show'); };
+window.setContrast = function(val) {
+  ['bow','wob','yob'].forEach(function(v) {
+    document.getElementById('contrast-'+v+'-check').className = 'opt-check'+(v===val?' visible':'');
+  });
+  val === 'bow'
+    ? document.documentElement.removeAttribute('data-contrast')
+    : document.documentElement.setAttribute('data-contrast', val);
+};
+
+const ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
+const TESTS_BIN   = '6a022b31c0954111d80b71d2';
+const MASTER_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+const API         = 'https://api.jsonbin.io/v3/b';
+
+var _candidate = null;
+
+function genId(existing) {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var id;
+  do { id = Array.from({length:6}, function(){ return chars[Math.floor(Math.random()*chars.length)]; }).join(''); }
+  while (existing.indexOf(id) !== -1);
+  return id;
+}
+function initials(f, l) { return ((f||'')[0]||'').toUpperCase() + ((l||'')[0]||'').toUpperCase(); }
+
+function setBtn(id, loading, html) {
+  var b = document.getElementById(id);
+  b.disabled = loading;
+  b.innerHTML = loading ? '<span class="spinner"></span> Please wait…' : html;
+}
+function setStatus(n, msg, isErr) {
+  var el = document.getElementById('status'+n);
+  var tx = document.getElementById('status'+n+'-text');
+  if (!msg) { el.classList.remove('show'); el.classList.remove('err'); return; }
+  tx.textContent = msg;
+  el.classList.add('show');
+  isErr ? el.classList.add('err') : el.classList.remove('err');
+}
+function setError(id, msg) {
+  var el = document.getElementById(id);
+  if (msg) { el.textContent = msg; el.style.display = 'block'; }
+  else { el.style.display = 'none'; }
+}
+
+async function apiFetch(url, opts) {
+  var ctrl = new AbortController();
+  var timer = setTimeout(function(){ ctrl.abort(); }, 12000);
+  try {
+    var res = await fetch(url, Object.assign({}, opts, {signal: ctrl.signal}));
+    clearTimeout(timer);
+    var text = await res.text();
+    var json;
+    try { json = JSON.parse(text); } catch(e) { throw new Error('Bad JSON (HTTP '+res.status+'): '+text.slice(0,100)); }
+    if (!res.ok) throw new Error('HTTP '+res.status+': '+(json.message||json.error||JSON.stringify(json)));
+    return json;
+  } catch(e) {
+    clearTimeout(timer);
+    if (e.name==='AbortError') throw new Error('Timeout — no response in 12 s. Check internet connection.');
+    throw e;
+  }
+}
+
+function getBin(id) {
+  return apiFetch(API+'/'+id+'/latest', {
+    headers: { 'X-Master-Key': MASTER_KEY }
+  });
+}
+function putBin(id, data) {
+  return apiFetch(API+'/'+id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
+    body: JSON.stringify(data)
+  });
+}
+
+// ── STEP 1 ──
+var BTN1 = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Register candidate';
+
+window.submitCandidate = async function() {
+  var first = document.getElementById('inp-first').value.trim();
+  var last  = document.getElementById('inp-last').value.trim();
+  setError('err-first', first ? null : 'Please enter your first name.');
+  setError('err-last',  last  ? null : 'Please enter your last name.');
+  if (!first || !last) return;
+
+  setBtn('btn1', true, BTN1);
+  setStatus(1, 'Connecting…', false);
+
+  try {
+    setStatus(1, 'Loading existing candidates…', false);
+    var store = {candidates:[]};
+    try {
+      var raw = await getBin(ANSWERS_BIN);
+      // jsonbin wraps in {record:...} when meta=true; without header returns record directly
+      store = (raw && raw.record) ? raw.record : raw;
+      if (!store || typeof store !== 'object') store = {candidates:[]};
+    } catch(e) {
+      var msg = String(e.message);
+      if (!msg.includes('404') && !msg.includes('NOT_FOUND') && !msg.includes('RECORD')) throw e;
+      store = {candidates:[]};
+    }
+    if (!Array.isArray(store.candidates)) store.candidates = [];
+
+    var ids = store.candidates.map(function(c){ return c.candidateId; });
+    var cid = genId(ids);
+
+    var cand = {
+      candidateId: cid,
+      firstName: first,
+      lastName: last,
+      registeredAt: new Date().toISOString(),
+      variantId: null,
+      answers: {}
+    };
+    store.candidates.push(cand);
+
+    setStatus(1, 'Saving registration…', false);
+    await putBin(ANSWERS_BIN, store);
+
+    _candidate = cand;
+    setStatus(1, null, false);
+    setBtn('btn1', false, BTN1);
+
+    // Advance to step 2
+    markDone(1); markActive(2);
+    document.getElementById('cand-avatar').textContent = initials(first, last);
+    document.getElementById('cand-name').textContent   = first+' '+last;
+    document.getElementById('cand-id').textContent     = cid;
+    document.getElementById('section1').classList.add('section-hidden');
+    document.getElementById('section2').classList.remove('section-hidden');
+    document.getElementById('inp-variant').focus();
+
+  } catch(e) {
+    setStatus(1, e.message, true);
+    setBtn('btn1', false, BTN1);
+  }
+};
+
+// ── STEP 2 ──
+var BTN2 = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="18" height="18"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Find variant';
+
+window.submitVariant = async function() {
+  var code = document.getElementById('inp-variant').value.trim().toUpperCase();
+  setError('err-variant', null);
+  if (!code) { setError('err-variant', 'Please enter a variant code.'); return; }
+
+  setBtn('btn2', true, BTN2);
+  setStatus(2, 'Loading tests…', false);
+
+  try {
+    var raw = await getBin(TESTS_BIN);
+    var tests = (raw && raw.record) ? raw.record : raw;
+
+    var found = null, foundKey = code;
+
+    function searchObj(obj) {
+      // obj is a plain object — look for key matching code
+      if (!obj || typeof obj !== 'object') return;
+      var k = Object.keys(obj).find(function(k){ return k.toUpperCase() === code; });
+      if (k) { found = obj[k]; foundKey = k; }
+    }
+    function searchArr(arr) {
+      // arr is an array of variant objects with id/code/name field
+      if (!Array.isArray(arr)) return;
+      var f = arr.find(function(v){
+        return String(v.id||v.variantId||v.code||v.name||'').toUpperCase() === code;
+      });
+      if (f) { found = f; foundKey = code; }
+    }
+
+    // 1. tests.variants is an object  {"TUL1P": {...}}  ← your case
+    if (!found && tests.variants && typeof tests.variants === 'object' && !Array.isArray(tests.variants))
+      searchObj(tests.variants);
+
+    // 2. tests.variants is an array   [{id:"TUL1P", ...}]
+    if (!found && Array.isArray(tests.variants))
+      searchArr(tests.variants);
+
+    // 3. Other array fields
+    if (!found) ['tests','questions','parts'].forEach(function(key){
+      if (!found) searchArr(tests[key]);
+    });
+
+    // 4. Root is an array
+    if (!found && Array.isArray(tests)) searchArr(tests);
+
+    // 5. Root object keys  {"TUL1P": {...}}
+    if (!found) searchObj(tests);
+
+    if (!found) {
+      // Build a helpful hint showing what variant keys actually exist
+      var hints = [];
+      if (tests.variants && typeof tests.variants === 'object')
+        hints = Object.keys(tests.variants).slice(0, 10);
+      else
+        hints = Object.keys(tests).slice(0, 10);
+      setError('err-variant', 'Variant "'+code+'" not found. Available variants: ['+hints.join(', ')+']');
+      setStatus(2, null, false);
+      setBtn('btn2', false, BTN2);
+      return;
+    }
+
+    // Count questions
+    var qCount = 0;
+    if (typeof found.questionCount === 'number') qCount = found.questionCount;
+    else if (Array.isArray(found.questions)) qCount = found.questions.length;
+    else if (typeof found === 'object') {
+      var arr = Object.values(found).find(function(v){ return Array.isArray(v); });
+      if (arr) qCount = arr.length;
+    }
+
+    // Save variant assignment
+    setStatus(2, 'Saving variant…', false);
+    var store2 = {candidates:[]};
+    try {
+      var r2 = await getBin(ANSWERS_BIN);
+      store2 = (r2 && r2.record) ? r2.record : r2;
+      if (!store2 || typeof store2 !== 'object') store2 = {candidates:[]};
+    } catch(e) { store2 = {candidates:[]}; }
+    if (!Array.isArray(store2.candidates)) store2.candidates = [];
+
+    var idx = store2.candidates.findIndex(function(c){ return c.candidateId === _candidate.candidateId; });
+    if (idx !== -1) {
+      store2.candidates[idx].variantId  = code;
+      store2.candidates[idx].variantKey = foundKey;
+    } else {
+      store2.candidates.push(Object.assign({}, _candidate, {variantId:code, variantKey:foundKey}));
+    }
+    await putBin(ANSWERS_BIN, store2);
+
+    _candidate.variantId  = code;
+    _candidate.variantKey = foundKey;
+    _candidate.qCount     = qCount;
+
+    setStatus(2, null, false);
+    setBtn('btn2', false, BTN2);
+
+    // Advance to step 3
+    markDone(2); markActive(3);
+    document.getElementById('cand-avatar2').textContent = initials(_candidate.firstName, _candidate.lastName);
+    document.getElementById('cand-name2').textContent   = _candidate.firstName+' '+_candidate.lastName;
+    document.getElementById('cand-id2').textContent     = _candidate.candidateId;
+    document.getElementById('cand-variant').textContent = code;
+    document.getElementById('q-count').textContent      = qCount ? qCount+' questions' : 'Ready';
+    document.getElementById('section2').classList.add('section-hidden');
+    document.getElementById('section3').classList.remove('section-hidden');
+
+  } catch(e) {
+    setStatus(2, e.message, true);
+    setBtn('btn2', false, BTN2);
+  }
+};
+
+window.goToExam = function() {
+  var p = new URLSearchParams({
+    candidateId: _candidate.candidateId,
+    variant: _candidate.variantKey || _candidate.variantId
+  });
+  window.location.href = 'a2key_exam_rw.html?' + p.toString();
+};
+
+function markDone(n) {
+  var d = document.getElementById('dot'+n);
+  d.className = 'pb-dot done';
+  d.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+  document.getElementById('lbl'+n).className = 'pb-text done';
+  if (n<3) document.getElementById('line'+n).className = 'pb-line done';
+}
+function markActive(n) {
+  var d = document.getElementById('dot'+n);
+  d.className = 'pb-dot active';
+  d.textContent = n;
+  document.getElementById('lbl'+n).className = 'pb-text active';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+  document.getElementById('inp-first').addEventListener('keydown',   function(e){ if(e.key==='Enter') window.submitCandidate(); });
+  document.getElementById('inp-last').addEventListener('keydown',    function(e){ if(e.key==='Enter') window.submitCandidate(); });
+  document.getElementById('inp-variant').addEventListener('keydown', function(e){ if(e.key==='Enter') window.submitVariant(); });
+});
+</script>
+</head>
+<body>
+
+<div id="header">
+  <div class="cam-logo">
+    <div class="cam-shield"></div>
+    <div class="cam-logo-text">
+      <div class="top">Cambridge Assessment</div>
+      <div class="bot">English</div>
+    </div>
+  </div>
+  <div class="header-sep"></div>
+  <div id="header-title">Candidate Registration</div>
+  <div class="header-icons">
+    <button class="h-icon-btn" onclick="openModal()" title="Display settings" aria-label="Display settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" opacity=".4"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" opacity=".3"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="main">
+  <div class="reg-card">
+
+    <div class="progress-bar">
+      <div class="pb-step">
+        <div class="pb-dot active" id="dot1">1</div>
+        <div class="pb-text active" id="lbl1">Candidate info</div>
+      </div>
+      <div class="pb-line" id="line1"></div>
+      <div class="pb-step">
+        <div class="pb-dot" id="dot2">2</div>
+        <div class="pb-text" id="lbl2">Exam variant</div>
+      </div>
+      <div class="pb-line" id="line2"></div>
+      <div class="pb-step">
+        <div class="pb-dot" id="dot3">3</div>
+        <div class="pb-text" id="lbl3">Start exam</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="section1">
+      <div class="step-header">
+        <span class="step-pill">Step 1 of 3</span>
+        <div class="step-title">Enter your details</div>
+        <div class="step-sub">Your first and last name as they appear on your registration form.</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Candidate information</div>
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label" for="inp-first">First name <span>*</span></label>
+            <input class="field-input" type="text" id="inp-first" placeholder="e.g. Alina" autocomplete="given-name">
+            <div class="field-error" id="err-first"></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="inp-last">Last name <span>*</span></label>
+            <input class="field-input" type="text" id="inp-last" placeholder="e.g. Serikova" autocomplete="family-name">
+            <div class="field-error" id="err-last"></div>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn1" onclick="submitCandidate()">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Register candidate
+        </button>
+        <div class="status-msg" id="status1">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="status1-text"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="section2" class="section-hidden">
+      <div class="step-header">
+        <span class="step-pill">Step 2 of 3</span>
+        <div class="step-title">Enter exam variant</div>
+        <div class="step-sub">Type the variant code from your examination slip.</div>
+      </div>
+      <div class="candidate-block">
+        <div class="cand-avatar" id="cand-avatar">—</div>
+        <div>
+          <div class="cand-name" id="cand-name">—</div>
+          <div class="cand-id-row">
+            <span class="cand-id-label">Candidate ID:</span>
+            <span class="cand-id-val" id="cand-id">——</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Exam variant</div>
+        <div class="field-row single">
+          <div class="field-group">
+            <label class="field-label" for="inp-variant">Variant code <span>*</span></label>
+            <input class="field-input mono" type="text" id="inp-variant" placeholder="e.g. VAR01" autocomplete="off" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+            <div class="field-error" id="err-variant"></div>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn2" onclick="submitVariant()">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Find variant
+        </button>
+        <div class="status-msg" id="status2">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="status2-text"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="section3" class="section-hidden">
+      <div class="step-header">
+        <span class="step-pill">Step 3 of 3</span>
+        <div class="step-title">Ready to begin</div>
+        <div class="step-sub">Your registration is complete. You may now start the exam.</div>
+      </div>
+      <div class="success-banner">
+        <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Registration successful
+      </div>
+      <div class="candidate-block">
+        <div class="cand-avatar" id="cand-avatar2">—</div>
+        <div>
+          <div class="cand-name" id="cand-name2">—</div>
+          <div class="cand-id-row">
+            <span class="cand-id-label">Candidate ID:</span>
+            <span class="cand-id-val" id="cand-id2">——</span>
+          </div>
+        </div>
+      </div>
+      <div class="variant-block">
+        <div class="var-label">Exam variant</div>
+        <div class="var-badge">
+          <span class="var-badge-id" id="cand-variant">——</span>
+          <div class="var-badge-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+      </div>
+      <div class="var-info">Questions: <strong id="q-count">—</strong></div>
+      <button class="btn-go" onclick="goToExam()">
+        Go to exam
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div class="modal-title">Display settings</div>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Colour scheme</div>
+    <div class="opt-list">
+      <div class="opt-row" onclick="setContrast('bow')">Black on white<span class="opt-check visible" id="contrast-bow-check">✓</span></div>
+      <div class="opt-row" onclick="setContrast('wob')">White on black<span class="opt-check" id="contrast-wob-check">✓</span></div>
+      <div class="opt-row" onclick="setContrast('yob')">Yellow on black<span class="opt-check" id="contrast-yob-check">✓</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
