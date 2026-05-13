@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interface Tutorial — Cambridge Assessment English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cam-teal:#00686E;--cam-teal-dark:#004F54;--cam-teal-light:#E6F4F5;
+  --cam-teal-btn:#007B82;--cam-active:#007B82;
+  --white:#fff;--text:#1A1A1A;--text-muted:#555;--border:#D0D0D0;
+  --bg-page:#fff;--bg-header:#fff;--bg-instr:#F8F8F8;--bg-panel:#F2F2F2;
+  --bg-selected:#DCF0FF;--bm-color:#E05C00;
+  --header-h:56px;--footer-h:56px;
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'Noto Sans',system-ui,sans-serif;
+}
+[data-contrast="wob"]{
+  --text:#FFF;--text-muted:#BBB;--border:#555;--bg-page:#000;--bg-header:#111;
+  --bg-instr:#111;--bg-panel:#111;--bg-selected:#1A3A3A;--cam-teal-light:#0A2A2C;
+}
+[data-contrast="yob"]{
+  --text:#FFD700;--text-muted:#C8A800;--border:#664400;--bg-page:#000;--bg-header:#111;
+  --bg-instr:#111;--bg-panel:#111;--bg-selected:#2A1A00;--cam-teal-light:#1A0E00;
+  --cam-teal:#CC8800;--cam-teal-dark:#AA6600;--cam-teal-btn:#CC8800;--cam-active:#CC8800;
+}
+[data-size="large"] #main{zoom:1.18}
+[data-size="xl"]    #main{zoom:1.4}
+
+html,body{height:100%;overflow:hidden;font-family:var(--sans);font-size:15px;color:var(--text);background:var(--bg-page);transition:background .2s,color .2s}
+
+/* ══ HEADER ══ */
+#header{
+  height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+}
+.cam-shield{width:38px;height:44px;background:linear-gradient(180deg,#C00000 50%,#FFD700 50%);border-radius:2px 2px 50% 50%;position:relative;overflow:hidden;flex-shrink:0}
+.cam-shield::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:var(--text)}
+.cam-logo-text .bot{font-size:11px;color:var(--text-muted)}
+.header-sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+#header-title{font-size:14px;font-weight:600;color:var(--text)}
+.cid-label{font-size:12px;color:var(--text-muted)}
+.header-icons{margin-left:auto;display:flex;align-items:center;gap:18px}
+.header-icons svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.8;cursor:pointer;opacity:.7;transition:opacity .15s}
+.header-icons svg:hover{opacity:1}
+#timer-display{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap}
+#timer-display svg{width:16px;height:16px;stroke:var(--text);fill:none;stroke-width:2;flex-shrink:0}
+
+/* ══ LAYOUT ══ */
+#main-wrap{position:fixed;top:var(--header-h);bottom:var(--footer-h);left:0;right:0;display:flex}
+#main{flex:1;overflow-y:auto;background:var(--bg-page);min-width:0;position:relative}
+
+/* ══ TASK PANEL (right sidebar) ══ */
+#task-panel{
+  width:300px;flex-shrink:0;
+  background:var(--bg-panel);border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#task-panel-header{
+  padding:14px 16px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+}
+#task-panel-title{font-size:13px;font-weight:700;color:var(--text)}
+.task-progress-text{font-size:12px;color:var(--text-muted)}
+#task-list{flex:1;overflow-y:auto;padding:12px 0}
+
+/* ── task item ── */
+.task-item{
+  padding:10px 16px;display:flex;align-items:flex-start;gap:10px;
+  border-bottom:1px solid var(--border);cursor:default;
+  transition:background .1s;
+}
+.task-item:last-child{border-bottom:none}
+.task-item.t-done{background:var(--bg-page)}
+.task-item.t-active{background:var(--bg-selected)}
+[data-contrast="wob"] .task-item.t-active,[data-contrast="yob"] .task-item.t-active{background:var(--bg-selected)}
+.task-check{
+  width:20px;height:20px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+  transition:all .2s;
+}
+.task-item.t-done .task-check{background:var(--cam-teal);border-color:var(--cam-teal)}
+.task-item.t-done .task-check svg{display:block}
+.task-item.t-active .task-check{border-color:var(--cam-active)}
+.task-check svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;display:none}
+.task-text{font-size:13px;line-height:1.45;color:var(--text)}
+.task-item.t-done .task-text{color:var(--text-muted);text-decoration:line-through;text-decoration-color:var(--border)}
+.task-section-head{
+  padding:10px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-muted);
+}
+
+/* ══ INSTRUCTION BAR ══ */
+.instr-bar{background:var(--bg-instr);border-bottom:1px solid var(--border);padding:12px 24px 11px;user-select:none}
+.instr-bar .qrange{font-size:14px;font-weight:700;color:var(--text)}
+.instr-bar .qinstr{font-size:14px;color:var(--text);margin-top:2px}
+.instr-bar .qinstr strong{font-weight:700}
+
+/* ══ TUTORIAL CALLOUT (yellow) ══ */
+.tut-callout{
+  margin:16px 24px 0;
+  background:#FFFBEA;border:1px solid #E8C840;border-left:4px solid #E8C840;border-radius:3px;
+  padding:12px 16px;font-size:13px;line-height:1.5;color:#5C4A00;
+  display:flex;gap:10px;align-items:flex-start;
+}
+[data-contrast="wob"] .tut-callout,[data-contrast="yob"] .tut-callout{
+  background:var(--bg-panel);border-color:var(--border);border-left-color:var(--cam-active);color:var(--text);
+}
+.tut-callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.tut-callout strong{font-weight:700}
+
+/* ══ EXAM PAGES ══ */
+.exam-page{display:none;padding:0 0 40px}
+.exam-page.active{display:block}
+#pg-t2,#pg-t3{padding:0}
+#pg-t2.active,#pg-t3.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
+#pg-t2.active .split-layout,#pg-t3.active .split-layout{flex:1;min-height:0;overflow:hidden;display:flex}
+.split-left{flex:1;min-width:0;overflow-y:auto;padding:24px;border-right:1px solid var(--border);background:var(--bg-page)}
+.split-right{flex:1;min-width:0;overflow-y:auto;padding:24px;background:var(--bg-page)}
+
+/* ══ MCQ STYLES (mirror real exam) ══ */
+.p1-single{padding:28px 32px 32px;max-width:680px}
+.p1-qhead{font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.p1-qnum{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border:2px solid transparent;font-size:13px;font-weight:700;flex-shrink:0;transition:border-color .15s}
+.p1-qnum.active-q{border-color:var(--cam-active)}
+.p1-options{display:flex;flex-direction:column;gap:0}
+.p1-opt{display:flex;align-items:center;gap:12px;padding:11px 14px;cursor:pointer;transition:background .1s;border-radius:2px;user-select:none;position:relative}
+.p1-opt:hover{background:var(--bg-instr)}
+.p1-opt.selected{background:var(--bg-selected)}
+[data-contrast="wob"] .p1-opt.selected,[data-contrast="yob"] .p1-opt.selected{background:var(--bg-selected)}
+.p1-letter{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-muted);flex-shrink:0;transition:all .15s}
+.p1-opt.selected .p1-letter{background:var(--cam-active);border-color:var(--cam-active);color:#fff}
+.p1-opt label{font-size:14px;color:var(--text);cursor:pointer;flex:1;user-select:text;-webkit-user-select:text}
+
+/* bookmark flag */
+.q-bookmark{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;cursor:pointer;flex-shrink:0;
+  border-radius:2px;transition:background .1s;margin-left:auto;
+}
+.q-bookmark svg{width:15px;height:15px;fill:none;stroke:#ccc;stroke-width:1.5;transition:.15s}
+.q-bookmark:hover svg{stroke:var(--bm-color)}
+.q-bookmark.marked svg{fill:var(--bm-color);stroke:var(--bm-color)}
+
+/* ── Highlight tooltip ── */
+#hl-tooltip{
+  position:fixed;background:#fff;border:1px solid var(--border);
+  border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.15);
+  display:none;z-index:300;overflow:hidden;flex-direction:column;align-items:stretch;min-width:110px;
+}
+#hl-tooltip.show{display:flex}
+#hl-tooltip button{
+  font-family:var(--sans);font-size:13px;font-weight:500;
+  padding:9px 16px;border:none;background:#fff;cursor:pointer;color:var(--text);
+  text-align:left;display:flex;align-items:center;gap:8px;transition:background .1s;
+}
+#hl-tooltip button:hover{background:#F5F5F5}
+.hl-divider{height:1px;background:var(--border)}
+[data-contrast="wob"] #hl-tooltip,[data-contrast="yob"] #hl-tooltip{background:var(--bg-panel);border-color:var(--border)}
+[data-contrast="wob"] #hl-tooltip button,[data-contrast="yob"] #hl-tooltip button{background:var(--bg-panel);color:var(--text)}
+[data-contrast="wob"] #hl-tooltip button:hover,[data-contrast="yob"] #hl-tooltip button:hover{background:var(--bg-selected)}
+mark.hl{background:var(--cam-teal);color:#fff;border-radius:2px;padding:0 2px;cursor:pointer}
+mark.note-hl{background:#E8B840;color:#1A1A1A;border-radius:2px;padding:0 2px;cursor:pointer;border-bottom:2px solid #C8941C}
+
+/* ── Notes panel ── */
+#notes-panel{width:0;overflow:hidden;background:var(--bg-panel);border-left:1px solid var(--border);display:flex;flex-direction:column;transition:width .2s}
+#notes-panel.open{width:260px}
+#notes-panel-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;white-space:nowrap}
+#notes-panel-title{font-size:14px;font-weight:700;color:var(--text)}
+#notes-panel-close{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;padding:0 2px}
+#notes-panel-close:hover{color:var(--text)}
+#notes-empty{padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px;line-height:1.6}
+#notes-list{flex:1;overflow-y:auto;padding:8px 0}
+.note-item{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text)}
+.note-item .ni-quote{font-style:italic;color:var(--text-muted);font-size:12px;margin-bottom:4px;padding-left:8px;border-left:3px solid #E8B840;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-item .ni-text{color:var(--text);line-height:1.4}
+#note-popup{position:fixed;z-index:310;background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:14px;width:260px;display:none}
+#note-popup.show{display:block}
+#note-popup textarea{width:100%;height:80px;resize:none;border:1px solid var(--border);border-radius:4px;padding:8px;font-family:var(--sans);font-size:13px;outline:none}
+#note-popup textarea:focus{border-color:var(--cam-active)}
+#note-popup-btns{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+#note-popup-btns button{padding:6px 14px;border-radius:4px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+#note-save-btn{background:var(--cam-teal);color:#fff}
+#note-save-btn:hover{background:var(--cam-teal-dark)}
+#note-cancel-btn{background:#E8E8E8;color:var(--text)}
+#note-cancel-btn:hover{background:#D0D0D0}
+[data-contrast="wob"] #note-popup,[data-contrast="yob"] #note-popup{background:var(--bg-panel);border-color:var(--border)}
+[data-contrast="wob"] #note-cancel-btn,[data-contrast="yob"] #note-cancel-btn{background:var(--bg-selected);color:var(--text)}
+
+/* text selection allowed in article areas */
+.selectable{user-select:text;-webkit-user-select:text}
+
+/* ══ PART 3 — text passage ══ */
+.article-text{font-family:var(--serif);font-size:15px;line-height:1.8;color:var(--text)}
+.article-text p{margin-bottom:12px}
+
+/* ══ PART 4 — audio-style status bar ══ */
+.audio-bar{
+  margin:20px 24px 0;padding:14px 18px;
+  background:var(--bg-instr);border:1px solid var(--border);border-radius:4px;
+  display:flex;align-items:center;gap:12px;font-size:14px;
+}
+.audio-bar svg{width:20px;height:20px;stroke:var(--cam-teal-dark);fill:none;stroke-width:1.8;flex-shrink:0}
+[data-contrast="wob"] .audio-bar svg,[data-contrast="yob"] .audio-bar svg{stroke:var(--cam-active)}
+.audio-bar-text{color:var(--text);font-weight:600}
+.audio-bar-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+
+/* ══ FOOTER ══ */
+:root{--footer-h:56px}
+#footer{
+  position:fixed;bottom:0;left:0;right:0;height:var(--footer-h);
+  background:var(--bg-panel);border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:2px;z-index:300;
+}
+.f-part-btn{
+  display:inline-flex;align-items:center;gap:4px;padding:5px 7px;border-radius:3px;
+  border:1px solid transparent;background:transparent;font-family:var(--sans);
+  font-size:13px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap;transition:.12s;flex-shrink:0;
+}
+.f-part-btn:hover{background:#E8E8E8}
+.f-part-btn.active{background:var(--white);border-color:var(--border);color:var(--cam-active);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+[data-contrast="wob"] .f-part-btn.active,[data-contrast="yob"] .f-part-btn.active{background:var(--bg-panel)}
+.f-part-count{font-size:11.5px;font-weight:400;color:var(--text-muted)}
+.f-part-btn.active .f-part-count{display:none}
+.f-q-pills{display:none;gap:3px;align-items:center}
+.f-part-btn.active .f-q-pills{display:inline-flex}
+.f-q-pill{
+  position:relative;width:26px;height:26px;border-radius:3px;border:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;
+  background:transparent;transition:.12s;flex-shrink:0;
+}
+.f-q-pill:hover{background:#E8E8E8}
+.f-q-pill.answered{background:var(--cam-teal-light);color:var(--cam-teal-dark)}
+[data-contrast="wob"] .f-q-pill.answered,[data-contrast="yob"] .f-q-pill.answered{background:var(--cam-teal-light);color:var(--cam-active)}
+.f-q-pill.bookmarked::after{content:'';position:absolute;top:2px;right:2px;width:5px;height:5px;border-radius:50%;background:var(--bm-color)}
+.f-q-pill.current{border:1.5px solid var(--cam-active);color:var(--cam-active);background:var(--white)}
+.f-sep{width:1px;height:24px;background:var(--border);flex-shrink:0;margin:0 2px}
+.f-spacer{flex:1}
+.f-nav-btn{width:44px;height:36px;display:flex;align-items:center;justify-content:center;border:none;border-radius:3px;cursor:pointer;flex-shrink:0;transition:.12s}
+.f-nav-prev{background:#808080;margin-left:4px}
+.f-nav-prev:hover{background:#666}
+.f-nav-prev:disabled{opacity:.4;cursor:not-allowed}
+.f-nav-next{background:var(--cam-teal-btn);margin-left:2px}
+.f-nav-next:hover{background:var(--cam-teal-dark)}
+.f-nav-btn svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.5}
+.f-submit-btn{width:36px;height:36px;border:none;border-radius:3px;background:#E8E8E8;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:2px;transition:.12s}
+.f-submit-btn:hover{background:#D0D0D0}
+.f-submit-btn svg{width:17px;height:17px;fill:none;stroke:#555;stroke-width:2.5}
+#btn-done-bar{
+  width:100%;height:var(--footer-h);
+  background:var(--cam-teal-dark);border-top:none;
+  display:none;align-items:center;justify-content:center;
+  position:fixed;bottom:0;left:0;right:0;z-index:400;cursor:pointer;
+  font-size:15px;font-weight:700;color:#fff;gap:10px;
+  border:none;font-family:var(--sans);
+}
+#btn-done-bar:hover{background:#003A3E}
+#btn-done-bar svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* ══ MODALS ══ */
+#modal-overlay{
+  position:fixed;inset:0;background:rgba(240,242,245,0.97);
+  z-index:400;display:none;flex-direction:column;font-family:var(--sans);
+}
+[data-contrast="wob"] #modal-overlay,[data-contrast="yob"] #modal-overlay{background:rgba(0,0,0,.95)}
+#modal-overlay.show{display:flex}
+.modal-header{display:flex;align-items:center;justify-content:center;padding:28px 24px 20px;position:relative;flex-shrink:0}
+.modal-back{position:absolute;left:24px;background:none;border:none;cursor:pointer;font-size:15px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
+.modal-back:hover{opacity:.7}
+.modal-title{font-size:22px;font-weight:400;color:var(--text)}
+.modal-close{position:absolute;right:24px;top:24px;background:none;border:none;cursor:pointer;font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.modal-close:hover{opacity:.7}
+.modal-body{flex:1;overflow-y:auto;padding:0 80px 40px;max-width:900px;width:100%;margin:0 auto}
+.opt-list{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-page)}
+.opt-row{display:flex;align-items:center;gap:16px;padding:20px 24px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .12s;background:var(--bg-page);color:var(--text)}
+.opt-row:last-child{border-bottom:none}
+.opt-row:hover{background:var(--bg-instr)}
+.opt-row.primary{background:var(--cam-teal-dark);color:#fff}
+.opt-row.primary:hover{background:#003B40}
+.opt-icon{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.opt-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.opt-row.primary .opt-icon svg{stroke:#fff}
+.opt-label{flex:1;font-size:16px;font-weight:400}
+.opt-arrow{font-size:18px;color:inherit;opacity:.6}
+.opt-check{width:28px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--text)}
+.contrast-thumb{width:54px;height:36px;border-radius:4px;border:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:3px;padding:6px 8px;flex-shrink:0}
+.contrast-thumb span{display:block;height:3px;border-radius:1px}
+</style>
+
+<script>
+/* ══════════════════════════════════════════
+   TUTORIAL STATE
+══════════════════════════════════════════ */
+var _page    = 1;   // 1–4 (tutorial sections)
+var _answers = {};  // qNum -> letter
+var _bmarks  = new Set();
+var _contrast= 'bow';
+var _size    = 'regular';
+var _timeVis = 'show';
+var _notes   = [];  // {id, quote, text}
+var _hlRange = null;
+var _hlTargetMark = null;
+var _wasDrag = false;
+var _pendingNoteRange = null;
+var _noteIdSeq = 0;
+
+// Tasks: id, text, section, done
+var TASKS = [
+  // Section 1 — Navigation
+  {id:'nav1', sec:'Navigation & timer', text:'Find your Candidate ID in the header'},
+  {id:'nav2', sec:'Navigation & timer', text:'Use the ← → arrows to move between questions'},
+  {id:'nav3', sec:'Navigation & timer', text:'Jump to Part 2 using the footer navigation'},
+  {id:'nav4', sec:'Navigation & timer', text:'Hide the timer, then show it again'},
+
+  // Section 2 — Answering & bookmarks
+  {id:'ans1', sec:'Answering & bookmarks', text:'Select any answer for Question 1 — watch the pill turn green'},
+  {id:'ans5', sec:'Answering & bookmarks', text:'Click the same answer again to deselect it — the pill goes grey'},
+  {id:'ans2', sec:'Answering & bookmarks', text:'Bookmark Question 1 using the flag icon 🔖'},
+  {id:'ans3', sec:'Answering & bookmarks', text:'Navigate away, then return to Question 1 via its pill in the footer'},
+  {id:'ans4', sec:'Answering & bookmarks', text:'Remove the bookmark from Question 1'},
+  {id:'res1', sec:'Answering & bookmarks', text:'Go to Part 2 and drag the centre divider to resize the panels'},
+
+  // Section 3 — Display settings
+  {id:'dis1', sec:'Display settings', text:'Open ☰ Options and switch to White on black'},
+  {id:'dis2', sec:'Display settings', text:'Increase text size to Large'},
+  {id:'dis3', sec:'Display settings', text:'Restore Black on white and Regular text size'},
+
+  // Section 4 — Highlights & notes
+  {id:'hl1', sec:'Highlights & notes', text:'Select a word in the passage — a menu will appear'},
+  {id:'hl2', sec:'Highlights & notes', text:'Apply a highlight to the selected text'},
+  {id:'hl3', sec:'Highlights & notes', text:'Select another phrase and add a note to it'},
+  {id:'hl4', sec:'Highlights & notes', text:'Open the Notes panel and find your note'},
+];
+
+// Which task is "active" (next to complete) — purely visual cue
+var _activeTask = 0;
+
+function renderTasks(){
+  var list = document.getElementById('task-list');
+  var html = '';
+  var lastSec = '';
+  var doneCount = TASKS.filter(function(t){ return t.done; }).length;
+  document.getElementById('task-progress-text').textContent = doneCount+' / '+TASKS.length;
+
+  TASKS.forEach(function(t, i){
+    if(t.sec !== lastSec){
+      html += '<div class="task-section-head">'+t.sec+'</div>';
+      lastSec = t.sec;
+    }
+    var cls = t.done ? 't-done' : (i === _activeTask ? 't-active' : '');
+    html += '<div class="task-item '+cls+'" id="ti-'+t.id+'">'
+      +'<div class="task-check">'
+        +'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+      +'</div>'
+      +'<div class="task-text">'+t.text+'</div>'
+    +'</div>';
+  });
+  list.innerHTML = html;
+  // Make tasks manually completable on click (for self-reporting)
+  TASKS.forEach(function(t, i){
+    var el = document.getElementById('ti-'+t.id);
+    if(el) el.addEventListener('click', function(){ completeTask(t.id); });
+  });
+}
+
+function completeTask(id){
+  var idx = TASKS.findIndex(function(t){ return t.id===id; });
+  if(idx === -1 || TASKS[idx].done) return;
+  TASKS[idx].done = true;
+  // advance activeTask
+  _activeTask = TASKS.findIndex(function(t){ return !t.done; });
+  if(_activeTask === -1) _activeTask = TASKS.length;
+  renderTasks();
+  // if all done, show Done button
+  var allDone = TASKS.every(function(t){ return t.done; });
+  if(allDone){
+    document.getElementById('footer').style.display='none';
+    document.getElementById('btn-done-bar').style.display='flex';
+  }
+}
+
+/* ── Pages / navigation ── */
+var PAGES = [
+  {id:'pg-t1', part:1, label:'Part 1', pills:[1,2,3]},
+  {id:'pg-t2', part:2, label:'Part 2', pills:[4,5,6]},
+  {id:'pg-t3', part:3, label:'Part 3', pills:[7,8,9]},
+  {id:'pg-t4', part:4, label:'Part 4', pills:[10]},
+];
+var _currentPage = 0;  // index into PAGES
+var _currentQ    = {1:1, 2:4, 3:7, 4:10}; // active question per page
+
+function showPage(pageIdx, q){
+  _currentPage = pageIdx;
+  PAGES.forEach(function(p,i){
+    document.getElementById(p.id).classList.toggle('active', i===pageIdx);
+  });
+  // footer part buttons
+  document.querySelectorAll('.f-part-btn').forEach(function(btn){
+    btn.classList.toggle('active', +btn.dataset.part === pageIdx+1);
+  });
+  // update prev/next
+  document.getElementById('btn-prev').disabled = (pageIdx===0 && q <= PAGES[0].pills[0]);
+  document.getElementById('btn-next').disabled = false;
+  if(q !== undefined) _currentQ[pageIdx+1] = q;
+  updatePills();
+}
+
+function navigate(dir){
+  var page = PAGES[_currentPage];
+  var pills = page.pills;
+  var cq = _currentQ[_currentPage+1];
+  var cidx = pills.indexOf(cq);
+  var newQ = cidx + dir;
+  if(newQ >= 0 && newQ < pills.length){
+    _currentQ[_currentPage+1] = pills[newQ];
+    updatePills();
+    highlightActiveQ();
+  } else if(dir === 1 && _currentPage < PAGES.length-1){
+    showPage(_currentPage+1, PAGES[_currentPage+1].pills[0]);
+    highlightActiveQ();
+    completeTask('nav3');
+  } else if(dir === -1 && _currentPage > 0){
+    var pp = PAGES[_currentPage-1].pills;
+    showPage(_currentPage-1, pp[pp.length-1]);
+    highlightActiveQ();
+  }
+  completeTask('nav2');
+  document.getElementById('btn-prev').disabled = (_currentPage===0 && _currentQ[1]===PAGES[0].pills[0]);
+}
+
+function goToPart(part){
+  showPage(part-1, PAGES[part-1].pills[0]);
+  highlightActiveQ();
+  if(part===2) completeTask('nav3');
+}
+
+function goToQ(pageIdx, q){
+  // Always switch to the correct page first, then set the active question
+  if(pageIdx !== _currentPage){
+    showPage(pageIdx, q);
+  } else {
+    _currentQ[pageIdx+1] = q;
+    updatePills();
+  }
+  highlightActiveQ();
+  document.getElementById('btn-prev').disabled = (pageIdx===0 && q===PAGES[0].pills[0]);
+  // task: returning to Q1 via pill
+  if(pageIdx===0 && q===1) completeTask('ans3');
+}
+
+function updatePills(){
+  PAGES.forEach(function(page, pi){
+    var container = document.getElementById('fp'+(pi+1)+'-pills');
+    if(!container) return;
+    container.innerHTML = '';
+    page.pills.forEach(function(q){
+      var pill = document.createElement('button');
+      var isCurrent = (pi===_currentPage && q===_currentQ[pi+1]);
+      pill.className = 'f-q-pill'
+        + (_answers[q] ? ' answered' : '')
+        + (_bmarks.has(q) ? ' bookmarked' : '')
+        + (isCurrent ? ' current' : '');
+      pill.textContent = q;
+      // capture pi and q correctly in closure
+      (function(pageIdx, qNum){
+        pill.addEventListener('click', function(e){
+          e.stopPropagation();
+          goToQ(pageIdx, qNum);
+        });
+      })(pi, q);
+      container.appendChild(pill);
+    });
+  });
+}
+
+/* ── Split panel resize ── */
+function initResize(layoutId, leftId, rightId, taskId){
+  var layout = document.getElementById(layoutId);
+  var left   = document.getElementById(leftId);
+  var right  = document.getElementById(rightId);
+  if(!layout || !left || !right) return;
+
+  // Insert drag handle between the two panels
+  var handle = document.createElement('div');
+  handle.style.cssText = 'width:8px;flex-shrink:0;cursor:col-resize;background:transparent;position:relative;z-index:2;display:flex;align-items:center;justify-content:center;';
+  handle.innerHTML = '<div style="width:3px;height:40px;background:var(--border);border-radius:2px;pointer-events:none"></div>';
+  handle.title = 'Drag to resize panels';
+  left.after(handle);
+
+  // Set initial flex-basis
+  left.style.flex  = 'none';
+  right.style.flex = '1';
+  left.style.width = '50%';
+  left.style.overflowY = 'auto';
+  right.style.overflowY = 'auto';
+
+  var dragging = false;
+  var startX, startW;
+
+  handle.addEventListener('mousedown', function(e){
+    dragging = true;
+    startX = e.clientX;
+    startW = left.getBoundingClientRect().width;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  handle.addEventListener('touchstart', function(e){
+    dragging = true;
+    startX = e.touches[0].clientX;
+    startW = left.getBoundingClientRect().width;
+    e.preventDefault();
+  }, {passive:false});
+
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    var total = layout.getBoundingClientRect().width - 8;
+    var newW  = Math.min(Math.max(startW + (e.clientX - startX), total*0.2), total*0.8);
+    left.style.width = newW + 'px';
+    if(taskId) completeTask(taskId);
+  });
+
+  document.addEventListener('touchmove', function(e){
+    if(!dragging) return;
+    var total = layout.getBoundingClientRect().width - 8;
+    var newW  = Math.min(Math.max(startW + (e.touches[0].clientX - startX), total*0.2), total*0.8);
+    left.style.width = newW + 'px';
+    if(taskId) completeTask(taskId);
+  });
+
+  document.addEventListener('mouseup',  function(){ if(dragging){ dragging=false; document.body.style.cursor=''; document.body.style.userSelect=''; }});
+  document.addEventListener('touchend', function(){ dragging=false; });
+}
+
+function highlightActiveQ(){
+  // highlight active question number in content
+  document.querySelectorAll('.p1-qnum').forEach(function(el){
+    var q = +el.dataset.q;
+    var page = PAGES[_currentPage];
+    el.classList.toggle('active-q', page && q === _currentQ[_currentPage+1]);
+  });
+}
+
+/* ── Answering ── */
+function selectAnswer(q, letter, el){
+  if(el && el.target && el.target.closest('mark')) return;
+  var parent = el.closest ? el.closest('.p1-options') : el.parentElement.parentElement;
+  // Second click on already-selected option → deselect
+  if(_answers[q] === letter){
+    delete _answers[q];
+    parent.querySelectorAll('.p1-opt').forEach(function(opt){
+      opt.classList.remove('selected');
+    });
+    completeTask('ans5');
+  } else {
+    _answers[q] = letter;
+    parent.querySelectorAll('.p1-opt').forEach(function(opt){
+      opt.classList.toggle('selected', opt.dataset.letter === letter);
+    });
+    completeTask('ans1');
+  }
+  updatePills();
+}
+
+/* ── Bookmarks ── */
+function toggleBookmark(q){
+  if(_bmarks.has(q)) { _bmarks.delete(q); completeTask('ans4'); }
+  else               { _bmarks.add(q);    completeTask('ans2'); }
+  // update flag icon
+  var bm = document.getElementById('bm-'+q);
+  if(bm) bm.classList.toggle('marked', _bmarks.has(q));
+  updatePills();
+}
+
+/* ── Timer ── */
+function setTimeVis(val){
+  _timeVis = val;
+  document.getElementById('timer-display').style.display = val==='show' ? 'flex' : 'none';
+  ['show','hide'].forEach(function(v){
+    document.getElementById('time-'+v+'-check').textContent = v===val ? '✓' : '';
+  });
+  if(val==='hide') completeTask('nav4');
+  if(val==='show' && _timeVis==='show') {} // toggled back
+}
+
+/* ── Options Modal ── */
+var _modalPage = null;
+function openModal(page){
+  _modalPage = page;
+  document.getElementById('modal-overlay').classList.add('show');
+  ['messages','options','contrast','textsize','time'].forEach(function(p){
+    var el = document.getElementById('modal-'+p);
+    if(el) el.style.display = p===page?'flex':'none';
+  });
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
+function openSubpage(sub){ if(!sub){ openModal('options'); return; } openModal(sub); }
+
+function setContrast(val){
+  _contrast = val;
+  ['bow','wob','yob'].forEach(function(v){
+    document.getElementById('contrast-'+v+'-check').textContent = v===val?'✓':'';
+  });
+  val==='bow'
+    ? document.documentElement.removeAttribute('data-contrast')
+    : document.documentElement.setAttribute('data-contrast', val);
+  if(val==='wob'||val==='yob') completeTask('dis1');
+  if(val==='bow' && (TASKS.find(function(t){return t.id==='dis1';}).done)) completeTask('dis3');
+}
+
+function setTextSize(val){
+  _size = val;
+  ['regular','large','xl'].forEach(function(v){
+    document.getElementById('size-'+v+'-check').textContent = v===val?'✓':'';
+  });
+  var root = document.documentElement;
+  if(val==='regular') root.removeAttribute('data-size');
+  else root.setAttribute('data-size', val);
+  if(val==='large'||val==='xl') completeTask('dis2');
+  if(val==='regular' && TASKS.find(function(t){return t.id==='dis2';}).done) completeTask('dis3');
+}
+
+/* ── Highlights & Notes ── */
+document.addEventListener('mouseup', function(e){
+  if(e.target.closest('#hl-tooltip, #note-popup')) return;
+  _wasDrag = false;
+  var sel = window.getSelection();
+  if(!sel || sel.isCollapsed || !sel.toString().trim()) return;
+  var range = sel.getRangeAt(0);
+  // Only in selectable zones
+  if(!range.commonAncestorContainer.parentElement.closest('.selectable')) return;
+  _hlRange = range;
+  showHlTooltip(e.clientX, e.clientY, false);
+});
+
+document.addEventListener('mousedown', function(){ _wasDrag=false; });
+document.addEventListener('mousemove', function(){ _wasDrag=true; });
+
+function showHlTooltip(x, y, isExisting){
+  var tt = document.getElementById('hl-tooltip');
+  document.getElementById('hl-btn-highlight').style.display = isExisting?'none':'flex';
+  document.getElementById('hl-btn-note').style.display = isExisting?'none':'flex';
+  document.getElementById('hl-btn-remove').style.display = isExisting?'flex':'none';
+  document.getElementById('hl-divider').style.display = isExisting?'none':'block';
+  tt.style.left = Math.min(x, window.innerWidth-160)+'px';
+  tt.style.top  = (y+10)+'px';
+  tt.classList.add('show');
+  completeTask('hl1');
+}
+function hideTooltip(){ document.getElementById('hl-tooltip').classList.remove('show'); _hlRange=null; _hlTargetMark=null; }
+
+function applyHighlight(){
+  if(!_hlRange) return;
+  try{
+    var mark = document.createElement('mark'); mark.className='hl';
+    _hlRange.surroundContents(mark);
+  }catch(e){
+    try{
+      var frag = _hlRange.extractContents();
+      var mark = document.createElement('mark'); mark.className='hl';
+      mark.appendChild(frag); _hlRange.insertNode(mark);
+    }catch(e2){}
+  }
+  window.getSelection().removeAllRanges();
+  hideTooltip();
+  completeTask('hl2');
+}
+
+function startNote(){
+  _pendingNoteRange = _hlRange;
+  hideTooltip();
+  var rect = _pendingNoteRange ? _pendingNoteRange.getBoundingClientRect() : {bottom:200,left:200};
+  var popup = document.getElementById('note-popup');
+  popup.style.left = Math.min(rect.left, window.innerWidth-280)+'px';
+  popup.style.top  = (rect.bottom+10)+'px';
+  popup.classList.add('show');
+  document.getElementById('note-text').value='';
+  document.getElementById('note-text').focus();
+}
+
+function saveNote(){
+  var text = document.getElementById('note-text').value.trim();
+  if(!_pendingNoteRange) { cancelNote(); return; }
+  try{
+    var quote = _pendingNoteRange.toString().slice(0,60);
+    var mark = document.createElement('mark'); mark.className='note-hl';
+    _id = ++_noteIdSeq;
+    mark.dataset.noteId = _id;
+    _pendingNoteRange.surroundContents(mark);
+    _notes.push({id:_id, quote:quote, text:text, markEl:mark});
+    renderNotes();
+    completeTask('hl3');
+  }catch(e){}
+  cancelNote();
+}
+function cancelNote(){ document.getElementById('note-popup').classList.remove('show'); _pendingNoteRange=null; }
+
+function toggleNotesPanel(){
+  var p = document.getElementById('notes-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')) completeTask('hl4');
+}
+
+function renderNotes(){
+  var list = document.getElementById('notes-list');
+  var empty = document.getElementById('notes-empty');
+  if(_notes.length===0){ empty.style.display='block'; list.style.display='none'; return; }
+  empty.style.display='none'; list.style.display='block';
+  list.innerHTML = _notes.map(function(n){
+    return '<div class="note-item"><div class="ni-quote">'+esc(n.quote)+'</div>'+(n.text?'<div class="ni-text">'+esc(n.text)+'</div>':'')+'</div>';
+  }).join('');
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function removeHighlight(){
+  if(!_hlTargetMark) return;
+  var parent = _hlTargetMark.parentNode;
+  while(_hlTargetMark.firstChild) parent.insertBefore(_hlTargetMark.firstChild, _hlTargetMark);
+  parent.removeChild(_hlTargetMark);
+  parent.normalize();
+  hideTooltip();
+}
+
+document.addEventListener('click', function(e){
+  var mark = e.target.closest('mark.hl, mark.note-hl');
+  if(mark && !_wasDrag){
+    _hlTargetMark = mark;
+    _hlRange = null;
+    showHlTooltip(e.clientX, e.clientY, true);
+  }
+});
+
+/* nav task: candidate ID in header — auto-complete on load */
+window.addEventListener('DOMContentLoaded', function(){
+  completeTask('nav1');
+  renderTasks();
+  highlightActiveQ();
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeModal(); hideTooltip(); cancelNote(); }});
+});
+
+window.navigate = navigate;
+window.goToPart = goToPart;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.openSubpage = openSubpage;
+window.setContrast = setContrast;
+window.setTextSize = setTextSize;
+window.setTimeVis = setTimeVis;
+window.toggleNotesPanel = toggleNotesPanel;
+window.applyHighlight = applyHighlight;
+window.startNote = startNote;
+window.saveNote = saveNote;
+window.cancelNote = cancelNote;
+window.removeHighlight = removeHighlight;
+window.toggleBookmark = toggleBookmark;
+window.selectAnswer = selectAnswer;
+window.completeTask = completeTask;
+</script>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="cam-logo">
+    <div class="cam-shield"></div>
+    <div class="cam-logo-text">
+      <div class="top">CAMBRIDGE</div>
+      <div class="bot">English</div>
+    </div>
+  </div>
+  <div class="header-sep"></div>
+  <div id="header-title">Interface Tutorial</div>
+  <div class="header-sep"></div>
+  <div class="cid-label">Candidate ID: <strong>DEMO</strong></div>
+  <div class="header-icons">
+    <div id="timer-display">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      <span id="timer-label">Practice mode</span>
+    </div>
+    <div class="header-sep" style="height:20px"></div>
+    <svg viewBox="0 0 24 24" onclick="openModal('messages')" title="Messages"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    <svg viewBox="0 0 24 24" onclick="openModal('options')" title="Options"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <svg viewBox="0 0 24 24" onclick="toggleNotesPanel()" title="Notes"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  </div>
+</div>
+
+<!-- MAIN WRAP -->
+<div id="main-wrap">
+<div id="main">
+
+  <!-- ═══ PAGE 1 — MCQ (navigation + answering) ═══ -->
+  <div class="exam-page active" id="pg-t1">
+    <div class="instr-bar">
+      <div class="qrange">Questions 1–3</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div class="tut-callout">
+      <span class="tut-callout-icon">💡</span>
+      <div><strong>Practice section:</strong> answers here don't matter — choose anything. Use the footer to jump between parts, and the ← → arrows to move question by question. Check off tasks in the panel on the right as you go.</div>
+    </div>
+    <div class="p1-single" id="p1-items"></div>
+  </div>
+
+  <!-- ═══ PAGE 2 — Split layout (resize panel) ═══ -->
+  <div class="exam-page" id="pg-t2">
+    <div class="instr-bar">
+      <div class="qrange">Questions 4–6</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div class="tut-callout">
+      <span class="tut-callout-icon">💡</span>
+      <div><strong>Split view:</strong> many questions show a text passage on the left and answer options on the right. You can drag the centre divider to adjust the panel widths.</div>
+    </div>
+    <div class="split-layout" id="p2-layout">
+      <div class="split-left selectable" id="p2-left"></div>
+      <div class="split-right" id="p2-right"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE 3 — Text passage + highlights ═══ -->
+  <div class="exam-page" id="pg-t3">
+    <div class="instr-bar">
+      <div class="qrange">Questions 7–9</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div class="tut-callout">
+      <span class="tut-callout-icon">💡</span>
+      <div><strong>Highlights & notes:</strong> select any text in the passage with your mouse — a small menu appears. You can highlight text in teal, or attach a private note. Open the Notes panel (pencil icon, top right) to review your notes.</div>
+    </div>
+    <div class="split-layout" id="p3-layout">
+      <div class="split-left selectable" id="p3-left"></div>
+      <div class="split-right" id="p3-right"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE 4 — Display settings demo ═══ -->
+  <div class="exam-page" id="pg-t4">
+    <div class="instr-bar">
+      <div class="qrange">Question 10</div>
+      <div class="qinstr">For each question, choose the correct answer.</div>
+    </div>
+    <div class="tut-callout">
+      <span class="tut-callout-icon">💡</span>
+      <div><strong>Display settings:</strong> use the ☰ Options menu (top right) to change colour scheme, text size, or hide the timer. Try each setting, then restore the defaults before your real exam.</div>
+    </div>
+    <div class="audio-bar">
+      <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+      <div><div class="audio-bar-text">Note: In the Listening exam, audio plays automatically</div><div class="audio-bar-sub">You will see a status indicator here showing when audio is playing, during preparation time, or between parts.</div></div>
+    </div>
+    <div class="p1-single" id="p4-items"></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- NOTES PANEL -->
+<div id="notes-panel">
+  <div id="notes-panel-header">
+    <span id="notes-panel-title">Notes</span>
+    <button id="notes-panel-close" onclick="toggleNotesPanel()">✕</button>
+  </div>
+  <div id="notes-empty" style="padding:32px 20px;text-align:center;color:var(--text-muted);font-size:13px;line-height:1.6">
+    <div style="font-size:28px;margin-bottom:10px;opacity:.4">✏️</div>
+    Your private notes<br>will appear here.<br><br>
+    <span style="font-size:12px">Select text, then choose<br>"Add note" from the menu.</span>
+  </div>
+  <div id="notes-list" style="display:none"></div>
+</div>
+
+<!-- TASK PANEL -->
+<div id="task-panel">
+  <div id="task-panel-header">
+    <span id="task-panel-title">Tasks to try</span>
+    <span class="task-progress-text" id="task-progress-text">0 / 15</span>
+  </div>
+  <div id="task-list"></div>
+</div>
+
+</div><!-- /main-wrap -->
+
+<!-- HIGHLIGHT TOOLTIP -->
+<div id="hl-tooltip">
+  <button id="hl-btn-highlight" onclick="applyHighlight()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    Highlight
+  </button>
+  <div class="hl-divider" id="hl-divider"></div>
+  <button id="hl-btn-note" onclick="startNote()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Add note
+  </button>
+  <button id="hl-btn-remove" onclick="removeHighlight()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6l-1,14a2,2,0,0,1-2,2H8a2,2,0,0,1-2-2L5,6"/></svg>
+    Remove highlight
+  </button>
+</div>
+
+<!-- NOTE POPUP -->
+<div id="note-popup">
+  <textarea id="note-text" placeholder="Add a note (optional)…"></textarea>
+  <div id="note-popup-btns">
+    <button id="note-cancel-btn" onclick="cancelNote()">Cancel</button>
+    <button id="note-save-btn" onclick="saveNote()">Save</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  <button class="f-part-btn active" data-part="1" onclick="goToPart(1)">
+    <span class="f-part-label">Part 1</span>
+    <span class="f-part-count">Q 1–3</span>
+    <div class="f-q-pills" id="fp1-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="2" onclick="goToPart(2)">
+    <span class="f-part-label">Part 2</span>
+    <span class="f-part-count">Q 4–6</span>
+    <div class="f-q-pills" id="fp2-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="3" onclick="goToPart(3)">
+    <span class="f-part-label">Part 3</span>
+    <span class="f-part-count">Q 7–9</span>
+    <div class="f-q-pills" id="fp3-pills"></div>
+  </button>
+  <div class="f-sep"></div>
+  <button class="f-part-btn" data-part="4" onclick="goToPart(4)">
+    <span class="f-part-label">Part 4</span>
+    <span class="f-part-count">Q 10</span>
+    <div class="f-q-pills" id="fp4-pills"></div>
+  </button>
+  <div class="f-spacer"></div>
+  <button class="f-nav-btn f-nav-prev" id="btn-prev" onclick="navigate(-1)" disabled>
+    <svg viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
+  </button>
+  <button class="f-nav-btn f-nav-next" id="btn-next" onclick="navigate(1)">
+    <svg viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+  </button>
+  <button class="f-submit-btn" title="Not available in tutorial">
+    <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+  </button>
+</div>
+
+<!-- DONE BAR (replaces footer when all tasks complete) -->
+<button id="btn-done-bar" onclick="(function(){
+  var p = new URLSearchParams(window.location.search);
+  var cid = p.get('candidateId')||'';
+  var v   = p.get('variant')||'';
+  window.location.href = 'https://samromand.github.io/exam_home'
+    + '?candidateId=' + encodeURIComponent(cid)
+    + '&variant='     + encodeURIComponent(v)
+    + '&completed=tutorial';
+})()">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  I'm done — return to exam home
+</button>
+
+<!-- ══ OPTIONS MODAL ══ -->
+<div id="modal-overlay">
+  <!-- Messages page -->
+  <div id="modal-messages" style="display:flex;flex-direction:column;width:100%;height:100%">
+    <div class="modal-header">
+      <button class="modal-back" onclick="closeModal()">✕ Close</button>
+      <div class="modal-title">Messages</div>
+    </div>
+    <div class="modal-body">
+      <div class="messages-empty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;color:var(--text-muted);font-size:16px;gap:12px">
+        <svg viewBox="0 0 24 24" style="width:40px;height:40px;stroke:var(--text-muted);fill:none;stroke-width:1.5;opacity:.4"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        No messages
+      </div>
+    </div>
+  </div>
+  <!-- Options page -->
+  <div id="modal-options" style="display:none;flex-direction:column;width:100%;height:100%">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-title">Options</div>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row primary" onclick="openSubpage('messages')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+          <div class="opt-label">Messages</div>
+          <div class="opt-arrow">›</div>
+        </div>
+        <div class="opt-row" onclick="openSubpage('contrast')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 000 20z" fill="currentColor" opacity=".3"/></svg></div>
+          <div class="opt-label">Colour scheme</div>
+          <div class="opt-arrow">›</div>
+        </div>
+        <div class="opt-row" onclick="openSubpage('textsize')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><text x="3" y="18" font-size="14" font-weight="bold" fill="currentColor" stroke="none">A</text><text x="12" y="18" font-size="10" fill="currentColor" stroke="none">a</text></svg></div>
+          <div class="opt-label">Text size</div>
+          <div class="opt-arrow">›</div>
+        </div>
+        <div class="opt-row" onclick="openSubpage('time')">
+          <div class="opt-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>
+          <div class="opt-label">Timer</div>
+          <div class="opt-arrow">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Contrast page -->
+  <div id="modal-contrast" style="display:none;flex-direction:column;width:100%;height:100%">
+    <div class="modal-header">
+      <button class="modal-back" onclick="openSubpage('options')">‹ Options</button>
+      <div class="modal-title">Colour scheme</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row" onclick="setContrast('bow')">
+          <div class="contrast-thumb" style="background:#fff"><span style="background:#1A1A1A;width:60%"></span><span style="background:#555;width:80%"></span><span style="background:#1A1A1A;width:40%"></span></div>
+          <div class="opt-label">Black on white</div>
+          <div class="opt-check" id="contrast-bow-check">✓</div>
+        </div>
+        <div class="opt-row" onclick="setContrast('wob')">
+          <div class="contrast-thumb" style="background:#000"><span style="background:#FFF;width:60%"></span><span style="background:#BBB;width:80%"></span><span style="background:#FFF;width:40%"></span></div>
+          <div class="opt-label">White on black</div>
+          <div class="opt-check" id="contrast-wob-check"></div>
+        </div>
+        <div class="opt-row" onclick="setContrast('yob')">
+          <div class="contrast-thumb" style="background:#000"><span style="background:#FFD700;width:60%"></span><span style="background:#C8A800;width:80%"></span><span style="background:#FFD700;width:40%"></span></div>
+          <div class="opt-label">Yellow on black</div>
+          <div class="opt-check" id="contrast-yob-check"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Text size page -->
+  <div id="modal-textsize" style="display:none;flex-direction:column;width:100%;height:100%">
+    <div class="modal-header">
+      <button class="modal-back" onclick="openSubpage('options')">‹ Options</button>
+      <div class="modal-title">Text size</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row" onclick="setTextSize('regular')"><div class="opt-label" style="font-size:15px">Regular</div><div class="opt-check" id="size-regular-check">✓</div></div>
+        <div class="opt-row" onclick="setTextSize('large')"><div class="opt-label" style="font-size:18px">Large</div><div class="opt-check" id="size-large-check"></div></div>
+        <div class="opt-row" onclick="setTextSize('xl')"><div class="opt-label" style="font-size:21px">Extra large</div><div class="opt-check" id="size-xl-check"></div></div>
+      </div>
+    </div>
+  </div>
+  <!-- Timer page -->
+  <div id="modal-time" style="display:none;flex-direction:column;width:100%;height:100%">
+    <div class="modal-header">
+      <button class="modal-back" onclick="openSubpage('options')">‹ Options</button>
+      <div class="modal-title">Timer</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="opt-list">
+        <div class="opt-row" onclick="setTimeVis('show');closeModal()"><div class="opt-label">Show timer</div><div class="opt-check" id="time-show-check">✓</div></div>
+        <div class="opt-row" onclick="setTimeVis('hide');closeModal()"><div class="opt-label">Hide timer</div><div class="opt-check" id="time-hide-check"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ BUILD PRACTICE QUESTIONS ══ */
+(function(){
+
+  // Helper: build a single MCQ block
+  function mcqBlock(qNum, qText, opts, part){
+    var bm = '<span class="q-bookmark" id="bm-'+qNum+'" onclick="toggleBookmark('+qNum+')" title="Bookmark"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></span>';
+    var letters = ['A','B','C'];
+    var optsHtml = opts.map(function(o, i){
+      return '<div class="p1-opt" data-letter="'+letters[i]+'" onclick="selectAnswer('+qNum+', \''+letters[i]+'\', this)">'
+        +'<div class="p1-letter">'+letters[i]+'</div>'
+        +'<label>'+o+'</label>'
+        +'</div>';
+    }).join('');
+    return '<div style="margin-bottom:28px">'
+      +'<div class="p1-qhead"><span class="p1-qnum" id="qnum-'+qNum+'" data-q="'+qNum+'">'+qNum+'</span> '+qText+' '+bm+'</div>'
+      +'<div class="p1-options">'+optsHtml+'</div>'
+      +'</div>';
+  }
+
+  // PAGE 1 — simple MCQ x3
+  var p1 = document.getElementById('p1-items');
+  p1.innerHTML =
+    mcqBlock(1, 'What is the main purpose of the footer navigation bar?',
+      ['To submit the exam early',
+       'To jump between parts and see question status at a glance',
+       'To change the colour scheme'], 1)
+    +mcqBlock(2, 'You want to return to a question later. What should you do?',
+      ['Leave the answer blank',
+       'Click the bookmark flag on the question',
+       'Write a note on paper'], 1)
+    +mcqBlock(3, 'Where can you find your Candidate ID during the exam?',
+      ['In the footer navigation bar',
+       'In the Options menu',
+       'In the header at the top of the screen'], 1);
+
+  // PAGE 2 — split layout left/right
+  var longText = '<p>The city library announced last week that it would extend its opening hours during the summer months. The head librarian, Ms. Carter, explained that the decision followed a survey showing that many students needed access to study spaces in the evenings.</p>'
+    +'<p>In addition to longer hours, the library will introduce three new computer workstations on the ground floor. These will be available on a first-come, first-served basis, with a maximum session of two hours per visitor.</p>'
+    +'<p>Ms. Carter also confirmed that a new quiet reading room would open on the second floor. This room will have no wi-fi access in order to minimise distractions.</p>';
+
+  document.getElementById('p2-left').innerHTML = '<h3 style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text)">Library announcement</h3><div class="article-text">'+longText+'</div>';
+  document.getElementById('p2-right').innerHTML =
+    mcqBlock(4, 'Why is the library extending its hours?',
+      ['Because the building needs repairs during the day',
+       'Students requested more evening study space',
+       'The local government required it'], 2)
+    +mcqBlock(5, 'How can visitors use the new computer workstations?',
+      ['By booking in advance online',
+       'On a first-come, first-served basis',
+       'Only with a library membership card'], 2)
+    +mcqBlock(6, 'What is special about the new quiet reading room?',
+      ['It is only open to school students',
+       'It has no wi-fi connection',
+       'It is located in the basement'], 2);
+
+  // PAGE 3 — longer passage for highlighting
+  var passage = '<p>The migration of birds across continents has fascinated scientists for centuries. Each year, billions of birds travel thousands of kilometres between their breeding grounds in the north and their wintering areas closer to the equator. What guides them on these extraordinary journeys?</p>'
+    +'<p>Research has shown that birds use a range of navigational tools. Some species rely on the position of the sun during the day, while others navigate by the stars at night. Many birds also possess a sensitivity to Earth\'s magnetic field, which acts as a kind of internal compass.</p>'
+    +'<p>However, these natural abilities alone are not enough. Young birds on their first migration must also learn landmarks — coastlines, mountain ranges and rivers — that they will use for the rest of their lives. This learning happens quickly and appears to be largely instinctive.</p>';
+
+  document.getElementById('p3-left').innerHTML = '<h3 style="font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text)">Bird migration</h3><div class="article-text selectable">'+passage+'</div>';
+  document.getElementById('p3-right').innerHTML =
+    mcqBlock(7, 'According to the text, which navigational tool do some birds use at night?',
+      ['The position of the sun',
+       'The stars',
+       'Sound waves from the ocean'], 3)
+    +mcqBlock(8, 'What does Earth\'s magnetic field provide for birds?',
+      ['A source of food along the route',
+       'A kind of internal compass',
+       'Protection from predators'], 3)
+    +mcqBlock(9, 'How do young birds learn landmarks?',
+      ['They are taught by older birds over several years',
+       'They use maps drawn by researchers',
+       'Quickly, in a way that appears largely instinctive'], 3);
+
+  // PAGE 4 — single Q10
+  document.getElementById('p4-items').innerHTML =
+    mcqBlock(10, 'Which setting in the Options menu lets you make text larger?',
+      ['Colour scheme',
+       'Timer',
+       'Text size'], 4);
+
+  // Init pills & task panel
+  updatePills();
+  renderTasks();
+  renderNotes();
+
+  // Init split panel resizers
+  initResize('p2-layout', 'p2-left', 'p2-right', 'res1');
+  initResize('p3-layout', 'p3-left', 'p3-right', null);
+})();
+</script>
+</body>
+</html>

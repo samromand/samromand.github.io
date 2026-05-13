@@ -258,6 +258,7 @@ var API         = 'https://api.jsonbin.io/v3/b';
 
 var _params     = {};
 var _candidate  = null;
+var _store      = null;   // full bin store, kept in memory for writes
 
 // URL params
 (function(){
@@ -287,6 +288,13 @@ async function apiFetch(url, opts) {
 function getBin(id) {
   return apiFetch(API+'/'+id+'/latest', { headers:{'X-Master-Key':MASTER_KEY} });
 }
+function putBin(id, data) {
+  return apiFetch(API+'/'+id, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},
+    body: JSON.stringify(data)
+  });
+}
 
 // Block definitions (in order)
 var BLOCKS = [
@@ -295,14 +303,14 @@ var BLOCKS = [
     title: 'Interface tutorial',
     desc: 'Learn how to navigate the exam, use tools, and submit answers.',
     icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
-    href: null   // set later if needed
+    href: 'https://samromand.github.io/tutorial'
   },
   {
     id: 'rw',
     title: 'Reading and Writing',
     desc: 'Complete all reading and writing tasks for your assigned variant.',
     icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
-    href: null
+    href: 'https://samromand.github.io/a2key_exam_rw'
   },
   {
     id: 'listening',
@@ -370,18 +378,41 @@ function renderBlocks(progress) {
     // Append children (connector div + block div)
     Array.from(el.children).forEach(function(child){ container.appendChild(child); });
 
-    // Click handler — only for unlocked blocks (all currently non-navigable as per spec)
-    // When href is set in future, navigation happens here
+    // Click handler for unlocked blocks — navigate and pass candidateId + variant
     if (isUnlocked) {
       document.getElementById('block-'+block.id).addEventListener('click', function(){
         if (block.href) {
-          var url = block.href + '?candidateId='+encodeURIComponent(_params.candidateId)+'&variant='+encodeURIComponent(_params.variant);
+          var url = block.href
+            + '?candidateId=' + encodeURIComponent(_params.candidateId)
+            + '&variant='     + encodeURIComponent(_params.variant);
           window.location.href = url;
         }
-        // else: not yet navigable — block is visually "ready" but href is null
       });
     }
   });
+}
+
+// Called from tutorial's "Done" button via URL param, or can be called directly
+async function markBlockDone(blockId) {
+  if (!_candidate || !_store) return;
+  var progress = Array.isArray(_candidate.progress) ? _candidate.progress : [];
+  if (progress.indexOf(blockId) !== -1) return; // already done
+  progress = progress.concat([blockId]);
+  _candidate.progress = progress;
+
+  // Update in store
+  var idx = _store.candidates.findIndex(function(c){ return c.candidateId === _candidate.candidateId; });
+  if (idx !== -1) _store.candidates[idx].progress = progress;
+
+  // Re-render immediately (optimistic)
+  renderBlocks(progress);
+
+  // Save to bin
+  try {
+    await putBin(ANSWERS_BIN, _store);
+  } catch(e) {
+    console.error('Could not save progress:', e.message);
+  }
 }
 
 async function loadCandidate() {
@@ -421,6 +452,7 @@ async function loadCandidate() {
     }
 
     _candidate = cand;
+    _store     = store;
     loading.style.display = 'none';
     idEl.textContent  = cand.candidateId;
     varEl.textContent = cand.variantId || _params.variant || '—';
@@ -454,7 +486,11 @@ window.setContrast = function(val){
 
 document.addEventListener('DOMContentLoaded', function(){
   document.addEventListener('keydown',function(e){ if(e.key==='Escape') window.closeModal(); });
-  loadCandidate();
+  // Read optional ?completed= param written by tutorial's Done button
+  var completed = new URLSearchParams(window.location.search).get('completed');
+  loadCandidate().then(function(){
+    if (completed) markBlockDone(completed);
+  });
 });
 </script>
 </head>
