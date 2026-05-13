@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Home — Cambridge Assessment English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cam-teal:#00686E;--cam-teal-dark:#004F54;--cam-teal-light:#E6F4F5;
+  --cam-teal-btn:#007B82;--cam-active:#007B82;
+  --text:#1A1A1A;--text-muted:#555;--border:#D0D0D0;
+  --header-h:56px;
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'Noto Sans',system-ui,sans-serif;
+  --bg-page:#fff;--bg-header:#fff;--bg-instr:#F8F8F8;--bg-panel:#F2F2F2;
+}
+[data-contrast="wob"]{
+  --text:#FFF;--text-muted:#BBB;--border:#555;
+  --bg-page:#000;--bg-header:#111;--bg-instr:#111;--bg-panel:#111;
+  --cam-teal-light:#0A2A2C;
+}
+[data-contrast="yob"]{
+  --text:#FFD700;--text-muted:#C8A800;--border:#664400;
+  --bg-page:#000;--bg-header:#111;--bg-instr:#111;--bg-panel:#111;
+  --cam-teal:#CC8800;--cam-teal-dark:#AA6600;--cam-teal-btn:#CC8800;
+  --cam-teal-light:#1A0E00;--cam-active:#CC8800;
+}
+
+html,body{min-height:100%;font-family:var(--sans);font-size:15px;color:var(--text);background:var(--bg-page);transition:background .2s,color .2s}
+
+/* ── HEADER ── */
+#header{
+  height:var(--header-h);background:var(--bg-header);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+}
+.cam-shield{
+  width:38px;height:44px;flex-shrink:0;
+  background:linear-gradient(180deg,#C00000 50%,#FFD700 50%);
+  border-radius:2px 2px 50% 50%;
+  position:relative;overflow:hidden;
+}
+.cam-shield::after{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover;
+}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:var(--text)}
+.cam-logo-text .bot{font-size:11px;color:var(--text-muted)}
+.header-sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+#header-title{font-size:14px;font-weight:600;color:var(--text)}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.cid-chip{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-instr);border:1px solid var(--border);
+  border-radius:3px;padding:5px 12px;
+}
+.cid-chip-label{font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.cid-chip-val{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--cam-teal-dark);letter-spacing:.1em}
+[data-contrast="wob"] .cid-chip-val,[data-contrast="yob"] .cid-chip-val{color:var(--cam-active)}
+.h-icon-btn{background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;opacity:.7;transition:opacity .15s}
+.h-icon-btn:hover{opacity:1}
+.h-icon-btn svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:1.8}
+
+/* ── MAIN ── */
+#main{
+  margin-top:var(--header-h);
+  min-height:calc(100vh - var(--header-h));
+  background:var(--bg-page);
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 20px 80px;
+}
+.page-wrap{width:100%;max-width:600px}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:36px}
+.page-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--cam-teal);margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.page-eyebrow::after{content:'';flex:1;height:1px;background:var(--border)}
+.page-title{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--text);line-height:1.25;margin-bottom:8px}
+.page-sub{font-size:14px;color:var(--text-muted);line-height:1.6}
+
+/* ── CANDIDATE BAR ── */
+.cand-bar{
+  background:var(--bg-instr);border:1px solid var(--border);
+  border-left:4px solid var(--cam-teal);border-radius:2px;
+  padding:14px 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  margin-bottom:32px;
+}
+.cand-bar-left{display:flex;align-items:center;gap:14px}
+.cand-bar-label{font-size:12px;color:var(--text-muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.cand-bar-id{font-family:'Courier New',monospace;font-size:16px;font-weight:700;color:var(--cam-teal-dark);letter-spacing:.12em}
+[data-contrast="wob"] .cand-bar-id,[data-contrast="yob"] .cand-bar-id{color:var(--cam-active)}
+.cand-bar-sep{width:1px;height:32px;background:var(--border)}
+.variant-lbl{font-size:12px;color:var(--text-muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+.variant-val{font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:var(--text);letter-spacing:.08em}
+.loading-bar{
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--text-muted);
+}
+.loading-bar .spinner{
+  width:16px;height:16px;border:2px solid var(--border);
+  border-top-color:var(--cam-teal);border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err-bar{
+  font-size:13px;color:#B00;padding:4px 0;
+}
+[data-contrast="wob"] .err-bar,[data-contrast="yob"] .err-bar{color:#FF6B6B}
+
+/* ── BLOCKS LIST ── */
+.blocks{display:flex;flex-direction:column;gap:12px}
+
+.block{
+  background:var(--bg-instr);
+  border:1px solid var(--border);
+  border-radius:4px;
+  overflow:hidden;
+  transition:border-color .18s,box-shadow .18s;
+  position:relative;
+}
+
+/* state: locked */
+.block--locked{opacity:.55}
+
+/* state: unlocked (ready to start) */
+.block--unlocked{
+  border-color:var(--cam-teal);
+  cursor:pointer;
+}
+.block--unlocked:hover{
+  box-shadow:0 0 0 3px rgba(0,104,110,.1);
+}
+
+/* state: done */
+.block--done{
+  border-color:#9ABFBE;
+}
+.block--done .block-num{background:var(--cam-teal);color:#fff;border-color:var(--cam-teal)}
+.block--done .block-num svg{display:block}
+.block--done .block-num span{display:none}
+
+.block-inner{
+  display:flex;align-items:center;gap:16px;
+  padding:20px 22px;
+}
+
+/* number circle */
+.block-num{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:var(--text-muted);
+  transition:all .2s;
+}
+.block--unlocked .block-num{border-color:var(--cam-active);color:var(--cam-active)}
+.block-num svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5;display:none}
+
+/* icon */
+.block-icon{
+  width:40px;height:40px;border-radius:3px;
+  background:var(--bg-panel);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .2s;
+}
+.block-icon svg{width:20px;height:20px;stroke:var(--text-muted);fill:none;stroke-width:1.8;transition:stroke .2s}
+.block--unlocked .block-icon{background:var(--cam-teal-light)}
+.block--unlocked .block-icon svg{stroke:var(--cam-teal-dark)}
+.block--done .block-icon{background:var(--cam-teal-light)}
+.block--done .block-icon svg{stroke:var(--cam-teal-dark)}
+
+/* text */
+.block-text{flex:1;min-width:0}
+.block-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px}
+.block-desc{font-size:13px;color:var(--text-muted);line-height:1.4}
+
+/* right side */
+.block-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+
+.block-badge{
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 10px;border-radius:2px;
+}
+.badge-locked{background:var(--bg-panel);color:var(--text-muted);border:1px solid var(--border)}
+.badge-ready{background:var(--cam-teal-light);color:var(--cam-teal-dark);border:1px solid #A0CED0}
+.badge-done{background:#E6F4F5;color:#004F54;border:1px solid #9ABFBE}
+[data-contrast="wob"] .badge-ready,[data-contrast="yob"] .badge-ready{color:var(--cam-active);background:var(--cam-teal-light)}
+[data-contrast="wob"] .badge-done,[data-contrast="yob"] .badge-done{color:var(--cam-active);background:var(--cam-teal-light)}
+
+.block-arrow{
+  width:20px;height:20px;flex-shrink:0;
+  display:none;
+}
+.block-arrow svg{width:20px;height:20px;stroke:var(--cam-teal);fill:none;stroke-width:2}
+.block--unlocked .block-arrow{display:block}
+
+/* lock icon */
+.block-lock{
+  width:18px;height:18px;flex-shrink:0;opacity:.35;
+}
+.block-lock svg{width:18px;height:18px;stroke:var(--text-muted);fill:none;stroke-width:1.8}
+.block--locked .block-lock{display:flex;align-items:center}
+.block--unlocked .block-lock,.block--done .block-lock{display:none}
+
+/* connector line between blocks */
+.block-connector{
+  width:2px;height:16px;
+  background:var(--border);
+  margin:0 auto;
+  margin-left:43px; /* align with center of num circle: 22px padding + 36/2 = 40px */
+  transition:background .3s;
+}
+.block-connector.done{background:var(--cam-teal)}
+
+/* ── LOADING STATE ── */
+#loading-state{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-muted);padding:24px 0}
+#loading-state .spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--cam-teal);border-radius:50%;animation:spin .7s linear infinite}
+
+/* ── MODAL ── */
+#modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(255,255,255,.97);display:none;align-items:center;justify-content:center}
+[data-contrast="wob"] #modal-overlay,[data-contrast="yob"] #modal-overlay{background:rgba(0,0,0,.95)}
+#modal-overlay.show{display:flex}
+.modal-box{background:var(--bg-instr);border:1px solid var(--border);border-radius:4px;padding:24px;width:320px;max-width:90vw}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-muted);line-height:1}
+.modal-close:hover{color:var(--text)}
+.opt-list{border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.opt-row{padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;font-size:14px;color:var(--text);background:var(--bg-instr);display:flex;align-items:center;justify-content:space-between;transition:background .1s}
+.opt-row:last-child{border-bottom:none}
+.opt-row:hover{background:var(--bg-panel)}
+.opt-check{color:var(--cam-teal);visibility:hidden}
+.opt-check.on{visibility:visible}
+
+@media(max-width:520px){
+  .cand-bar{flex-direction:column;align-items:flex-start}
+  .cand-bar-sep{display:none}
+  .block-inner{padding:16px}
+  .block-desc{display:none}
+  #header-title{display:none}
+  .cid-chip{display:none}
+}
+</style>
+
+<script>
+var ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
+var MASTER_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+var API         = 'https://api.jsonbin.io/v3/b';
+
+var _params     = {};
+var _candidate  = null;
+
+// URL params
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  _params.candidateId = p.get('candidateId') || '';
+  _params.variant     = p.get('variant') || '';
+})();
+
+async function apiFetch(url, opts) {
+  var ctrl = new AbortController();
+  var t = setTimeout(function(){ ctrl.abort(); }, 12000);
+  try {
+    var res = await fetch(url, Object.assign({}, opts||{}, {signal: ctrl.signal}));
+    clearTimeout(t);
+    var text = await res.text();
+    var json;
+    try { json = JSON.parse(text); } catch(e) { throw new Error('Bad JSON ('+res.status+'): '+text.slice(0,80)); }
+    if (!res.ok) throw new Error('HTTP '+res.status+': '+(json.message||json.error||''));
+    return json;
+  } catch(e) {
+    clearTimeout(t);
+    if (e.name==='AbortError') throw new Error('Request timed out.');
+    throw e;
+  }
+}
+
+function getBin(id) {
+  return apiFetch(API+'/'+id+'/latest', { headers:{'X-Master-Key':MASTER_KEY} });
+}
+
+// Block definitions (in order)
+var BLOCKS = [
+  {
+    id: 'tutorial',
+    title: 'Interface tutorial',
+    desc: 'Learn how to navigate the exam, use tools, and submit answers.',
+    icon: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+    href: null   // set later if needed
+  },
+  {
+    id: 'rw',
+    title: 'Reading and Writing',
+    desc: 'Complete all reading and writing tasks for your assigned variant.',
+    icon: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+    href: null
+  },
+  {
+    id: 'listening',
+    title: 'Listening',
+    desc: 'Answer questions based on audio recordings.',
+    icon: '<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
+    href: null
+  },
+  {
+    id: 'speaking',
+    title: 'Speaking — Print answer sheet',
+    desc: 'Print the examiner\'s assessment form for the Speaking component.',
+    icon: '<svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
+    href: null
+  }
+];
+
+function renderBlocks(progress) {
+  // progress: array of completed block ids stored on candidate, e.g. ["tutorial","rw"]
+  var done = Array.isArray(progress) ? progress : [];
+  var container = document.getElementById('blocks-list');
+  container.innerHTML = '';
+
+  BLOCKS.forEach(function(block, i) {
+    var isDone     = done.indexOf(block.id) !== -1;
+    var prevDone   = i === 0 || done.indexOf(BLOCKS[i-1].id) !== -1;
+    var isUnlocked = !isDone && prevDone;
+    var isLocked   = !isDone && !prevDone;
+
+    var stateClass = isDone ? 'block--done' : isUnlocked ? 'block--unlocked' : 'block--locked';
+    var badge      = isDone
+      ? '<span class="block-badge badge-done">Completed</span>'
+      : isUnlocked
+        ? '<span class="block-badge badge-ready">Ready</span>'
+        : '<span class="block-badge badge-locked">Locked</span>';
+
+    var numInner = isDone
+      ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>'+(i+1)+'</span>'
+      : '<span>'+(i+1)+'</span>';
+
+    // connector above (except first)
+    var connector = '';
+    if (i > 0) {
+      var connDone = done.indexOf(BLOCKS[i-1].id) !== -1;
+      connector = '<div class="block-connector'+(connDone?' done':'')+'"></div>';
+    }
+
+    var el = document.createElement('div');
+    el.innerHTML = connector + '<div class="block '+stateClass+'" id="block-'+block.id+'">'
+      + '<div class="block-inner">'
+        + '<div class="block-num">'+numInner+'</div>'
+        + '<div class="block-icon">'+block.icon+'</div>'
+        + '<div class="block-text">'
+          + '<div class="block-title">'+block.title+'</div>'
+          + '<div class="block-desc">'+block.desc+'</div>'
+        + '</div>'
+        + '<div class="block-right">'
+          + badge
+          + '<div class="block-lock"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>'
+          + '<div class="block-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';
+
+    // Append children (connector div + block div)
+    Array.from(el.children).forEach(function(child){ container.appendChild(child); });
+
+    // Click handler — only for unlocked blocks (all currently non-navigable as per spec)
+    // When href is set in future, navigation happens here
+    if (isUnlocked) {
+      document.getElementById('block-'+block.id).addEventListener('click', function(){
+        if (block.href) {
+          var url = block.href + '?candidateId='+encodeURIComponent(_params.candidateId)+'&variant='+encodeURIComponent(_params.variant);
+          window.location.href = url;
+        }
+        // else: not yet navigable — block is visually "ready" but href is null
+      });
+    }
+  });
+}
+
+async function loadCandidate() {
+  var bar = document.getElementById('cand-bar');
+  var idEl = document.getElementById('cand-id-val');
+  var varEl = document.getElementById('cand-variant-val');
+  var loading = document.getElementById('cand-loading');
+  var errEl   = document.getElementById('cand-err');
+
+  // Show header chip
+  if (_params.candidateId) {
+    document.getElementById('header-cid').textContent = _params.candidateId;
+    document.getElementById('header-variant').textContent = _params.variant || '—';
+    document.getElementById('header-cid-wrap').style.display = 'flex';
+  }
+
+  if (!_params.candidateId) {
+    loading.style.display = 'none';
+    errEl.textContent = 'No candidate ID in URL. Please go back to registration.';
+    errEl.style.display = 'block';
+    renderBlocks([]);
+    return;
+  }
+
+  try {
+    var raw  = await getBin(ANSWERS_BIN);
+    var store = (raw && raw.record) ? raw.record : raw;
+    var candidates = Array.isArray(store.candidates) ? store.candidates : [];
+    var cand = candidates.find(function(c){ return c.candidateId === _params.candidateId; });
+
+    if (!cand) {
+      loading.style.display = 'none';
+      errEl.textContent = 'Candidate "'+_params.candidateId+'" not found. Please re-register.';
+      errEl.style.display = 'block';
+      renderBlocks([]);
+      return;
+    }
+
+    _candidate = cand;
+    loading.style.display = 'none';
+    idEl.textContent  = cand.candidateId;
+    varEl.textContent = cand.variantId || _params.variant || '—';
+    bar.style.display = 'flex';
+
+    // Update page subtitle with variant
+    var variantSpan = document.getElementById('subtitle-variant');
+    if (variantSpan) variantSpan.textContent = cand.variantId || _params.variant || '';
+
+    renderBlocks(cand.progress || []);
+
+  } catch(e) {
+    loading.style.display = 'none';
+    errEl.textContent = 'Could not load candidate data: '+e.message;
+    errEl.style.display = 'block';
+    // Still render blocks in locked state
+    renderBlocks([]);
+  }
+}
+
+window.openModal  = function(){ document.getElementById('modal-overlay').classList.add('show'); };
+window.closeModal = function(){ document.getElementById('modal-overlay').classList.remove('show'); };
+window.setContrast = function(val){
+  ['bow','wob','yob'].forEach(function(v){
+    document.getElementById('c-'+v).className='opt-check'+(v===val?' on':'');
+  });
+  val==='bow'
+    ? document.documentElement.removeAttribute('data-contrast')
+    : document.documentElement.setAttribute('data-contrast',val);
+};
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') window.closeModal(); });
+  loadCandidate();
+});
+</script>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="cam-logo">
+    <div class="cam-shield"></div>
+    <div class="cam-logo-text">
+      <div class="top">Cambridge Assessment</div>
+      <div class="bot">English</div>
+    </div>
+  </div>
+  <div class="header-sep"></div>
+  <div id="header-title">Exam Home</div>
+  <div class="header-right">
+    <div class="cid-chip" id="header-cid-wrap" style="display:none">
+      <span class="cid-chip-label">ID</span>
+      <span class="cid-chip-val" id="header-cid">——</span>
+      <span style="width:1px;height:16px;background:var(--border);display:inline-block;margin:0 4px"></span>
+      <span class="cid-chip-label">Variant</span>
+      <span class="cid-chip-val" id="header-variant">——</span>
+    </div>
+    <button class="h-icon-btn" onclick="openModal()" title="Display settings" aria-label="Display settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" opacity=".4"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none" opacity=".3"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main id="main">
+  <div class="page-wrap">
+
+    <div class="page-header">
+      <div class="page-eyebrow">A2 Key for Schools</div>
+      <h1 class="page-title">Your exam overview</h1>
+      <p class="page-sub">Complete each section in order. The next section unlocks only after the previous one is submitted.<br>Variant: <strong id="subtitle-variant" style="color:var(--text);font-family:'Courier New',monospace;letter-spacing:.06em">——</strong></p>
+    </div>
+
+    <!-- CANDIDATE BAR -->
+    <div id="cand-loading" class="loading-bar" style="margin-bottom:24px">
+      <div class="spinner"></div>
+      Loading candidate data…
+    </div>
+    <div class="err-bar" id="cand-err" style="display:none;margin-bottom:24px"></div>
+
+    <div class="cand-bar" id="cand-bar" style="display:none">
+      <div class="cand-bar-left">
+        <div>
+          <div class="cand-bar-label">Candidate ID</div>
+          <div class="cand-bar-id" id="cand-id-val">——</div>
+        </div>
+        <div class="cand-bar-sep"></div>
+        <div>
+          <div class="variant-lbl">Variant</div>
+          <div class="variant-val" id="cand-variant-val">——</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCKS -->
+    <div class="blocks" id="blocks-list">
+      <!-- rendered by JS -->
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title">
+      Display settings
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Colour scheme</div>
+    <div class="opt-list">
+      <div class="opt-row" onclick="setContrast('bow')">Black on white<span class="opt-check on" id="c-bow">✓</span></div>
+      <div class="opt-row" onclick="setContrast('wob')">White on black<span class="opt-check" id="c-wob">✓</span></div>
+      <div class="opt-row" onclick="setContrast('yob')">Yellow on black<span class="opt-check" id="c-yob">✓</span></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
