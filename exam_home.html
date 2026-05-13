@@ -249,6 +249,39 @@ html,body{min-height:100%;font-family:var(--sans);font-size:15px;color:var(--tex
   #header-title{display:none}
   .cid-chip{display:none}
 }
+
+/* ── Speaking done banner ── */
+#speaking-done-banner{
+  display:none;
+  background:var(--cam-teal-light);border:1px solid #A0CED0;border-radius:4px;
+  padding:14px 18px;margin-top:16px;
+  align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+#speaking-done-banner .banner-text{font-size:14px;color:var(--cam-teal-dark)}
+[data-contrast="wob"] #speaking-done-banner,[data-contrast="yob"] #speaking-done-banner{
+  background:var(--bg-panel);border-color:var(--border);
+}
+[data-contrast="wob"] #speaking-done-banner .banner-text,
+[data-contrast="yob"] #speaking-done-banner .banner-text{color:var(--cam-active)}
+.banner-btn{
+  padding:8px 18px;background:var(--cam-teal-dark);color:#fff;
+  border:none;border-radius:3px;font-family:var(--sans);font-size:13px;
+  font-weight:700;cursor:pointer;white-space:nowrap;
+}
+.banner-btn:hover{background:#003A3E}
+
+/* ── Return to portal ── */
+#return-to-portal{
+  display:none;
+  margin-top:24px;width:100%;
+  padding:14px 20px;
+  background:var(--cam-teal-dark);color:#fff;
+  border:none;border-radius:4px;
+  font-family:var(--sans);font-size:15px;font-weight:700;
+  cursor:pointer;align-items:center;justify-content:center;gap:10px;
+}
+#return-to-portal:hover{background:#003A3E}
+#return-to-portal svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5}
 </style>
 
 <script>
@@ -324,7 +357,7 @@ var BLOCKS = [
     title: 'Speaking — Print answer sheet',
     desc: 'Print the examiner\'s assessment form for the Speaking component.',
     icon: '<svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
-    href: null
+    href: 'https://samromand.github.io/speaking_sheet'
   }
 ];
 
@@ -385,12 +418,33 @@ function renderBlocks(progress) {
           var url = block.href
             + '?candidateId=' + encodeURIComponent(_params.candidateId)
             + '&variant='     + encodeURIComponent(_params.variant);
-          window.location.href = url;
+          // Speaking: open print sheet in new tab, then show "mark as done" banner
+          if (block.id === 'speaking') {
+            window.open(url + '&print=1', '_blank');
+            showSpeakingDoneBanner();
+          } else {
+            window.location.href = url;
+          }
         }
       });
     }
   });
+
+  // Show return-to-portal button if all blocks done
+  var allDone = BLOCKS.every(function(b){ return done.indexOf(b.id) !== -1; });
+  var returnBtn = document.getElementById('return-to-portal');
+  if (returnBtn) returnBtn.style.display = allDone ? 'flex' : 'none';
 }
+
+function showSpeakingDoneBanner() {
+  var banner = document.getElementById('speaking-done-banner');
+  if (banner) banner.style.display = 'flex';
+}
+
+window.markSpeakingDone = function() {
+  document.getElementById('speaking-done-banner').style.display = 'none';
+  markBlockDone('speaking');
+};
 
 // Called from tutorial's "Done" button via URL param, or can be called directly
 async function markBlockDone(blockId) {
@@ -556,6 +610,18 @@ document.addEventListener('DOMContentLoaded', function(){
     <div class="blocks" id="blocks-list">
       <!-- rendered by JS -->
     </div>
+
+    <!-- Speaking done banner -->
+    <div id="speaking-done-banner">
+      <span class="banner-text">The answer sheet has opened in a new tab. Once printed, mark this section as complete.</span>
+      <button class="banner-btn" onclick="markSpeakingDone()">✓ Mark as done</button>
+    </div>
+
+    <!-- Return to portal (shown when all 4 blocks complete) -->
+    <button id="return-to-portal" onclick="window.location.href='https://samromand.github.io'">
+      <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      All sections complete — return to portal
+    </button>
 
   </div>
 </main>
