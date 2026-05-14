@@ -1553,18 +1553,19 @@ function buildP4() {
       const qNum = i + 19;
       if (!line.includes(`(${qNum})`)) return;
       const opts = [g.optA||'A', g.optB||'B', g.optC||'C'];
-      const sel = answers[qNum] || '';
-      const inner = sel
-        ? `<span class="p4-gap-val">${esc(sel)}</span>`
+      const sel = answers[qNum] || '';  // stored as 'A'/'B'/'C'
+      const selText = sel==='A'?opts[0] : sel==='B'?opts[1] : sel==='C'?opts[2] : '';
+      const inner = selText
+        ? `<span class="p4-gap-val">${esc(selText)}</span>`
         : `<span class="p4-gap-num">${qNum}</span>`;
       const isBm = bookmarks.has(qNum);
       const gapHtml = `<span class="p4-gap${isBm?' bookmarked':''}" id="p4-gap-${qNum}">
         <span class="p4-gap-input" id="p4-val-${qNum}" onclick="openDropdown(${qNum},event)">${inner}</span>
         <div class="p4-dropdown" id="p4-dd-${qNum}">
           <button class="p4-clear-btn" onclick="clearP4(${qNum},event)" title="Clear">✕</button>
-          <button class="p4-opt-btn${sel===opts[0]?' active-sel':''}" onclick="selectP4(${qNum},'${esc(opts[0])}',event)">${esc(opts[0])}</button>
-          <button class="p4-opt-btn${sel===opts[1]?' active-sel':''}" onclick="selectP4(${qNum},'${esc(opts[1])}',event)">${esc(opts[1])}</button>
-          <button class="p4-opt-btn${sel===opts[2]?' active-sel':''}" onclick="selectP4(${qNum},'${esc(opts[2])}',event)">${esc(opts[2])}</button>
+          <button class="p4-opt-btn${sel==='A'?' active-sel':''}" onclick="selectP4(${qNum},'A','${esc(opts[0])}',event)">${esc(opts[0])}</button>
+          <button class="p4-opt-btn${sel==='B'?' active-sel':''}" onclick="selectP4(${qNum},'B','${esc(opts[1])}',event)">${esc(opts[1])}</button>
+          <button class="p4-opt-btn${sel==='C'?' active-sel':''}" onclick="selectP4(${qNum},'C','${esc(opts[2])}',event)">${esc(opts[2])}</button>
           <button class="p4-bm-btn${isBm?' active-sel':''}" onclick="p4ToggleBm(${qNum},event)" title="Bookmark">
             <svg viewBox="0 0 24 24" width="14" height="17" fill="${isBm?'#fff':'none'}" stroke="#fff" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
           </button>
@@ -1623,11 +1624,11 @@ function toggleBookmark(qNum) {
   updateFooterPills();
 }
 
-function selectP4(qNum, val, e) {
+function selectP4(qNum, letter, text, e) {
   e.stopPropagation();
-  answers[qNum] = val;
+  answers[qNum] = letter;  // save A/B/C
   const el = document.getElementById(`p4-val-${qNum}`);
-  if (el) el.innerHTML = `<span class="p4-gap-val">${esc(val)}</span>`;
+  if (el) el.innerHTML = `<span class="p4-gap-val">${esc(text)}</span>`;  // display text
   closeAllDropdowns();
   updateFooterPills();
 }
@@ -2130,14 +2131,14 @@ function generatePDF(type) {
       rows += `<tr><td colspan="2" class="part-header">${label}</td></tr>`;
       qs.forEach(q => {
         const ans = answers[q];
-        const bm = bookmarks.has(q) ? ' 🔖' : '';
+        const bm = '';
         // For writing parts (6,7): preserve line breaks as <br>
         const isPara = (+part === 6 || +part === 7);
         const displayAns = ans
           ? (isPara ? ans.replace(/\n/g, '<br>') : esc(String(ans)))
           : '—';
         rows += `<tr>
-          <td class="qnum">${q}${bm}</td>
+          <td class="qnum">${q}</td>
           <td class="qans ${ans?'answered':'blank'}" style="${isPara?'white-space:pre-wrap;line-height:1.6':''}">${displayAns}</td>
         </tr>`;
       });

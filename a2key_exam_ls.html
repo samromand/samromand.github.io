@@ -1585,7 +1585,7 @@ function buildP2() {
 }
 
 // Allowed: a-z A-Z 0-9 space . : - / ' # £ $ % + ( ) & am/pm etc.
-const LS2_ALLOWED = /^[a-zA-Z0-9 .\-:/'#£$%+()\&]$/;
+const LS2_ALLOWED = /^[a-zA-Z0-9.\-:/'#£$%+()\&]$/;  // no space
 function ls2KeyFilter(e) {
   if (e.key.length > 1) return true;   // control keys (backspace, arrows, etc.)
   if (e.ctrlKey || e.metaKey) return true;
@@ -1595,7 +1595,7 @@ function ls2KeyFilter(e) {
 }
 function answerLS2(qNum, val) {
   // Strip any chars that slipped through (e.g. paste)
-  const clean = val.replace(/[^a-zA-Z0-9 .\-:/'#£$%+()\&]/g, '');
+  const clean = val.replace(/[^a-zA-Z0-9.\-:/'#£$%+()\&]/g, '');  // no space
   if (clean !== val) {
     const inp = document.getElementById(`ls2-inp-${qNum}`);
     if (inp) { const pos = inp.selectionStart - (val.length - clean.length); inp.value = clean; inp.setSelectionRange(Math.max(0,pos), Math.max(0,pos)); }

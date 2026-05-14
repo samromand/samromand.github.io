@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examiner Review — Cambridge Assessment English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#00686E;--teal-dark:#004F54;--teal-light:#E6F4F5;--teal-btn:#007B82;
+  --text:#1A1A1A;--muted:#555;--border:#D0D0D0;--bg:#fff;--bg-panel:#F8F8F8;--bg-nav:#F2F2F2;
+  --header-h:56px;--serif:'Source Serif 4',Georgia,serif;--sans:'Noto Sans',system-ui,sans-serif;
+  --amber:#E05C00;--amber-light:#FFF3E8;
+}
+html,body{min-height:100%;font-family:var(--sans);font-size:15px;color:var(--text);background:#F0F0F0}
+/* HEADER */
+#header{height:var(--header-h);background:#fff;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:300}
+.cam-shield{width:38px;height:44px;flex-shrink:0;
+  background:linear-gradient(180deg,#C00 50%,#FFD700 50%);
+  border-radius:2px 2px 50% 50%;position:relative;overflow:hidden}
+.cam-shield::after{content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:var(--text)}
+.cam-logo-text .bot{font-size:11px;color:var(--muted)}
+.header-sep{width:1px;height:28px;background:var(--border);flex-shrink:0}
+#header-title{font-size:14px;font-weight:600;color:var(--text)}
+/* MAIN */
+#main{margin-top:var(--header-h);min-height:calc(100vh - var(--header-h));
+  display:flex;justify-content:center;padding:36px 20px 80px}
+.wrap{width:100%;max-width:680px}
+/* PAGE HEADER */
+.page-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.page-eyebrow::after{content:'';flex:1;height:1px;background:var(--border)}
+.page-title{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--text);margin-bottom:6px}
+.page-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:28px}
+/* CARD */
+.card{background:#fff;border:1px solid var(--border);border-radius:4px;
+  padding:24px 28px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:3px;height:16px;background:var(--teal);border-radius:1px;display:inline-block}
+/* CANDIDATE LIST */
+.cand-list{display:flex;flex-direction:column;gap:0}
+.cand-row{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;
+  transition:background .1s;border-radius:2px}
+.cand-row:last-child{border-bottom:none}
+.cand-row:hover{background:var(--bg-panel)}
+.cand-row.selected{background:#E6F4F5;border-left:3px solid var(--teal);padding-left:11px}
+.cand-id{font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:var(--teal-dark)}
+.cand-status{font-size:12px;font-weight:600;padding:3px 10px;border-radius:2px}
+.status-ready{background:#FFF3E8;color:#7A3800;border:1px solid #F5C080}
+.status-partial{background:#FFF8E8;color:#7A5800;border:1px solid #E8C840}
+.status-done{background:var(--teal-light);color:var(--teal-dark);border:1px solid #A0CED0}
+.status-published{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
+/* SCORING PANEL */
+#scoring-panel{display:none}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.panel-header .cand-badge{
+  font-family:'Courier New',monospace;font-size:16px;font-weight:700;
+  color:var(--teal-dark);background:var(--teal-light);padding:4px 14px;border-radius:2px;letter-spacing:.1em}
+.back-btn{background:none;border:1px solid var(--border);border-radius:3px;
+  padding:5px 14px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.back-btn:hover{background:var(--bg-panel);color:var(--text)}
+/* CRITERION CARD */
+.crit-card{background:#fff;border:1px solid var(--border);border-radius:4px;padding:24px 28px;margin-bottom:12px}
+.crit-label{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.crit-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+/* SCORE SLIDER */
+.score-row{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.score-chips{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.chip{
+  min-width:44px;height:36px;border:1.5px solid var(--border);border-radius:3px;
+  background:#fff;font-family:'Noto Sans',sans-serif;font-size:13px;font-weight:700;
+  color:var(--text);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center}
+.chip:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-light)}
+.chip.selected{background:var(--teal);border-color:var(--teal);color:#fff!important}
+.chip:not(.selected){color:var(--text)}
+/* CONFIRM BUTTON */
+.btn-confirm{
+  width:100%;height:44px;background:var(--teal-btn);color:#fff;
+  border:none;border-radius:3px;font-family:var(--sans);font-size:14px;font-weight:700;
+  cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-confirm:hover{background:var(--teal-dark)}
+.btn-confirm:disabled{background:#9DBFC2;cursor:not-allowed}
+.btn-confirm svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5}
+/* PRIMARY BUTTON */
+.btn-primary{
+  width:100%;height:44px;background:var(--teal-btn);color:#fff;
+  border:none;border-radius:3px;font-family:var(--sans);font-size:14px;font-weight:700;
+  cursor:pointer;transition:background .15s;margin-top:4px}
+.btn-primary:hover{background:var(--teal-dark)}
+.btn-action{
+  width:100%;height:48px;background:var(--teal-dark);color:#fff;
+  border:none;border-radius:3px;font-family:var(--sans);font-size:15px;font-weight:700;
+  cursor:pointer;transition:background .15s;margin-top:8px}
+.btn-action:hover{background:#003A3E}
+.btn-action:disabled{background:#9DBFC2;cursor:not-allowed}
+/* STATUS MESSAGE */
+.status-banner{
+  border-radius:3px;padding:12px 16px;margin-bottom:12px;
+  font-size:13px;line-height:1.5;display:flex;align-items:center;gap:10px}
+.banner-ok{background:var(--teal-light);border:1px solid #A0CED0;color:var(--teal-dark)}
+.banner-warn{background:var(--amber-light);border:1px solid #F5C080;color:#7A3800}
+.banner-err{background:#FEE2E2;border:1px solid #FCA5A5;color:#7F1D1D}
+.banner-info{background:#F0F9F9;border:1px solid var(--border);color:var(--muted)}
+.status-banner svg{width:18px;height:18px;flex-shrink:0;fill:none;stroke-width:2}
+.banner-ok svg{stroke:var(--teal)}
+.banner-warn svg{stroke:#E05C00}
+.banner-err svg{stroke:#DC2626}
+.banner-info svg{stroke:var(--muted)}
+/* MANUAL ENTRY */
+.manual-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.manual-row label{font-size:13px;font-weight:600;color:var(--muted);width:80px;flex-shrink:0}
+.manual-row input{
+  flex:1;height:38px;border:1px solid var(--border);border-radius:3px;
+  padding:0 12px;font-family:'Courier New',monospace;font-size:14px;color:var(--text);
+  background:#fff;outline:none}
+.manual-row input:focus{border-color:var(--teal);box-shadow:0 0 0 2px rgba(0,104,110,.1)}
+/* PROGRESS STEPPER */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:24px}
+.step{
+  display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  color:var(--muted);white-space:nowrap}
+.step.active{color:var(--teal)}
+.step.done{color:var(--teal)}
+.step-num{
+  width:22px;height:22px;border-radius:50%;border:2px solid currentColor;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step.done .step-num{background:var(--teal);border-color:var(--teal);color:#fff}
+.step.active .step-num{border-color:var(--teal);color:var(--teal)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 6px;min-width:8px}
+.step-line.done{background:var(--teal)}
+/* RESULTS TABLE */
+.res-table{width:100%;border-collapse:collapse;margin-top:8px}
+.res-table th{
+  background:var(--teal);color:#fff;padding:8px 12px;
+  font-size:11px;font-weight:700;text-align:left;letter-spacing:.05em;text-transform:uppercase}
+.res-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:14px}
+.res-table tr:last-child td{border-bottom:none}
+.res-table td.num{font-family:'Courier New',monospace;font-weight:700;font-size:15px;text-align:center}
+.res-table td.grade{text-align:center}
+.grade-badge{
+  display:inline-block;padding:3px 12px;border-radius:2px;font-size:12px;font-weight:700}
+.grade-b1a{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
+.grade-a2b{background:#E3F2FD;color:#0D47A1;border:1px solid #90CAF9}
+.grade-a2c{background:var(--teal-light);color:var(--teal-dark);border:1px solid #A0CED0}
+.grade-a1{background:#FFF3E8;color:#7A3800;border:1px solid #F5C080}
+.grade-none{background:var(--bg-panel);color:var(--muted);border:1px solid var(--border)}
+.final-score-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;background:var(--teal-dark);border-radius:3px;margin-top:12px;color:#fff}
+.final-score-label{font-size:14px;font-weight:600;opacity:.85}
+.final-score-val{font-family:'Courier New',monospace;font-size:28px;font-weight:700}
+.final-grade-row{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  padding:12px 20px;background:var(--teal-light);border-radius:3px;margin-top:6px;
+  border:1px solid #A0CED0}
+.final-grade-label{font-size:13px;color:var(--teal-dark);font-weight:600}
+.final-grade-val{font-size:20px;font-weight:700;color:var(--teal-dark)}
+/* SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0}
+.spinner-dark{border-color:rgba(0,104,110,.2);border-top-color:var(--teal)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.divider{height:1px;background:var(--border);margin:16px 0}
+</style>
+
+<script>
+// ── CONFIG ──
+var ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
+var TESTS_BIN   = '6a022b31c0954111d80b71d2';
+var MASTER_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+var API         = 'https://api.jsonbin.io/v3/b';
+
+// ── SCORE CONVERSION TABLES ──
+// Reading: raw 0-30 → scale
+var TABLE_R = {30:150,29:145,28:140,27:138,26:135,25:133,24:130,23:128,22:125,21:123,
+  20:120,19:117,18:114,17:111,16:109,15:106,14:103,13:100,12:97,11:94,10:91,
+  9:88,8:85,7:82,6:0,5:0,4:0,3:0,2:0,1:0,0:0};
+// Writing: raw 0-30 → scale
+var TABLE_W = {30:150,29:148,28:145,27:143,26:140,25:138,24:135,23:133,22:130,21:128,
+  20:125,19:123,18:120,17:117,16:113,15:110,14:107,13:103,12:100,11:96,10:91,
+  9:87,8:82,7:0,6:0,5:0,4:0,3:0,2:0,1:0,0:0};
+// Listening: raw 0-25 → scale
+var TABLE_L = {25:150,24:145,23:140,22:137,21:133,20:130,19:127,18:123,17:120,
+  16:117,15:113,14:110,13:107,12:103,11:100,10:96,9:93,8:89,7:86,6:82,
+  5:0,4:0,3:0,2:0,1:0,0:0};
+// Speaking: raw 0-45 step 0.5 → scale (lookup by raw*2 index)
+var TABLE_SP_RAW = [0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,
+  10,10.5,11,11.5,12,12.5,13,13.5,14,14.5,15,15.5,16,16.5,17,17.5,18,18.5,19,19.5,
+  20,20.5,21,21.5,22,22.5,23,23.5,24,24.5,25,25.5,26,26.5,27,27.5,28,28.5,29,29.5,
+  30,30.5,31,31.5,32,32.5,33,33.5,34,34.5,35,35.5,36,36.5,37,37.5,38,38.5,39,39.5,
+  40,40.5,41,41.5,42,42.5,43,43.5,44,44.5,45];
+var TABLE_SP_SCALE = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,82,83,84,85,87,88,89,90,91,92,93,94,96,97,98,99,100,101,102,103,104,106,107,108,109,110,111,112,113,114,116,117,118,119,120,121,121,122,123,124,124,125,126,126,127,128,129,129,130,131,131,132,133,134,134,135,136,136,137,138,139,139,140,141,143,144,145,146,148,149,150];
+
+function scaleSpeaking(raw){
+  var idx = Math.round(raw * 2);
+  if(idx < 0 || idx >= TABLE_SP_SCALE.length) return 0;
+  return TABLE_SP_SCALE[idx];
+}
+function scaleReading(raw){ return TABLE_R[raw] !== undefined ? TABLE_R[raw] : 0; }
+function scaleWriting(raw){ return TABLE_W[raw] !== undefined ? TABLE_W[raw] : 0; }
+function scaleListening(raw){ return TABLE_L[raw] !== undefined ? TABLE_L[raw] : 0; }
+
+function gradeFromScale(scale){
+  if(scale >= 140) return {cefr:'B1', grade:'A', result:'Pass with Distinction'};
+  if(scale >= 133) return {cefr:'A2', grade:'B', result:'Pass with Merit'};
+  if(scale >= 120) return {cefr:'A2', grade:'C', result:'Pass'};
+  if(scale >= 100) return {cefr:'A1', grade:'-', result:'Level A1'};
+  if(scale >= 82)  return {cefr:'-',  grade:'-', result:'Participation'};
+  return               {cefr:'-',  grade:'-', result:'Participation'};
+}
+function overallGrade(avgScale){
+  if(avgScale >= 140) return {level:'B1', grade:'A', pass:true,  result:'Pass with Distinction'};
+  if(avgScale >= 133) return {level:'A2', grade:'B', pass:true,  result:'Pass with Merit'};
+  if(avgScale >= 120) return {level:'A2', grade:'C', pass:true,  result:'Pass'};
+  if(avgScale >= 100) return {level:'A1', grade:'-', pass:false, result:'Level A1'};
+  if(avgScale >= 82)  return {level:'-',  grade:'-', pass:false, result:'Participation'};
+  return                     {level:'-',  grade:'-', pass:false, result:'Participation'};
+}
+
+// ── SPEAKING CRITERIA ──
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var SP_CRITERIA = [
+  {id:'ga',  label:'Global Achievement',       role:'Interlocutor', half:true, max:5},
+  {id:'gv',  label:'Grammar and Vocabulary',   role:'Assessor',     half:true, max:5},
+  {id:'pr',  label:'Pronunciation',            role:'Assessor',     half:true, max:5},
+  {id:'ic',  label:'Interactive Communication',role:'Assessor',     half:true, max:5}
+];
+// Speaking raw = GA×3 + GV×2 + PR×2 + IC×2
+function spRawScore(scores){
+  return scores.ga*3 + scores.gv*2 + scores.pr*2 + scores.ic*2;
+}
+
+// ── WRITING CRITERIA ──
+var WR_CRITERIA = [
+  {id:'c', label:'Content', bands:[
+    {n:5, d:'All content is relevant. Target reader is fully informed.'},
+    {n:4, d:'Almost all content is relevant. Target reader informed, with only minor gaps.'},
+    {n:3, d:'Minor irrelevances or omissions may be present. Target reader on the whole informed.'},
+    {n:2, d:'Some content irrelevant or missing. Target reader only partly informed; effort required to understand the message.'},
+    {n:1, d:'Irrelevances and misinterpretation of task may be present. Target reader minimally informed.'}
+  ]},
+  {id:'o', label:'Organisation', bands:[
+    {n:5, d:'Text is well-connected using basic high-frequency linking words. Ideas are clearly ordered and easy to follow.'},
+    {n:4, d:'Text is mostly connected. Basic linking words used correctly, though variety is limited.'},
+    {n:3, d:'Text is connected using basic linking words, though organisation may be inconsistent in places.'},
+    {n:2, d:'Text shows limited connection between ideas. Linking words few or used incorrectly; reader must make some effort to follow.'},
+    {n:1, d:'Text is poorly connected. Ideas are difficult to follow; little or no use of linking words.'}
+  ]},
+  {id:'l', label:'Language', bands:[
+    {n:5, d:'Everyday vocabulary generally appropriately used. Simple grammatical forms with good degree of control. Errors noticeable but meaning determinable.'},
+    {n:4, d:'Everyday vocabulary with reasonable appropriacy. Moderate grammatical control; errors present but rarely impede meaning.'},
+    {n:3, d:'Basic vocabulary reasonably appropriate. Some grammatical control. Errors may impede meaning at times.'},
+    {n:2, d:'Limited vocabulary, often repetitive or inappropriate. Weak grammatical control; errors frequently impede meaning.'},
+    {n:1, d:'Very limited range of words and phrases. Very little grammatical control; meaning often unclear.'}
+  ]}
+];
+// Writing raw per part = C+O+L (max 15), total Writing raw = P6+P7 (max 30)
+
+// ── CORRECT ANSWERS PLACEHOLDER ──
+// Loaded from tests bin per variant
+var _correctAnswers = {}; // {qNum: 'A'|text}
+var _candidateAnswers = {}; // {qNum: 'A'|text}
+
+// ── STATE ──
+var _store      = null;
+var _taskData   = null;
+var _candidates = [];
+var _current    = null; // candidate object
+var _phase      = 'list'; // list | speaking | writing6 | writing7 | reading | listening | calculate | done
+var _spScores   = {};
+var _wrP6       = {};
+var _wrP7       = {};
+var _spCritIdx  = 0;
+var _wrCritIdx  = 0;
+var _manualRW   = null; // null | 'reading' | 'listening'
+var _manualQIdx = 0;
+var _manualAnswers = {};
+
+// ── API ──
+async function apiFetch(url, opts){
+  var ctrl = new AbortController();
+  var t = setTimeout(function(){ ctrl.abort(); }, 14000);
+  try {
+    var res = await fetch(url, Object.assign({}, opts||{}, {signal:ctrl.signal}));
+    clearTimeout(t);
+    var text = await res.text();
+    var json; try{ json = JSON.parse(text); }catch(e){ throw new Error('Bad JSON: '+text.slice(0,80)); }
+    if(!res.ok) throw new Error('HTTP '+res.status+': '+(json.message||json.error||''));
+    return json;
+  } catch(e){ clearTimeout(t); if(e.name==='AbortError') throw new Error('Timeout.'); throw e; }
+}
+function getBin(id){ return apiFetch(API+'/'+id+'/latest',{headers:{'X-Master-Key':MASTER_KEY}}); }
+function putBin(id, data){ return apiFetch(API+'/'+id,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(data)}); }
+
+// ── LOAD ──
+async function loadCandidates(){
+  showMsg('loading','Loading candidates…');
+  try {
+    var raw = await getBin(ANSWERS_BIN);
+    _store = (raw.record||raw);
+    if(!Array.isArray(_store.candidates)) _store.candidates = [];
+    // Filter: only candidates who completed all 4 blocks (or at minimum rw+listening, ie have progress)
+    _candidates = _store.candidates.filter(function(c){
+      var p = c.progress||[];
+      return p.includes('rw') && p.includes('listening');
+    });
+    hideMsg();
+    renderList();
+  } catch(e){
+    showMsg('error','Could not load: '+e.message);
+  }
+}
+
+function renderList(){
+  _phase = 'list';
+  document.getElementById('scoring-panel').style.display = 'none';
+  document.getElementById('list-panel').style.display = 'block';
+  var list = document.getElementById('cand-list');
+  if(_candidates.length === 0){
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:14px">No candidates have completed the exam yet.</div>';
+    return;
+  }
+  list.innerHTML = _candidates.map(function(c){
+    var statusClass, statusLabel;
+    var rev = c.review || {};
+    if(rev.published){
+      statusClass = 'status-published'; statusLabel = 'Published';
+    } else if(rev.calculatedAt){
+      statusClass = 'status-done'; statusLabel = 'Calculated';
+    } else if(rev.spDone || rev.wrP6Done || rev.wrP7Done){
+      statusClass = 'status-partial'; statusLabel = 'In progress';
+    } else {
+      statusClass = 'status-ready'; statusLabel = 'Ready to review';
+    }
+    return '<div class="cand-row" onclick="selectCandidate(\''+c.candidateId+'\')">'
+      +'<span class="cand-id">'+c.candidateId+'</span>'
+      +'<span class="cand-status '+statusClass+'">'+statusLabel+'</span>'
+      +'</div>';
+  }).join('');
+}
+
+function selectCandidate(id){
+  _current = _candidates.find(function(c){ return c.candidateId === id; });
+  if(!_current) return;
+  document.getElementById('list-panel').style.display = 'none';
+  document.getElementById('scoring-panel').style.display = 'block';
+  document.getElementById('panel-cand-id').textContent = _current.candidateId;
+  var varEl = document.getElementById('panel-variant');
+  if(varEl) varEl.textContent = 'Variant: '+(_current.variantId||_current.variantKey||'—');
+
+  // Pre-load task data for writing criteria display (non-blocking)
+  if(!_taskData){
+    getBin(TESTS_BIN).then(function(raw){
+      _taskData = (raw.record||raw).variants || (raw.record||raw);
+    }).catch(function(){});
+  }
+  _spScores = Object.assign({ga:null,gv:null,pr:null,ic:null}, (_current.review||{}).spScores||{});
+  _wrP6 = Object.assign({c:null,o:null,l:null}, (_current.review||{}).wrP6||{});
+  _wrP7 = Object.assign({c:null,o:null,l:null}, (_current.review||{}).wrP7||{});
+
+  var rev = _current.review || {};
+  if(rev.published){
+    showPublishedResults();
+  } else if(rev.calculatedAt){
+    showCalculateReady(true);
+  } else if(rev.spDone && rev.wrP6Done && rev.wrP7Done){
+    startReadingCheck();
+  } else if(rev.spDone && rev.wrP6Done){
+    _wrCritIdx = 0;
+    showWritingCrit(7, 0);
+  } else if(rev.spDone){
+    _wrCritIdx = 0;
+    showWritingCrit(6, 0);
+  } else {
+    _spCritIdx = 0;
+    showSpCrit(0);
+  }
+}
+
+// ── SPEAKING ──
+function showSpCrit(idx){
+  _phase = 'speaking';
+  _spCritIdx = idx;
+  var crit = SP_CRITERIA[idx];
+  var content = document.getElementById('scoring-content');
+  updateStepper(0);
+  var chips = '';
+  for(var v = 0; v <= crit.max; v += (crit.half ? 0.5 : 1)){
+    var isInt = (v === Math.floor(v));
+    var chipClass = 'chip'+(isInt?' int':' half');
+    var cur = _spScores[crit.id];
+    if(cur === v) chipClass += ' selected';
+    chips += '<div class="'+chipClass+'" onclick="selectSpScore(\''+crit.id+'\','+v+','+idx+')">'+v+'</div>';
+  }
+  content.innerHTML =
+    '<div class="card-title">Speaking — '+SP_CRITERIA.map(function(c,i){ return '<span style="opacity:'+(i===idx?1:.35)+'">'+c.label+'</span>'; }).join(' › ')+'</div>'
+    +'<div class="crit-card">'
+      +'<div class="crit-label">'+crit.label+'</div>'
+      +'<div class="crit-desc" style="color:var(--muted);font-size:12px;margin-bottom:14px">'+crit.role+' · 0–5 (half marks permitted)</div>'
+      +'<div class="score-chips">'+chips+'</div>'
+    +'</div>'
+    +'<button class="btn-confirm" id="btn-crit-confirm" onclick="confirmSpCrit('+idx+')" '
+      +(_spScores[crit.id]===null?'disabled':'')+' style="margin-top:4px">'
+      +'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Confirm score'
+    +'</button>';
+}
+
+function selectSpScore(id, val, idx){
+  _spScores[id] = val;
+  document.querySelectorAll('.score-chips .chip').forEach(function(el){
+    el.classList.remove('selected');
+    if(parseFloat(el.textContent)===val) el.classList.add('selected');
+  });
+  document.getElementById('btn-crit-confirm').disabled = false;
+}
+
+function confirmSpCrit(idx){
+  if(idx < SP_CRITERIA.length - 1){
+    showSpCrit(idx + 1);
+  } else {
+    // All speaking done
+    saveSpScores();
+  }
+}
+
+async function saveSpScores(){
+  showLoading('Saving speaking scores…');
+  try {
+    if(!_current.review) _current.review = {};
+    _current.review.spScores = _spScores;
+    _current.review.spDone   = true;
+    await saveCandidate();
+    _wrCritIdx = 0;
+    showWritingCrit(6, 0);
+  } catch(e){ showLoading(null); alert('Save failed: '+e.message); }
+}
+
+// ── WRITING ──
+function showWritingCrit(part, idx){
+  _phase = 'writing'+part;
+  _wrCritIdx = idx;
+  var crit = WR_CRITERIA[idx];
+  var scores = part===6 ? _wrP6 : _wrP7;
+  updateStepper(1);
+
+  // Chips 0-5
+  var chips = '';
+  for(var v=0; v<=5; v++){
+    var cls = 'chip int'+(scores[crit.id]===v?' selected':'');
+    chips += '<div class="'+cls+'" onclick="selectWrScore('+part+",'"+crit.id+"',"+v+','+idx+')">'+v+'</div>';
+  }
+
+  var allCrits = WR_CRITERIA.map(function(c,i){
+    return '<span style="opacity:'+(i===idx?1:.35)+'">'+c.label+'</span>';
+  }).join(' › ');
+
+  // ── Task block ──
+  var taskBlock = '';
+  var varKey = _current.variantKey || _current.variantId;
+  if(_taskData && _taskData[varKey]){
+    var vd = _taskData[varKey];
+    if(part===6 && vd.rw6){
+      var t = vd.rw6;
+      var bullets = [t.bullet1,t.bullet2,t.bullet3].filter(Boolean).map(function(b){
+        return '<li style="margin-left:18px;margin-bottom:3px">'+esc(b)+'</li>';
+      }).join('');
+      taskBlock = '<div style="background:#F0F9F9;border:1px solid #A0CED0;border-radius:3px;padding:12px 14px;margin-bottom:12px">'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#00686E;margin-bottom:8px">Task — Part 6</div>'
+        +(t.recipient?'<div style="font-size:13px;margin-bottom:6px">Write an email to <strong>'+esc(t.recipient)+'</strong></div>':'')
+        +(t.scenario?'<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;margin-bottom:8px">'+esc(t.scenario)+'</div>':'')
+        +(bullets?'<ul style="font-size:13px;list-style:disc;line-height:1.6">'+bullets+'</ul>':'')
+        +'</div>';
+    } else if(part===7 && vd.rw7){
+      var t7 = vd.rw7;
+      var imgs = [t7.img1,t7.img2,t7.img3].filter(Boolean).map(function(url){
+        return '<img src="'+url+'" style="height:90px;border-radius:3px;border:1px solid #ddd;object-fit:cover">';
+      }).join('');
+      taskBlock = '<div style="background:#F0F9F9;border:1px solid #A0CED0;border-radius:3px;padding:12px 14px;margin-bottom:12px">'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#00686E;margin-bottom:8px">Task — Part 7 (story pictures)</div>'
+        +(imgs?'<div style="display:flex;gap:10px;flex-wrap:wrap">'+imgs+'</div>':'')
+        +(t7.note?'<div style="font-size:13px;margin-top:8px">'+esc(t7.note)+'</div>':'')
+        +'</div>';
+    }
+  }
+
+  // ── Candidate answer ──
+  var qNum = part===6 ? 31 : 32;
+  var candText = (_current.rwAnswers && _current.rwAnswers[qNum]) ? _current.rwAnswers[qNum] : null;
+  var candBlock = candText
+    ? '<div style="background:#FFFBEA;border:1px solid #E8C840;border-radius:3px;padding:12px 14px;margin-bottom:12px">'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7A5800;margin-bottom:6px">Candidate answer</div>'
+        +'<div style="font-size:13px;line-height:1.7;white-space:pre-wrap;color:#1A1A1A">'+candText.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
+      +'</div>'
+    : '<div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:3px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#7F1D1D">No answer found for Part '+part+'</div>';
+
+  // ── Band descriptor table ──
+  var bandRows = crit.bands.map(function(b){
+    var sel = scores[crit.id]===b.n;
+    return '<tr style="'+(sel?'background:#E6F4F5':'')+'">'
+      +'<td style="width:32px;text-align:center;padding:6px 8px;border-bottom:1px solid #eee;font-weight:700;font-size:14px;color:'+(sel?'#004F54':'#00686E')+';vertical-align:top">'+b.n+'</td>'
+      +'<td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:12px;line-height:1.45;color:#222;vertical-align:top">'+b.d+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var content = document.getElementById('scoring-content');
+  content.innerHTML =
+    '<div class="card-title">Writing — Part '+part+' &nbsp;›&nbsp; '+allCrits+'</div>'
+    +taskBlock
+    +candBlock
+    +'<div class="crit-card">'
+      +'<div class="crit-label" style="margin-bottom:10px">'+crit.label+'</div>'
+      +'<table style="width:100%;border-collapse:collapse;margin-bottom:14px">'
+        +'<tbody>'+bandRows+'</tbody>'
+      +'</table>'
+      +'<div class="score-chips">'+chips+'</div>'
+    +'</div>'
+    +'<button class="btn-confirm" id="btn-wr-confirm" onclick="confirmWrCrit('+part+','+idx+')" '
+      +(scores[crit.id]===null?'disabled':'')+' style="margin-top:4px">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>'
+      +' Confirm score'
+    +'</button>';
+}
+
+
+function selectWrScore(part, id, val, idx){
+  if(part===6) _wrP6[id]=val; else _wrP7[id]=val;
+  document.querySelectorAll('.score-chips .chip').forEach(function(el){
+    el.classList.remove('selected');
+    if(parseInt(el.textContent)===val) el.classList.add('selected');
+  });
+  document.getElementById('btn-wr-confirm').disabled = false;
+}
+
+async function confirmWrCrit(part, idx){
+  if(idx < WR_CRITERIA.length - 1){
+    showWritingCrit(part, idx+1);
+  } else if(part===6){
+    // P6 done → save and go P7
+    showLoading('Saving Part 6…');
+    try {
+      if(!_current.review) _current.review={};
+      _current.review.wrP6 = _wrP6;
+      _current.review.wrP6Done = true;
+      await saveCandidate();
+      _wrCritIdx = 0;
+      showWritingCrit(7, 0);
+    } catch(e){ showLoading(null); alert('Save failed: '+e.message); }
+  } else {
+    // P7 done → save and go reading check
+    showLoading('Saving Part 7…');
+    try {
+      if(!_current.review) _current.review={};
+      _current.review.wrP7 = _wrP7;
+      _current.review.wrP7Done = true;
+      await saveCandidate();
+      startReadingCheck();
+    } catch(e){ showLoading(null); alert('Save failed: '+e.message); }
+  }
+}
+
+// ── READING CHECK ──
+async function startReadingCheck(){
+  _phase = 'reading';
+  updateStepper(2);
+  showLoading('Checking Reading answers…');
+  // Load correct answers from tests bin
+  try {
+    var raw = await getBin(TESTS_BIN);
+    var tests = (raw.record||raw);
+    var varKey = _current.variantKey || _current.variantId;
+    var variant = null;
+    if(tests.variants) variant = tests.variants[varKey] || tests.variants[varKey.toUpperCase()] || tests.variants[varKey.toLowerCase()] || null;
+    if(!variant) variant = tests[varKey] || tests[varKey.toUpperCase()] || null;
+
+    var rwCA = {}; // q1-q30 correct answers for Reading (parts 1-5)
+    var lsCA = {}; // q1-q25 correct answers for Listening (parts 1-5)
+
+    if(variant){
+      // ── Reading: rw1-rw5 ──
+      // rw1: MCQ with questions[].correct
+      // rw2: MCQ with questions[].correct
+      // rw3: MCQ with questions[].correct
+      // rw4: dropdown with questions[].correct (or options[].correct)
+      // rw5: gap-fill with rows[].answer or answers[]
+      // rw1-rw3: MCQ with questions[].correct
+      // rw4: MCQ cloze with gaps[].correct (letter A/B/C)
+      // rw5: open cloze with answers[].answer + optional .also alternative
+      var rwQ = 1;
+
+      // rw1: array directly (each element is a question with .correct)
+      (function(){
+        var p = variant['rw1'];
+        if(!p) return;
+        var qs = Array.isArray(p) ? p : (p.questions || p.items || []);
+        qs.forEach(function(q){
+          rwCA[rwQ++] = String(q.correct || q.answer || q.correctAnswer || '').trim();
+        });
+      })();
+
+      // rw2: {persons:[], questions:[]} — use questions[]
+      // rw3: {title, questions:[]} — use questions[]
+      ['rw2','rw3'].forEach(function(key){
+        var p = variant[key];
+        if(!p) return;
+        var qs = p.questions || p.items || [];
+        qs.forEach(function(q){
+          rwCA[rwQ++] = String(q.correct || q.answer || q.correctAnswer || '').trim();
+        });
+      });
+
+      // rw4: {gaps:[]} — gaps[].correct is letter A/B/C
+      (function(){
+        var p = variant['rw4'];
+        if(!p) return;
+        var gaps = p.gaps || p.questions || [];
+        gaps.forEach(function(g){
+          rwCA[rwQ++] = String(g.correct || g.answer || '').trim();
+        });
+      })();
+
+      // rw5: {answers:[]} — answers[].answer + optional .also
+      (function(){
+        var p = variant['rw5'];
+        if(!p) return;
+        var answers = p.answers || p.rows || p.gaps || [];
+        answers.forEach(function(a){
+          var primary = typeof a === 'string' ? a : String(a.answer || a.correct || '').trim();
+          var also    = (typeof a === 'object' && a.also) ? String(a.also).trim() : '';
+          rwCA[rwQ] = primary;
+          if(also) rwCA[rwQ] = primary + '|' + also;
+          rwQ++;
+        });
+      })();
+
+      // ── Listening ──
+      var lsQ = 1;
+      // ls1: Q1-5, MCQ questions[].correct
+      (function(){ var p=variant['ls1']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+      // ls2: Q6-10, rows[].answer + optional .also
+      (function(){ var p=variant['ls2']; if(!p) return; (p.rows||[]).forEach(function(r){ var pri=String(r.answer||r.correct||'').trim(); var also=(r.also||'').trim(); lsCA[lsQ]=pri+(also?'|'+also:''); lsQ++; }); })();
+      // ls3: Q11-15, MCQ questions[].correct
+      (function(){ var p=variant['ls3']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+      // ls4: Q16-20, MCQ questions[].correct
+      (function(){ var p=variant['ls4']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+      // ls5: Q21-25, answers[] — NO example, use all 6 elements as-is (but only 5 = Q21-25... wait: names has 6 = Q21-26? No — exam has 5 Qs)
+      // Actually ls5 has 6 names but exam questions are 5 (Q21-25), answers has 6 items = one per name
+      // The exam page saves Q21-25 as the 5 matching answers. answers[] has 6 elements (one per name including example "Harriet")
+      // answers[0]=Harriet(example shown), answers[1..5]=Akos,Olga,Shane,Jenny,Tracy = Q21-25
+      (function(){ var p=variant['ls5']; if(!p) return; var ans=p.answers||[]; ans.slice(1).forEach(function(a){ lsCA[lsQ++]=String(a).trim(); }); })();
+    }
+
+    _correctAnswers.reading   = rwCA;
+    _correctAnswers.listening = lsCA;
+
+
+  } catch(e){ _correctAnswers.reading={}; _correctAnswers.listening={}; console.error('answer load:',e); }
+
+  var rwAnswers = _current.rwAnswers || {};
+  var hasAnswers = Object.keys(rwAnswers).length > 0;
+  showAnswerStatus('reading', hasAnswers, rwAnswers);
+}
+
+function showAnswerStatus(section, hasAnswers, answers){
+  var isRW = section==='reading';
+  var label = isRW ? 'Reading (Parts 1–5)' : 'Listening (Parts 1–5)';
+  var nextFn = isRW ? 'startListeningCheck' : 'showCalculateReady';
+  var content = document.getElementById('scoring-content');
+  updateStepper(isRW ? 2 : 3);
+  if(hasAnswers){
+    var qCount = Object.keys(answers).filter(function(k){
+      return isRW ? parseInt(k) <= 30 : parseInt(k) >= 100 || (parseInt(k)>30 && parseInt(k)<=55);
+    }).length;
+    // For RW questions are 1-30 (parts 1-5 = reading), for LS 1-25
+    var expected = isRW ? 30 : 25;
+    var found = isRW
+      ? Object.keys(answers).filter(function(k){ return parseInt(k)>=1 && parseInt(k)<=30; }).length
+      : Object.keys(answers).filter(function(k){ return parseInt(k)>=1 && parseInt(k)<=25; }).length;
+    var warnMsg = found < expected
+      ? '<div class="status-banner banner-warn" style="margin-top:8px"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>'+(expected-found)+' questions have no answer. They will count as incorrect.</span></div>'
+      : '';
+    content.innerHTML =
+      '<div class="card-title">'+label+' — Answer check</div>'
+      +'<div class="status-banner banner-ok">'
+        +'<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+        +'<span>'+found+' of '+expected+' answers found in the database.</span>'
+      +'</div>'
+      +warnMsg
+      +'<button class="btn-primary" onclick="'+nextFn+'()">Continue →</button>'
+      +'<button class="btn-primary" style="margin-top:6px;background:var(--bg-panel);color:var(--text);border:1px solid var(--border)" onclick="startManualEntry(\'' + section + '\')">Re-enter answers manually</button>';
+  } else {
+    content.innerHTML =
+      '<div class="card-title">'+label+' — Answer check</div>'
+      +'<div class="status-banner banner-err">'
+        +'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+        +'<span>No answers found in the database for this section. This may indicate a submission error.</span>'
+      +'</div>'
+      +'<button class="btn-primary" onclick="startManualEntry(\''+section+'\')">Enter answers manually →</button>';
+  }
+}
+
+// ── MANUAL ENTRY ──
+function startManualEntry(section){
+  _manualRW = section;
+  _manualQIdx = 0;
+  _manualAnswers = {};
+  showManualQ(section, 0);
+}
+
+function showManualQ(section, idx){
+  var isRW = section==='reading';
+  var total = isRW ? 30 : 25;
+  var qNum = idx + 1;
+  var label = isRW ? 'Reading' : 'Listening';
+  var content = document.getElementById('scoring-content');
+  content.innerHTML =
+    '<div class="card-title">'+label+' — Manual entry ('+qNum+' of '+total+')</div>'
+    +'<div class="crit-card">'
+      +'<div class="crit-label" style="margin-bottom:12px">Question '+qNum+'</div>'
+      +'<div class="manual-row">'
+        +'<label>Answer</label>'
+        +'<input type="text" id="manual-inp" placeholder="e.g. A or word" maxlength="40" '
+          +'value="'+((_manualAnswers[qNum]||''))+'" '
+          +'onkeydown="if(event.key===\'Enter\') confirmManualQ(\''+section+'\','+idx+')">'
+      +'</div>'
+    +'</div>'
+    +'<button class="btn-confirm" onclick="confirmManualQ(\''+section+'\','+idx+')">'
+      +'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> '
+      +(idx < total-1 ? 'Next question' : 'Finish')
+    +'</button>';
+  setTimeout(function(){ var el=document.getElementById('manual-inp'); if(el) el.focus(); }, 50);
+}
+
+function confirmManualQ(section, idx){
+  var inp = document.getElementById('manual-inp');
+  var val = inp ? inp.value.trim() : '';
+  var qNum = idx + 1;
+  _manualAnswers[qNum] = val;
+  var total = section==='reading' ? 30 : 25;
+  if(idx < total - 1){
+    showManualQ(section, idx+1);
+  } else {
+    // Save manual answers
+    if(section==='reading'){
+      _current.rwAnswers = Object.assign({}, _current.rwAnswers||{}, _manualAnswers);
+    } else {
+      _current.lsAnswers = Object.assign({}, _current.lsAnswers||{}, _manualAnswers);
+    }
+    saveCandidate().then(function(){
+      if(section==='reading') startListeningCheck();
+      else showCalculateReady(false);
+    }).catch(function(e){ alert('Save failed: '+e.message); });
+  }
+}
+
+// ── LISTENING CHECK ──
+async function startListeningCheck(){
+  _phase = 'listening';
+  updateStepper(3);
+  showLoading('Checking Listening answers…');
+  var lsAnswers = _current.lsAnswers || {};
+  var hasAnswers = Object.keys(lsAnswers).length > 0;
+  showAnswerStatus('listening', hasAnswers, lsAnswers);
+}
+
+// ── CALCULATE ──
+function showCalculateReady(alreadyCalc){
+  _phase = 'calculate';
+  updateStepper(4);
+  var content = document.getElementById('scoring-content');
+  var rev = _current.review || {};
+  content.innerHTML =
+    '<div class="card-title">Calculate scores</div>'
+    +(alreadyCalc
+      ? '<div class="status-banner banner-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Scores already calculated on '+new Date(rev.calculatedAt).toLocaleDateString()+'.</span></div>'
+      : '')
+    +'<button class="btn-action" id="btn-calc" onclick="calculateScores()">Calculate all scores</button>';
+}
+
+async function calculateScores(){
+  var btn = document.getElementById('btn-calc');
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Calculating…'; }
+
+  try {
+    var rev = _current.review || {};
+
+    // a) Speaking raw
+    var spRaw = spRawScore({
+      ga: rev.spScores.ga||0,
+      gv: rev.spScores.gv||0,
+      pr: rev.spScores.pr||0,
+      ic: rev.spScores.ic||0
+    });
+    var spScale = scaleSpeaking(spRaw);
+
+    // b) Writing raw
+    var p6raw = (rev.wrP6.c||0)+(rev.wrP6.o||0)+(rev.wrP6.l||0);
+    var p7raw = (rev.wrP7.c||0)+(rev.wrP7.o||0)+(rev.wrP7.l||0);
+    var wrRaw  = p6raw + p7raw;
+    var wrScale = scaleWriting(wrRaw);
+
+    // c) Always reload correct answers from tests bin (no cache)
+    _correctAnswers = {reading:{}, listening:{}};
+    {
+      try {
+        var testsRaw = await getBin(TESTS_BIN);
+        var tests = (testsRaw.record || testsRaw);
+        var varKey = _current.variantKey || _current.variantId;
+        var variant = null;
+        if(tests.variants) variant = tests.variants[varKey] || tests.variants[varKey.toUpperCase()] || tests.variants[varKey.toLowerCase()] || null;
+        if(!variant) variant = tests[varKey] || tests[varKey.toUpperCase()] || null;
+        if(variant) {
+          var rwCA = {}; var lsCA = {}; var rwQ = 1;
+          // rw1: array directly
+          (function(){ var p=variant['rw1']; if(!p) return; var qs=Array.isArray(p)?p:(p.questions||[]); qs.forEach(function(q){ rwCA[rwQ++]=String(q.correct||q.answer||'').trim(); }); })();
+          // rw2, rw3: questions[]
+          ['rw2','rw3'].forEach(function(key){ var p=variant[key]; if(!p) return; (p.questions||[]).forEach(function(q){ rwCA[rwQ++]=String(q.correct||q.answer||'').trim(); }); });
+          // rw4: gaps[].correct = letter
+          (function(){ var p=variant['rw4']; if(!p) return; (p.gaps||[]).forEach(function(g){ rwCA[rwQ++]=String(g.correct||g.answer||'').trim(); }); })();
+          // rw5: answers[].answer + .also
+          (function(){ var p=variant['rw5']; if(!p) return; (p.answers||[]).forEach(function(a){ var pri=typeof a==='string'?a:String(a.answer||'').trim(); var also=(typeof a==='object'&&a.also)?String(a.also).trim():''; rwCA[rwQ]=pri+(also?'|'+also:''); rwQ++; }); })();
+          var lsQ = 1;
+          // ls1: Q1-5
+          (function(){ var p=variant['ls1']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+          // ls2: Q6-10
+          (function(){ var p=variant['ls2']; if(!p) return; (p.rows||[]).forEach(function(r){ var pri=String(r.answer||r.correct||'').trim(); var also=(r.also||'').trim(); lsCA[lsQ]=pri+(also?'|'+also:''); lsQ++; }); })();
+          // ls3: Q11-15
+          (function(){ var p=variant['ls3']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+          // ls4: Q16-20
+          (function(){ var p=variant['ls4']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+          // ls5: Q21-25 (answers[0]=example Harriet, skip)
+          (function(){ var p=variant['ls5']; if(!p) return; (p.answers||[]).slice(1).forEach(function(a){ lsCA[lsQ++]=String(a).trim(); }); })();
+          _correctAnswers.reading = rwCA;
+          _correctAnswers.listening = lsCA;
+        }
+      } catch(e){ console.error('Failed to load correct answers:', e); }
+    }
+
+    // c) Reading: compare answers case-insensitively
+    var rwAnswers = _current.rwAnswers || {};
+    var correct = _correctAnswers.reading || {};
+    var rwRaw = 0;
+    for(var q=1; q<=30; q++){
+      var candVal = rwAnswers[q] !== undefined ? rwAnswers[q] : (rwAnswers[String(q)]||'');
+      var cand = String(candVal).trim().toUpperCase();
+      var corrRaw = String(correct[q] !== undefined ? correct[q] : (correct[String(q)]||'')).trim();
+      var corrAlts = corrRaw.toUpperCase().split('|').map(function(s){ return s.trim(); });
+      if(cand && corrRaw && corrAlts.indexOf(cand) !== -1) rwRaw++;
+    }
+    var rwScale = scaleReading(rwRaw);
+
+    // d) Listening — check both numeric and string keys
+    var lsAnswers = _current.lsAnswers || {};
+    var lsCorrect = _correctAnswers.listening || {};
+    var lsRaw = 0;
+    for(var q=1; q<=25; q++){
+      var cand = String(lsAnswers[q] !== undefined ? lsAnswers[q] : (lsAnswers[String(q)]||'')).trim().toUpperCase();
+      var corr = String(lsCorrect[q] !== undefined ? lsCorrect[q] : (lsCorrect[String(q)]||'')).trim().toUpperCase();
+      var match = (cand && corr && cand===corr);
+      if(match) lsRaw++;
+    }
+    var lsScale = scaleListening(lsRaw);
+
+    // e) Check for zero scale in any section → immediate fail
+    var anyZero = (spScale===0 || wrScale===0 || rwScale===0 || lsScale===0);
+
+    // f) Average (only if no zeros)
+    var avg = anyZero ? null : Math.round((spScale + wrScale + rwScale + lsScale) / 4);
+
+    // g) Overall grade
+    var overall = anyZero
+      ? {level:'-', grade:'-', pass:false, failReason:'One or more sections scored 0'}
+      : overallGrade(avg);
+
+    // Save
+    // Show interim debug on screen
+
+    rev.spRaw=spRaw; rev.spScale=spScale;
+    rev.wrRaw=wrRaw; rev.wrScale=wrScale;
+    rev.rwRaw=rwRaw; rev.rwScale=rwScale;
+    rev.lsRaw=lsRaw; rev.lsScale=lsScale;
+    rev.avgScale=anyZero ? null : avg;
+    rev.overall=overall;
+    rev.calculatedAt = new Date().toISOString();
+    _current.review = rev;
+
+    await saveCandidate();
+
+    showCalculateReady(true);
+    var content = document.getElementById('scoring-content');
+    content.innerHTML += '<button class="btn-action" style="margin-top:8px" onclick="publishResults()">Publish results</button>';
+
+  } catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='Retry'; }
+    alert('Calculation error: '+e.message);
+  }
+}
+
+// ── PUBLISH ──
+async function publishResults(){
+  showLoading('Publishing…');
+  try {
+    _current.review.published    = true;
+    _current.review.publishedAt  = new Date().toISOString();
+    await saveCandidate();
+    showPublishedResults();
+  } catch(e){ showLoading(null); alert('Publish failed: '+e.message); }
+}
+
+function showPublishedResults(){
+  updateStepper(5);
+  var rev = _current.review || {};
+  var parts = [
+    {label:'Speaking',  scale:rev.spScale, raw:rev.spRaw},
+    {label:'Writing',   scale:rev.wrScale, raw:rev.wrRaw},
+    {label:'Reading',   scale:rev.rwScale, raw:rev.rwRaw},
+    {label:'Listening', scale:rev.lsScale, raw:rev.lsRaw}
+  ];
+
+  function badgeCEFR(cefr){
+    if(cefr==='B1') return '<span class="grade-badge grade-b1a">B1</span>';
+    if(cefr==='A2') return '<span class="grade-badge grade-a2c">A2</span>';
+    if(cefr==='A1') return '<span class="grade-badge grade-a1">A1</span>';
+    return '<span class="grade-badge grade-none">—</span>';
+  }
+  function badgeGrade(grade){
+    if(grade==='A') return '<span class="grade-badge grade-b1a">A</span>';
+    if(grade==='B') return '<span class="grade-badge grade-a2b">B</span>';
+    if(grade==='C') return '<span class="grade-badge grade-a2c">C</span>';
+    return '<span class="grade-badge grade-none">—</span>';
+  }
+
+  var rows = parts.map(function(p){
+    if(p.scale === undefined || p.scale === null) return '';
+    var g = gradeFromScale(p.scale);
+    var zeroWarn = p.scale === 0 ? ' <span style="color:#DC2626;font-size:11px;font-weight:700">● 0</span>' : '';
+    return '<tr>'
+      +'<td>'+p.label+zeroWarn+'</td>'
+      +'<td class="num">'+p.scale+'</td>'
+      +'<td class="grade">'+badgeCEFR(g.cefr)+'</td>'
+      +'<td class="grade">'+badgeGrade(g.grade)+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var avg     = rev.avgScale;
+  var overall = rev.overall || {};
+  var avgDisplay = (avg !== null && avg !== undefined) ? avg : '—';
+
+  // Overall summary block at top
+  var overallResult, overallCEFR, overallGradeStr;
+  if(avg === null || avg === undefined){
+    overallResult = 'Not determined'; overallCEFR = '—'; overallGradeStr = '—';
+  } else {
+    var og = gradeFromScale(avg);
+    overallResult   = og.result;
+    overallCEFR     = og.cefr;
+    overallGradeStr = og.grade;
+  }
+
+  var resultColor = overallResult==='Pass with Distinction'?'#1B5E20'
+    :overallResult==='Pass with Merit'?'#0D47A1'
+    :overallResult==='Pass'?'#004F54'
+    :overallResult==='Level A1'?'#7A3800'
+    :'#555';
+
+  var variantInfo = _current.variantId || _current.variantKey || '—';
+
+  var content = document.getElementById('scoring-content');
+  content.innerHTML =
+    '<div class="card-title">Results — published</div>'
+
+    // Variant
+    +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:var(--muted)">'
+      +'Variant: <span style="font-family:Courier New,monospace;font-weight:700;color:var(--teal-dark);background:var(--teal-light);padding:2px 10px;border-radius:2px;letter-spacing:.08em">'+variantInfo+'</span>'
+    +'</div>'
+
+    // ── OVERALL SUMMARY ROW ──
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">'
+
+      +'<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:3px;padding:12px 14px">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px">Result</div>'
+        +'<div style="font-size:14px;font-weight:700;color:'+resultColor+'">'+overallResult+'</div>'
+      +'</div>'
+
+      +'<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:3px;padding:12px 14px">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px">Overall Score</div>'
+        +'<div style="font-size:22px;font-weight:700;color:var(--teal-dark);font-family:Courier New,monospace">'+avgDisplay+'</div>'
+      +'</div>'
+
+      +'<div style="background:var(--bg-panel);border:1px solid var(--border);border-radius:3px;padding:12px 14px">'
+        +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px">CEFR Level</div>'
+        +'<div style="font-size:18px;font-weight:700;color:var(--teal-dark)">'+overallCEFR
+          +(overallGradeStr!=='-'?' <span style="font-size:14px;color:var(--muted)">Grade '+overallGradeStr+'</span>':'')
+        +'</div>'
+      +'</div>'
+
+    +'</div>'
+
+    // ── PER-SKILL TABLE ──
+    +'<table class="res-table">'
+      +'<thead><tr>'
+        +'<th>Section</th>'
+        +'<th style="text-align:center">Scale score</th>'
+        +'<th style="text-align:center">CEFR</th>'
+        +'<th style="text-align:center">Grade</th>'
+      +'</tr></thead>'
+      +'<tbody>'+rows+'</tbody>'
+    +'</table>'
+
+    // ── ACTIONS ──
++'</div>';
+}
+
+
+
+
+
+// ── HELPERS ──
+async function saveCandidate(){
+  var idx = _store.candidates.findIndex(function(c){ return c.candidateId===_current.candidateId; });
+  if(idx!==-1) _store.candidates[idx] = _current;
+  await putBin(ANSWERS_BIN, _store);
+}
+
+function showLoading(msg){
+  var content = document.getElementById('scoring-content');
+  if(!msg){ content.innerHTML = ''; return; }
+  content.innerHTML = '<div style="display:flex;align-items:center;gap:12px;padding:24px 0;color:var(--muted);font-size:14px">'
+    +'<div class="spinner spinner-dark"></div><span>'+msg+'</span></div>';
+}
+
+function showMsg(type, msg){
+  var el = document.getElementById('msg-bar');
+  if(!el) return;
+  if(!msg){ el.style.display='none'; return; }
+  var cls = type==='error' ? 'banner-err' : 'banner-info';
+  el.className = 'status-banner '+cls;
+  el.style.display='flex';
+  el.innerHTML = '<span>'+msg+'</span>';
+}
+function hideMsg(){ showMsg('',''); }
+
+function updateStepper(active){
+  var steps = document.querySelectorAll('.step');
+  var lines = document.querySelectorAll('.step-line');
+  steps.forEach(function(s,i){
+    s.classList.toggle('active', i===active);
+    s.classList.toggle('done', i<active);
+    var num = s.querySelector('.step-num');
+    if(num){
+      if(i<active){ num.innerHTML='<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'; }
+      else{ num.textContent = i+1; }
+    }
+  });
+  lines.forEach(function(l,i){ l.classList.toggle('done', i<active); });
+}
+
+window.selectCandidate = selectCandidate;
+window.selectSpScore   = selectSpScore;
+window.confirmSpCrit   = confirmSpCrit;
+window.selectWrScore   = selectWrScore;
+window.confirmWrCrit   = confirmWrCrit;
+window.confirmManualQ  = confirmManualQ;
+window.startManualEntry = startManualEntry;
+window.startListeningCheck = startListeningCheck;
+window.showCalculateReady  = showCalculateReady;
+window.calculateScores = calculateScores;
+window.publishResults  = publishResults;
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('btn-back').addEventListener('click', function(){
+    renderList();
+  });
+  loadCandidates();
+});
+</script>
+</head>
+<body>
+
+<div id="header">
+  <div class="cam-logo">
+    <div class="cam-shield"></div>
+    <div class="cam-logo-text">
+      <div class="top">Cambridge Assessment</div>
+      <div class="bot">English</div>
+    </div>
+  </div>
+  <div class="header-sep"></div>
+  <div id="header-title">Examiner Review</div>
+</div>
+
+<div id="main">
+  <div class="wrap">
+
+    <div class="page-eyebrow">A2 Key for Schools</div>
+    <h1 class="page-title">Examiner review portal</h1>
+    <p class="page-sub">Candidates who have completed all exam sections appear below.</p>
+
+    <div class="status-banner banner-info hidden" id="msg-bar" style="margin-bottom:16px"></div>
+
+    <!-- CANDIDATE LIST -->
+    <div id="list-panel">
+      <div class="card" style="padding:0">
+        <div style="padding:16px 20px 12px;border-bottom:1px solid var(--border)">
+          <div class="card-title" style="margin:0">Candidates</div>
+        </div>
+        <div id="cand-list"></div>
+      </div>
+    </div>
+
+    <!-- SCORING PANEL -->
+    <div id="scoring-panel" style="display:none">
+      <div class="panel-header">
+        <button class="back-btn" id="btn-back">← Back to list</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">          <span class="cand-badge" id="panel-cand-id">——</span>          <span style="font-family:Courier New,monospace;font-size:11px;color:var(--muted)" id="panel-variant"></span>        </div>
+      </div>
+
+      <!-- STEPPER -->
+      <div class="stepper" style="margin-bottom:20px">
+        <div class="step active">
+          <div class="step-num">1</div>
+          <span>Speaking</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <span>Writing</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <span>Reading</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <span>Listening</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <span>Calculate</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <span>Results</span>
+        </div>
+      </div>
+
+      <div class="card" style="padding:22px 24px">
+        <div id="scoring-content"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
