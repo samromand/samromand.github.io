@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statement of Results — Cambridge Assessment English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans',Arial,sans-serif;font-size:13px;color:#111;background:#e8e8e8;padding:24px 16px 60px}
+
+/* ── SHEET ── */
+.sheet{
+  max-width:680px;margin:0 auto;
+  background:#fff;
+  box-shadow:0 4px 24px rgba(0,0,0,.18);
+}
+
+/* ── HEADER BAND ── */
+.sheet-header{
+  background:#fff;
+  border-bottom:4px solid #00686E;
+  padding:16px 24px 14px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;
+}
+.logo-block{display:flex;align-items:center;gap:10px}
+.shield{
+  width:44px;height:52px;flex-shrink:0;
+  background:linear-gradient(180deg,#C00000 50%,#FFD700 50%);
+  border-radius:2px 2px 50% 50%;
+  position:relative;overflow:hidden;
+}
+.shield::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 52'%3E%3Cpath d='M22 4 L40 12 L40 30 Q40 46 22 50 Q4 46 4 30 L4 12 Z' fill='none' stroke='rgba(255,255,255,.25)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
+.logo-text{line-height:1.25}
+.logo-text .l1{font-size:16px;font-weight:700;letter-spacing:.02em;color:#111}
+.logo-text .l2{font-size:12px;color:#444;margin-top:1px}
+.logo-text .l3{font-size:11px;color:#666}
+.ref-block{text-align:right;font-size:11px;color:#555;line-height:1.5}
+.ref-block strong{font-size:13px;font-weight:700;color:#111;display:block;margin-bottom:2px}
+
+/* ── BODY ── */
+.sheet-body{padding:20px 24px 0}
+.exam-name{font-size:22px;font-weight:700;color:#111;margin-bottom:2px;font-family:'Source Serif 4',Georgia,serif}
+.statement-label{font-size:13px;color:#555;margin-bottom:18px}
+
+/* candidate row */
+.info-grid{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:18px;align-items:start}
+.info-field{}
+.info-field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;display:block;margin-bottom:3px}
+.info-field .val{font-size:17px;font-weight:600;color:#111;background:#f5f5f5;padding:6px 10px;border-bottom:2px solid #bbb}
+.session-box{text-align:center;background:#f5f5f5;padding:8px 16px;border-bottom:2px solid #bbb;min-width:80px}
+.session-box label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;display:block;margin-bottom:4px}
+.session-box .val{font-size:14px;font-weight:700;color:#111;line-height:1.3}
+
+/* result summary row */
+.result-summary{
+  display:grid;grid-template-columns:auto auto auto;gap:0;
+  margin-bottom:24px;border-top:1px solid #ddd;
+}
+.rs-cell{padding:10px 16px 10px 0}
+.rs-cell label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;display:block;margin-bottom:6px}
+.rs-result{
+  display:inline-block;
+  background:#00686E;color:#fff;
+  font-size:14px;font-weight:700;
+  padding:5px 16px;
+  min-width:120px;text-align:center;
+}
+.rs-result.b1{background:#00686E}
+.rs-result.a2{background:#007B82}
+.rs-result.a1{background:#888}
+.rs-result.part{background:#aaa}
+.rs-score{font-size:26px;font-weight:700;color:#111}
+.rs-cefr{font-size:22px;font-weight:700;color:#111}
+
+/* ── CHART SECTION ── */
+.chart-section{padding:0 24px 28px}
+
+/* column headers */
+.chart-heads{
+  display:grid;
+  grid-template-columns:60px 60px 1fr 1fr 1fr 1fr;
+  gap:0;margin-bottom:6px;
+}
+.ch{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#555;text-align:center;padding:0 2px}
+.ch.left{text-align:left}
+
+/* chart body */
+.chart-body{
+  display:grid;
+  grid-template-columns:60px 60px 1fr 1fr 1fr 1fr;
+  gap:0;
+  align-items:stretch;
+  border-top:1px solid #ccc;
+}
+
+/* CEFR label column */
+.cefr-col{border-right:1px solid #ccc;padding-right:0}
+.cefr-row{
+  display:flex;align-items:flex-start;justify-content:flex-end;
+  padding-right:8px;
+}
+.cefr-lbl{font-size:12px;font-weight:700;color:#333}
+
+/* Scale column */
+.scale-col{border-right:2px solid #333;position:relative}
+.scale-tick{
+  display:flex;align-items:flex-start;justify-content:flex-end;
+  padding-right:5px;position:relative;
+}
+.scale-tick::after{
+  content:'';position:absolute;right:0;top:0;width:6px;height:1px;background:#333;
+}
+.scale-num{font-size:10px;color:#555;line-height:1;padding-top:0}
+
+/* band rows */
+.band-row{display:contents}
+.band-cell-cefr,.band-cell-scale{display:flex;align-items:flex-start}
+.band-marker{
+  border-top:1px dashed #bbb;
+  display:flex;align-items:flex-start;
+  padding-top:0;
+  position:relative;
+}
+.band-marker.solid{border-top:1px solid #999}
+.band-marker.thick{border-top:2px solid #555}
+
+/* skill bar columns */
+.skill-col{
+  display:flex;flex-direction:column;align-items:stretch;
+  padding:0 6px;
+  position:relative;
+}
+
+/* bar itself */
+.bar-wrap{
+  flex:1;display:flex;flex-direction:column;justify-content:flex-end;
+  padding-bottom:0;
+}
+.bar{
+  background:#00686E;
+  position:relative;
+  min-height:4px;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding-top:4px;
+}
+.bar-score{
+  font-size:11px;font-weight:700;color:#fff;
+  position:absolute;top:4px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;
+}
+.bar.zero{background:#ccc}
+.bar.b1-color{background:#00686E}
+.bar.a2b-color{background:#007B82}
+.bar.a2c-color{background:#00868C}
+.bar.a1-color{background:#888}
+.bar.part-color{background:#bbb}
+
+/* scale lines overlaid */
+.scale-line{
+  position:absolute;left:0;right:0;height:1px;background:rgba(0,0,0,.12);
+  pointer-events:none;
+}
+.scale-line.major{background:rgba(0,0,0,.25)}
+
+/* result certification labels */
+.cert-col{display:flex;flex-direction:column;justify-content:flex-end;padding:0 4px 0 8px;border-right:1px solid #ddd;min-width:60px}
+.cert-band{
+  font-size:10px;font-weight:700;color:#fff;text-align:center;
+  padding:2px 4px;margin-bottom:0;
+}
+.cert-band.dist{background:#00686E}
+.cert-band.merit{background:#007B82}
+.cert-band.pass{background:#00868C}
+.cert-band.level-a1{background:#888;color:#fff}
+.cert-empty{flex:1}
+
+/* band labels in cefr col */
+.cefr-band-lbl{font-size:10px;color:#777;padding-right:4px;text-align:right}
+
+/* bottom score labels */
+.skill-score-row{
+  display:grid;
+  grid-template-columns:60px 60px 1fr 1fr 1fr 1fr;
+  gap:0;margin-top:4px;
+}
+.skill-score-lbl{font-size:11px;font-weight:700;text-align:center;color:#111}
+
+/* ── FOOTER ── */
+.sheet-footer{
+  background:#f5f5f5;border-top:1px solid #ddd;
+  padding:10px 24px;font-size:10px;color:#888;line-height:1.5;
+}
+
+/* ── PRINT ── */
+.print-btn{display:block;margin:20px auto 0;padding:9px 28px;background:#00686E;color:#fff;border:none;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.print-btn:hover{background:#004F54}
+.no-print{}
+@media print{
+  body{background:#fff;padding:0}
+  .sheet{box-shadow:none;max-width:none}
+  .no-print{display:none!important}
+  @page{margin:10mm;size:A4}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+}
+
+/* ── LOADING / ERROR ── */
+#overlay{position:fixed;inset:0;background:#e8e8e8;display:flex;align-items:center;justify-content:center;z-index:999;font-family:'Noto Sans',sans-serif;font-size:15px;color:#555;gap:12px}
+.spin{width:20px;height:20px;border:3px solid #ccc;border-top-color:#00686E;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="overlay"><div class="spin"></div> Loading results…</div>
+
+<div class="sheet" id="sheet" style="display:none">
+
+  <!-- HEADER -->
+  <div class="sheet-header">
+    <div class="logo-block">
+      <div class="shield"></div>
+      <div class="logo-text">
+        <div class="l1">CAMBRIDGE ENGLISH</div>
+        <div class="l2">Language Assessment</div>
+        <div class="l3">Part of the University of Cambridge</div>
+      </div>
+    </div>
+    <div class="ref-block">
+      <strong id="ref-no">—</strong>
+      To be quoted on all<br>Correspondence
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="sheet-body">
+    <div class="exam-name">A2 Key for Schools</div>
+    <div class="statement-label">Statement of Results</div>
+
+    <div class="info-grid">
+      <div>
+        <div class="info-field">
+          <label>Candidate name</label>
+          <div class="val" id="cand-name">—</div>
+        </div>
+      </div>
+      <div class="session-box">
+        <label>Session</label>
+        <div class="val" id="session-val">—</div>
+      </div>
+    </div>
+
+    <div class="result-summary">
+      <div class="rs-cell">
+        <label>Result</label>
+        <div class="rs-result" id="rs-result">—</div>
+      </div>
+      <div class="rs-cell" style="padding-left:24px">
+        <label>Overall Score</label>
+        <div class="rs-score" id="rs-score">—</div>
+      </div>
+      <div class="rs-cell" style="padding-left:24px">
+        <label>CEFR Level</label>
+        <div class="rs-cefr" id="rs-cefr">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-section" id="chart-section">
+    <!-- built by JS -->
+  </div>
+
+  <!-- FOOTER -->
+  <div class="sheet-footer">
+    This Statement of Results is computer generated and does not require a signature. Results are reported on the Cambridge English Scale.
+    Candidate ID: <strong id="footer-cid">—</strong>
+  </div>
+
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">🖨 Print / Save as PDF</button>
+
+<script>
+var ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
+var MASTER_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+var API         = 'https://api.jsonbin.io/v3/b';
+
+// Scale: 82–150, displayed range 80–160 for chart headroom
+var SCALE_MIN  = 80;
+var SCALE_MAX  = 162;
+var SCALE_STEP = 10;
+
+// Band thresholds (lower bound of band)
+var BANDS = [
+  {min:140, max:150, label:'Distinction', cefr:'B1',  grade:'A', colorClass:'b1-color',   certClass:'dist',     resultText:'Pass with Distinction'},
+  {min:133, max:139, label:'Merit',       cefr:'A2',  grade:'B', colorClass:'a2b-color',  certClass:'merit',    resultText:'Pass with Merit'},
+  {min:120, max:132, label:'Pass',        cefr:'A2',  grade:'C', colorClass:'a2c-color',  certClass:'pass',     resultText:'Pass'},
+  {min:100, max:119, label:'Level A1',    cefr:'A1',  grade:'-', colorClass:'a1-color',   certClass:'level-a1', resultText:'Level A1'},
+  {min:82,  max:99,  label:'',            cefr:'',    grade:'-', colorClass:'part-color', certClass:'',         resultText:'Participation'},
+  {min:0,   max:81,  label:'',            cefr:'',    grade:'-', colorClass:'zero',       certClass:'',         resultText:'Participation'}
+];
+
+function bandFor(scale){
+  for(var i=0;i<BANDS.length;i++) if(scale>=BANDS[i].min) return BANDS[i];
+  return BANDS[BANDS.length-1];
+}
+
+function scaleToPercent(val){
+  return Math.max(0, Math.min(100, (val - SCALE_MIN) / (SCALE_MAX - SCALE_MIN) * 100));
+}
+
+function fmtSession(iso){
+  if(!iso) return '—';
+  var d = new Date(iso);
+  return d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+}
+
+function fmtRef(cid){
+  // Fake reference number based on candidateId
+  return cid + new Date().getFullYear();
+}
+
+async function loadAndRender(){
+  var p = new URLSearchParams(window.location.search);
+  var candidateId = p.get('candidateId') || '';
+  var firstName   = p.get('firstName')   || '';
+  var lastName    = p.get('lastName')    || '';
+
+  try {
+    var raw   = await fetch(API+'/'+ANSWERS_BIN+'/latest',{headers:{'X-Master-Key':MASTER_KEY}});
+    var data  = await raw.json();
+    var store = data.record || data;
+    var cands = Array.isArray(store.candidates) ? store.candidates : [];
+    var cand  = cands.find(function(c){ return c.candidateId === candidateId; });
+
+    if(!cand || !cand.review || !cand.review.published){
+      document.getElementById('overlay').innerHTML = '<div style="text-align:center"><div style="font-size:18px;font-weight:700;margin-bottom:8px">Results not available</div><div style="font-size:14px;color:#777">This result has not been published yet, or the link is incorrect.</div><a href="https://samromand.github.io/check_results" style="display:inline-block;margin-top:16px;color:#00686E;font-weight:700">← Back</a></div>';
+      return;
+    }
+
+    render(cand);
+  } catch(e){
+    document.getElementById('overlay').innerHTML = '<div>Error loading results: '+e.message+'</div>';
+  }
+}
+
+function render(cand){
+  var rev   = cand.review;
+  var name  = cand.firstName + ' ' + cand.lastName;
+  var cid   = cand.candidateId;
+  var avg   = rev.avgScale;
+  var band  = avg ? bandFor(avg) : BANDS[BANDS.length-1];
+  var sessionDate = fmtSession(cand.registeredAt || rev.publishedAt);
+
+  // Header
+  document.getElementById('ref-no').textContent = fmtRef(cid);
+  document.getElementById('cand-name').textContent = name;
+  document.getElementById('session-val').innerHTML = sessionDate.replace(' ','\n');
+  document.getElementById('footer-cid').textContent = cid;
+
+  // Result summary
+  var rsEl = document.getElementById('rs-result');
+  rsEl.textContent = band.resultText;
+  rsEl.className = 'rs-result ' + band.certClass;
+  document.getElementById('rs-score').textContent = avg || '—';
+  document.getElementById('rs-cefr').textContent  = band.cefr || '—';
+
+  // Chart
+  buildChart(rev);
+
+  // Show
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('sheet').style.display   = 'block';
+}
+
+function buildChart(rev){
+  var skills = [
+    {label:'Reading',  scale:rev.rwScale,  raw:rev.rwRaw},
+    {label:'Writing',  scale:rev.wrScale,  raw:rev.wrRaw},
+    {label:'Listening',scale:rev.lsScale,  raw:rev.lsRaw},
+    {label:'Speaking', scale:rev.spScale,  raw:rev.spRaw}
+  ];
+
+  var totalH = 360; // px height of chart area
+
+  // Build scale rows (160 down to 80, every 10)
+  var ticks = [];
+  for(var v = SCALE_MAX-2; v >= SCALE_MIN; v -= SCALE_STEP) ticks.push(v);
+
+  // Band boundaries (for dashed lines)
+  var boundaries = [140, 133, 120, 100, 82];
+  var cefrLabels = {150:'B1', 140:'', 133:'A2', 120:'', 100:'A1', 82:''};
+
+  // Height per unit
+  var pxPerUnit = totalH / (SCALE_MAX - SCALE_MIN);
+
+  function valToTop(val){
+    return (SCALE_MAX - val) * pxPerUnit;
+  }
+
+  // Container
+  var cs = document.getElementById('chart-section');
+  cs.innerHTML = '';
+
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'position:relative;padding-bottom:8px';
+
+  // ── Column headers ──
+  var headRow = document.createElement('div');
+  headRow.style.cssText = 'display:grid;grid-template-columns:48px 48px 90px 1fr 1fr 1fr 1fr;gap:0;margin-bottom:4px;padding-left:0';
+
+  var headCells = ['CEFR<br>Level','Cambridge<br>English<br>Scale','Certificated<br>Results','Reading &<br>Writing','Listening','Speaking',''];
+  // Override for our 4 skills
+  var headCells2 = ['CEFR<br>Level','Scale','Certificated<br>Results','Reading','Writing','Listening','Speaking'];
+  headCells2.forEach(function(h){
+    var d = document.createElement('div');
+    d.style.cssText = 'font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#555;text-align:center;line-height:1.3;padding:0 2px';
+    d.innerHTML = h;
+    headRow.appendChild(d);
+  });
+  wrap.appendChild(headRow);
+
+  // ── Chart area ──
+  var chartArea = document.createElement('div');
+  chartArea.style.cssText = 'position:relative;height:'+totalH+'px;display:grid;grid-template-columns:48px 48px 90px 1fr 1fr 1fr 1fr;gap:0;border-top:2px solid #333';
+
+  // CEFR col
+  var cefrCol = document.createElement('div');
+  cefrCol.style.cssText = 'position:relative;border-right:1px solid #ccc';
+  // A2 Key levels: B1, A2, A1
+  [{scale:142, label:'B1'},{scale:127, label:'A2'},{scale:108, label:'A1'}].forEach(function(lb){
+    var top = valToTop(lb.scale);
+    var d = document.createElement('div');
+    d.style.cssText = 'position:absolute;right:6px;top:'+top+'px;font-size:12px;font-weight:700;color:#333;transform:translateY(-50%)';
+    d.textContent = lb.label;
+    cefrCol.appendChild(d);
+  });
+  chartArea.appendChild(cefrCol);
+
+  // Scale col
+  var scaleCol = document.createElement('div');
+  scaleCol.style.cssText = 'position:relative;border-right:2px solid #333';
+  ticks.forEach(function(v){
+    var top = valToTop(v);
+    var d = document.createElement('div');
+    d.style.cssText = 'position:absolute;right:5px;top:'+top+'px;font-size:9px;color:#555;transform:translateY(-50%);display:flex;align-items:center;gap:2px';
+    d.innerHTML = v+'<span style="display:block;width:5px;height:1px;background:#555;margin-left:2px"></span>';
+    scaleCol.appendChild(d);
+  });
+  // dashed band lines across entire chart
+  boundaries.forEach(function(v){
+    var top = valToTop(v);
+    var line = document.createElement('div');
+    line.style.cssText = 'position:absolute;left:0;right:0;top:'+top+'px;height:1px;background:rgba(0,0,0,.2);z-index:1;pointer-events:none';
+    scaleCol.appendChild(line);
+    // label
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'position:absolute;left:2px;top:'+(top-10)+'px;font-size:8px;color:#555;font-weight:700';
+    lbl.textContent = v;
+    scaleCol.appendChild(lbl);
+  });
+  chartArea.appendChild(scaleCol);
+
+  // Certificated Results col
+  var certCol = document.createElement('div');
+  certCol.style.cssText = 'position:relative;border-right:1px solid #ddd;';
+  var certBands = [
+    {topVal:150, bottomVal:140, label:'Distinction', bg:'#00686E'},
+    {topVal:140, bottomVal:133, label:'Merit',       bg:'#007B82'},
+    {topVal:133, bottomVal:120, label:'Pass',        bg:'#00868C'},
+    {topVal:120, bottomVal:100, label:'Level A1',    bg:'#888888'},
+  ];
+  certBands.forEach(function(b){
+    var top = valToTop(b.topVal);
+    var bot = valToTop(b.bottomVal);
+    var h   = bot - top;
+    var d = document.createElement('div');
+    d.style.cssText = 'position:absolute;left:6px;right:6px;top:'+top+'px;height:'+h+'px;background:'+b.bg+';display:flex;align-items:center;justify-content:center';
+    d.innerHTML = '<span style="font-size:9px;font-weight:700;color:#fff;writing-mode:horizontal-tb;text-align:center;line-height:1.2">'+b.label+'</span>';
+    certCol.appendChild(d);
+  });
+  chartArea.appendChild(certCol);
+
+  // Skill bar cols
+  skills.forEach(function(skill){
+    var col = document.createElement('div');
+    col.style.cssText = 'position:relative;border-right:1px solid #eee;';
+
+    if(skill.scale && skill.scale > 0){
+      var barTop    = valToTop(skill.scale);
+      var barBottom = valToTop(SCALE_MIN);
+      var barH      = barBottom - barTop;
+      var band      = bandFor(skill.scale);
+
+      var bar = document.createElement('div');
+      bar.style.cssText = 'position:absolute;left:8px;right:8px;top:'+barTop+'px;height:'+barH+'px;background:'+barColor(band)+';';
+
+      // Score label inside bar top
+      var scoreLbl = document.createElement('div');
+      scoreLbl.style.cssText = 'position:absolute;top:4px;left:0;right:0;text-align:center;font-size:11px;font-weight:700;color:#fff';
+      scoreLbl.textContent = skill.scale;
+      bar.appendChild(scoreLbl);
+      col.appendChild(bar);
+    } else {
+      var na = document.createElement('div');
+      na.style.cssText = 'position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:9px;color:#aaa';
+      na.textContent = '—';
+      col.appendChild(na);
+    }
+    chartArea.appendChild(col);
+  });
+
+  wrap.appendChild(chartArea);
+
+  // Skill name labels below
+  var lblRow = document.createElement('div');
+  lblRow.style.cssText = 'display:grid;grid-template-columns:48px 48px 90px 1fr 1fr 1fr 1fr;gap:0;margin-top:6px;border-top:1px solid #ccc;padding-top:4px';
+  ['','',''].concat(skills.map(function(s){return s.label;})).forEach(function(l){
+    var d = document.createElement('div');
+    d.style.cssText = 'font-size:10px;font-weight:700;text-align:center;color:#333;text-transform:uppercase;letter-spacing:.04em';
+    d.textContent = l;
+    lblRow.appendChild(d);
+  });
+  wrap.appendChild(lblRow);
+
+  cs.appendChild(wrap);
+}
+
+function barColor(band){
+  var map = {
+    'dist':'#00686E','merit':'#007B82','pass':'#00868C',
+    'level-a1':'#888888','':'#bbbbbb'
+  };
+  return map[band.certClass] || '#bbbbbb';
+}
+
+// Band lines overlaid on skill columns
+// (drawn via absolute positioned divs from scaleCol - already done above)
+
+window.addEventListener('load', loadAndRender);
+</script>
+</body>
+</html>
