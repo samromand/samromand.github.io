@@ -42,79 +42,10 @@ body{font-family:'Noto Sans',Arial,sans-serif;font-size:13px;color:#111;backgrou
 .sum-cefr{font-size:22px;font-weight:700;color:#111;background:#CC2222;color:#fff;padding:4px 18px;display:inline-block}
 
 /* ── CHART WRAPPER ── */
-.chart-wrap{padding:0 22px 22px;position:relative}
-
-/* column headers */
-.col-heads{
-  display:grid;
-  grid-template-columns: 34px 38px 78px 1fr 1fr 1fr 1fr;
-  gap:0;margin-bottom:4px;
-}
-.col-head{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#555;text-align:center;line-height:1.3}
-
-/* chart area */
-.chart-area{
-  display:grid;
-  grid-template-columns: 34px 38px 78px 1fr 1fr 1fr 1fr;
-  gap:0;
-  position:relative;
-}
-
-/* ── CEFR label col ── */
-.cefr-col{position:relative}
-.cefr-lbl{position:absolute;right:6px;font-size:12px;font-weight:700;color:#222;transform:translateY(-50%)}
-
-/* ── RULER col ── */
-.ruler-col{position:relative;border-right:2px solid #222}
-.rtick{position:absolute;right:0;transform:translateY(-50%);display:flex;align-items:center;gap:1px}
-.rtick span{font-size:8px;color:#444;line-height:1;padding-right:2px}
-
-/* ── CERTIFIED RESULTS col ── */
-.cert-col{position:relative;border-right:1px solid #ccc;background:#f5f5f5}
-.cert-band{position:absolute;left:4px;right:4px;display:flex;align-items:center;justify-content:center}
-.cert-band span{font-size:10px;font-weight:700;color:#fff;text-align:center;line-height:1.2}
-
-/* ── SKILL cols ── */
-.skill-col{position:relative;border-right:1px solid #eee;background:#f9f9f9}
-
-/* band divider lines - drawn absolute over entire chart */
-.band-line{position:absolute;left:0;right:0;height:1px;background:#aaa;z-index:2;pointer-events:none}
-.band-line.major{background:#888;height:1px}
-
-/* skill bar: arrow shape */
-.skill-bar{
-  position:absolute;left:0;right:6px;
-  display:flex;align-items:center;
-  z-index:4;
-}
-.skill-bar-inner{
-  flex:1;height:18px;background:#CC2222;
-  display:flex;align-items:center;justify-content:flex-end;
-  padding-right:6px;
-  position:relative;
-}
-.skill-bar-inner::before{
-  /* arrow point on left */
-  content:'';
-  position:absolute;left:-9px;top:0;
-  width:0;height:0;
-  border-top:9px solid transparent;
-  border-bottom:9px solid transparent;
-  border-right:9px solid #CC2222;
-}
-.skill-bar-score{font-size:10px;font-weight:700;color:#fff}
-
-/* skill name labels below */
-.col-lbls{
-  display:grid;
-  grid-template-columns: 34px 38px 78px 1fr 1fr 1fr 1fr;
-  gap:0;margin-top:4px;border-top:1px solid #ccc;padding-top:4px;
-}
-.col-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#444;text-align:center}
-
-/* ── FOOTER ── */
-.footer{background:#f5f5f5;border-top:1px solid #ddd;padding:8px 22px;font-size:9px;color:#888;line-height:1.5}
-
+.chart-wrap{padding:0 22px 22px}
+.chart-heads{display:flex;gap:0;margin-bottom:4px;align-items:flex-end}
+.ch{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#555;text-align:center;line-height:1.3;padding:0 2px}
+canvas#chart{display:block;width:100%}
 /* ── PRINT ── */
 .print-btn{display:block;margin:16px auto 0;padding:8px 26px;background:#CC2222;color:#fff;border:none;border-radius:2px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .print-btn:hover{background:#991A1A}
@@ -273,178 +204,200 @@ function render(cand){
 
 function buildChart(rev){
   var skills = [
-    {label:'Reading',  scale:rev.rwScale},
-    {label:'Writing',  scale:rev.wrScale},
-    {label:'Listening',scale:rev.lsScale},
-    {label:'Speaking', scale:rev.spScale}
+    {label:'Reading',  v:rev.rwScale||0},
+    {label:'Writing',  v:rev.wrScale||0},
+    {label:'Listening',v:rev.lsScale||0},
+    {label:'Speaking', v:rev.spScale||0}
   ];
 
-  var CHART_H = 320;
-  PX_PER_UNIT = CHART_H / (S_MAX - S_MIN);
+  // Scale: 82–150 displayed as 80–152 for padding
+  var S_LO = 80, S_HI = 152;
 
   var wrap = document.getElementById('chart-wrap');
   wrap.innerHTML = '';
 
-  // Column headers
-  var heads = document.createElement('div');
-  heads.className = 'col-heads';
-  ['CEFR\nLevel','Cambridge\nEnglish\nScale','Certificated\nResults','Reading','Writing','Listening','Speaking'].forEach(function(h){
-    var d=document.createElement('div'); d.className='col-head';
-    d.innerHTML=h.replace(/\n/g,'<br>'); heads.appendChild(d);
-  });
-  wrap.appendChild(heads);
+  // ── Column headers ──
+  var COL_CEFR=44, COL_RULER=42, COL_CERT=82, COL_SKILL=0; // skill = remaining/4
 
-  // Chart area
-  var area = document.createElement('div');
-  area.className = 'chart-area';
-  area.style.height = CHART_H+'px';
-  area.style.position = 'relative';
+  var headDiv = document.createElement('div');
+  headDiv.className = 'chart-heads';
 
-  // ── 1. Cert Results col (background) ──
-  var certCol = document.createElement('div');
-  certCol.className = 'cert-col';
-  certCol.style.gridColumn='3';
-  certCol.style.position='relative';
-  CERT_BANDS.forEach(function(b){
-    var top = s2px(b.top), h = s2px(b.bot)-top;
-    var d=document.createElement('div');
-    d.className='cert-band';
-    d.style.cssText='top:'+top+'px;height:'+h+'px;background:'+b.bg;
-    d.innerHTML='<span>'+b.label+'</span>';
-    certCol.appendChild(d);
-  });
+  var heads = ['CEFR\nLevel','Cambridge\nEnglish\nScale','Certificated\nResults','Reading','Writing','Listening','Speaking'];
+  var headWidths = [COL_CEFR, COL_RULER, COL_CERT, 'flex','flex','flex','flex'];
 
-  // ── 2. Skill cols (background bars) ──
-  var skillCols = skills.map(function(s,i){
-    var col=document.createElement('div');
-    col.className='skill-col';
-    col.style.gridColumn=(4+i)+'';
-    return col;
-  });
-
-  // ── CEFR col ──
-  var cefrCol=document.createElement('div');
-  cefrCol.className='cefr-col';
-  cefrCol.style.gridColumn='1';
-  CEFR_LABELS.forEach(function(lb){
-    var d=document.createElement('div');
-    d.className='cefr-lbl';
-    d.style.top=s2px(lb.val)+'px';
-    d.textContent=lb.lbl;
-    cefrCol.appendChild(d);
-  });
-
-  // ── RULER col (grid col 2) ──
-  var rulerCol=document.createElement('div');
-  rulerCol.className='ruler-col';
-  rulerCol.style.gridColumn='2';
-  // Draw ticks from S_MAX down to S_MIN every 1
-  for(var v=S_MAX-1; v>=S_MIN; v--){
-    var tick=document.createElement('div');
-    tick.className='rtick';
-    var top=s2px(v);
-    tick.style.top=top+'px';
-    var mod10=v%10===0, mod5=v%5===0;
-    var len = mod10?12 : mod5?7 : 3;
-    var tickLine=document.createElement('div');
-    tickLine.style.cssText='width:'+len+'px;height:1px;background:#333;position:absolute;right:0;top:'+top+'px';
-    if(mod10){
-      var num=document.createElement('div');
-      num.style.cssText='position:absolute;right:'+(len+2)+'px;top:'+top+'px;font-size:8px;color:#444;transform:translateY(-50%);font-weight:600';
-      num.textContent=v;
-      rulerCol.appendChild(num);
+  heads.forEach(function(h, i){
+    var d = document.createElement('div');
+    d.className = 'ch';
+    d.innerHTML = h.replace(/\n/g,'<br>');
+    if(headWidths[i] === 'flex'){
+      d.style.flex = '1';
+    } else {
+      d.style.width = headWidths[i]+'px';
+      d.style.flexShrink = '0';
     }
-    rulerCol.appendChild(tickLine);
+    headDiv.appendChild(d);
+  });
+  wrap.appendChild(headDiv);
+
+  // ── Canvas ──
+  var canvas = document.createElement('canvas');
+  canvas.id = 'chart';
+  wrap.appendChild(canvas);
+
+  // Get actual render width
+  var totalW = wrap.getBoundingClientRect().width;
+  var DPR = window.devicePixelRatio || 1;
+  var CHART_H = 300;
+
+  canvas.width  = totalW * DPR;
+  canvas.height = CHART_H * DPR;
+  canvas.style.width  = totalW + 'px';
+  canvas.style.height = CHART_H + 'px';
+
+  var ctx = canvas.getContext('2d');
+  ctx.scale(DPR, DPR);
+
+  // Column layout (px)
+  var skillColW = (totalW - COL_CEFR - COL_RULER - COL_CERT) / 4;
+  var X_CEFR   = 0;
+  var X_RULER  = COL_CEFR;
+  var X_CERT   = X_RULER + COL_RULER;
+  var X_SKILLS = X_CERT + COL_CERT;
+
+  function s2y(v){ return (S_HI - v) / (S_HI - S_LO) * CHART_H; }
+  function skillX(i){ return X_SKILLS + i * skillColW; }
+
+  // ── LAYER 1: Cert Results column ──
+  var certBands = [
+    {top:150, bot:140, label:'Grade A',  bg:[170,170,170]},
+    {top:140, bot:133, label:'Grade B',  bg:[145,145,145]},
+    {top:133, bot:120, label:'Grade C',  bg:[120,120,120]},
+    {top:120, bot:100, label:'Level A1', bg:[100,100,100]},
+  ];
+  certBands.forEach(function(b){
+    var y1=s2y(b.top), y2=s2y(b.bot), h=y2-y1;
+    ctx.fillStyle='rgb('+b.bg[0]+','+b.bg[1]+','+b.bg[2]+')';
+    ctx.fillRect(X_CERT, y1, COL_CERT, h);
+    ctx.fillStyle='#fff';
+    ctx.font='bold 9px Arial';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(b.label, X_CERT + COL_CERT/2, y1+h/2);
+  });
+
+  // Skill column backgrounds
+  for(var i=0;i<4;i++){
+    ctx.fillStyle = i%2===0 ? '#f4f4f4' : '#eeeeee';
+    ctx.fillRect(skillX(i), 0, skillColW, CHART_H);
+    // right border
+    ctx.fillStyle='#ddd';
+    ctx.fillRect(skillX(i)+skillColW-1, 0, 1, CHART_H);
   }
 
-  // ── Band divider lines (layer 2, over skill cols) ──
-  // These span from cert col through all skill cols
-  // We'll add them as absolutely positioned divs on the chart area
-
-  // ── Skill bar arrows (layer 3, topmost) ──
-
-  // Build grid: first add background cols
-  // Use a single wrapper with CSS grid
-  var grid=document.createElement('div');
-  grid.style.cssText='display:grid;grid-template-columns:34px 38px 78px 1fr 1fr 1fr 1fr;gap:0;height:'+CHART_H+'px;position:relative';
-
-  grid.appendChild(cefrCol);
-  grid.appendChild(rulerCol);
-  grid.appendChild(certCol);
-  skillCols.forEach(function(c){ grid.appendChild(c); });
-
-  // ── Band lines overlay (absolute over entire grid) ──
-  // Use an absolute overlay div
-  var overlay=document.createElement('div');
-  overlay.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:2';
-  BAND_LINES.forEach(function(v){
-    var line=document.createElement('div');
-    var top=s2px(v);
-    // starts after ruler col: 34+38=72px from left
-    line.style.cssText='position:absolute;left:72px;right:0;top:'+top+'px;height:1px;background:rgba(80,80,80,.45)';
-    overlay.appendChild(line);
+  // ── LAYER 2: Band divider lines (full width, under ruler) ──
+  var bandLines = [140, 120, 100];
+  bandLines.forEach(function(v){
+    var y = s2y(v);
+    ctx.strokeStyle = 'rgba(80,80,80,0.55)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(totalW, y);
+    ctx.stroke();
   });
 
-  // ── Ruler overlay (absolute, covers full height, col 2 position) ──
-  // Already drawn ticks inside rulerCol
+  // ── LAYER 3: Ruler (drawn on top, covers band lines in ruler col) ──
+  // Ruler background
+  ctx.fillStyle = '#f8f8f8';
+  ctx.fillRect(X_RULER, 0, COL_RULER, CHART_H);
 
-  // ── Skill bar arrows (absolute over grid) ──
-  var barsOverlay=document.createElement('div');
-  barsOverlay.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:5';
+  // Right border of ruler (thick)
+  ctx.fillStyle = '#222';
+  ctx.fillRect(X_RULER + COL_RULER - 2, 0, 2, CHART_H);
 
-  // Calculate col widths for positioning bars
-  // Grid: 34 38 78 1fr 1fr 1fr 1fr
-  // We need to position bars after rendering, but use a trick:
-  // We'll position skill bars using left offset relative to chart area
-  // Fixed cols = 34+38+78 = 150px
-  // Each skill col = (total - 150) / 4
-  // We'll compute dynamically after append
+  // Ticks: 82–150
+  for(var v=82; v<=150; v++){
+    var y = s2y(v);
+    var mod10 = v%10===0;
+    var mod5  = v%5===0 && !mod10;
+    var tickLen = mod10 ? 11 : mod5 ? 6 : 3;
 
-  grid.appendChild(overlay);
-  grid.appendChild(barsOverlay);
-  area.appendChild(grid);
-  wrap.appendChild(area);
+    ctx.fillStyle = '#333';
+    ctx.fillRect(X_RULER + COL_RULER - 2 - tickLen, y-0.5, tickLen, 1);
 
-  // Column labels row
-  var lblRow=document.createElement('div');
-  lblRow.className='col-lbls';
-  ['','','','Reading','Writing','Listening','Speaking'].forEach(function(l){
-    var d=document.createElement('div'); d.className='col-lbl'; d.textContent=l; lblRow.appendChild(d);
+    // Label every 10
+    if(mod10 && v >= 90){
+      ctx.fillStyle = '#333';
+      ctx.font = '8px Arial';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(v, X_RULER + COL_RULER - 14, y);
+    }
+    // Also label 150
+    if(v === 150){
+      ctx.fillStyle = '#333';
+      ctx.font = '8px Arial';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('150', X_RULER + COL_RULER - 14, y);
+    }
+  }
+
+  // ── LAYER 3b: CEFR labels (on ruler, covered by nothing) ──
+  var cefrLabels = [{v:145, l:'B1'},{v:127, l:'A2'},{v:109, l:'A1'}];
+  cefrLabels.forEach(function(lb){
+    var y = s2y(lb.v);
+    ctx.fillStyle = '#222';
+    ctx.font = 'bold 11px Arial';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lb.l, X_CEFR + COL_CEFR - 4, y);
+  });
+
+  // ── LAYER 4: Skill bar arrows ──
+  var barH = 16;
+  var arrowW = 9; // width of the arrow point
+
+  skills.forEach(function(skill, i){
+    if(!skill.v || skill.v <= 0) return;
+    var y    = s2y(skill.v) - barH/2;
+    var x0   = skillX(i);
+    var barW = skillColW - 2; // slight inset
+
+    ctx.fillStyle = '#CC2222';
+    ctx.beginPath();
+    // Arrow shape: pointy left, flat right
+    ctx.moveTo(x0 + arrowW,  y);           // top-left of body
+    ctx.lineTo(x0 + barW,    y);           // top-right
+    ctx.lineTo(x0 + barW,    y + barH);    // bottom-right
+    ctx.lineTo(x0 + arrowW,  y + barH);    // bottom-left of body
+    ctx.lineTo(x0,           y + barH/2);  // point
+    ctx.closePath();
+    ctx.fill();
+
+    // Score text
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px Arial';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(skill.v, x0 + barW - 4, y + barH/2);
+  });
+
+  // ── Skill name labels below chart ──
+  var lblRow = document.createElement('div');
+  lblRow.style.cssText = 'display:flex;border-top:1px solid #ccc;margin-top:3px;padding-top:3px';
+  var empties = [COL_CEFR, COL_RULER, COL_CERT];
+  empties.forEach(function(w){
+    var d=document.createElement('div'); d.style.cssText='width:'+w+'px;flex-shrink:0'; lblRow.appendChild(d);
+  });
+  skills.forEach(function(s){
+    var d=document.createElement('div');
+    d.style.cssText='flex:1;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#444;text-align:center';
+    d.textContent=s.label; lblRow.appendChild(d);
   });
   wrap.appendChild(lblRow);
-
-  // Position skill bars after layout
-  requestAnimationFrame(function(){
-    var areaRect = grid.getBoundingClientRect();
-    var totalW   = areaRect.width;
-    var fixedW   = 34+38+78;
-    var skillW   = (totalW - fixedW) / 4;
-    var barH     = 18;
-
-    skills.forEach(function(skill, i){
-      if(!skill.scale || skill.scale<=0) return;
-      var colLeft = fixedW + i*skillW;
-      var top     = s2px(skill.scale) - barH/2;
-      var bar     = document.createElement('div');
-      bar.style.cssText =
-        'position:absolute;'
-        +'top:'+top+'px;'
-        +'left:'+colLeft+'px;'
-        +'width:'+(skillW-4)+'px;'
-        +'height:'+barH+'px;'
-        +'background:#CC2222;'
-        +'display:flex;align-items:center;justify-content:flex-end;'
-        +'padding-right:6px;'
-        +'clip-path:polygon(10px 0%, 100% 0%, 100% 100%, 10px 100%, 0% 50%);';
-      var score=document.createElement('span');
-      score.style.cssText='font-size:10px;font-weight:700;color:#fff';
-      score.textContent=skill.scale;
-      bar.appendChild(score);
-      barsOverlay.appendChild(bar);
-    });
-  });
 }
-
 window.addEventListener('load', loadAndRender);
 </script>
 </body>
