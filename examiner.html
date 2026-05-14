@@ -211,17 +211,17 @@ function scaleWriting(raw){ return TABLE_W[raw] !== undefined ? TABLE_W[raw] : 0
 function scaleListening(raw){ return TABLE_L[raw] !== undefined ? TABLE_L[raw] : 0; }
 
 function gradeFromScale(scale){
-  if(scale >= 140) return {cefr:'B1', grade:'A', result:'Pass with Distinction'};
-  if(scale >= 133) return {cefr:'A2', grade:'B', result:'Pass with Merit'};
-  if(scale >= 120) return {cefr:'A2', grade:'C', result:'Pass'};
+  if(scale >= 140) return {cefr:'B1', grade:'A', result:'Pass at Grade A'};
+  if(scale >= 133) return {cefr:'A2', grade:'B', result:'Pass at Grade B'};
+  if(scale >= 120) return {cefr:'A2', grade:'C', result:'Pass at Grade C'};
   if(scale >= 100) return {cefr:'A1', grade:'-', result:'Level A1'};
   if(scale >= 82)  return {cefr:'-',  grade:'-', result:'Participation'};
   return               {cefr:'-',  grade:'-', result:'Participation'};
 }
 function overallGrade(avgScale){
-  if(avgScale >= 140) return {level:'B1', grade:'A', pass:true,  result:'Pass with Distinction'};
-  if(avgScale >= 133) return {level:'A2', grade:'B', pass:true,  result:'Pass with Merit'};
-  if(avgScale >= 120) return {level:'A2', grade:'C', pass:true,  result:'Pass'};
+  if(avgScale >= 140) return {level:'B1', grade:'A', pass:true,  result:'Pass at Grade A'};
+  if(avgScale >= 133) return {level:'A2', grade:'B', pass:true,  result:'Pass at Grade B'};
+  if(avgScale >= 120) return {level:'A2', grade:'C', pass:true,  result:'Pass at Grade C'};
   if(avgScale >= 100) return {level:'A1', grade:'-', pass:false, result:'Level A1'};
   if(avgScale >= 82)  return {level:'-',  grade:'-', pass:false, result:'Participation'};
   return                     {level:'-',  grade:'-', pass:false, result:'Participation'};
@@ -1056,9 +1056,9 @@ function showPublishedResults(){
     overallGradeStr = og.grade;
   }
 
-  var resultColor = overallResult==='Pass with Distinction'?'#1B5E20'
-    :overallResult==='Pass with Merit'?'#0D47A1'
-    :overallResult==='Pass'?'#004F54'
+  var resultColor = overallResult==='Pass at Grade A'?'#1B5E20'
+    :overallResult==='Pass at Grade B'?'#0D47A1'
+    :overallResult==='Pass at Grade C'?'#004F54'
     :overallResult==='Level A1'?'#7A3800'
     :'#555';
 
