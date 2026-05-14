@@ -149,7 +149,7 @@ var CEFR_LABELS = [{val:147,lbl:'B1'},{val:128,lbl:'A2'},{val:109,lbl:'A1'}];
 
 function resultText(avg){
   if(!avg) return {text:'Participation', badge:'#888', cefrTxt:'—'};
-  if(avg>=140) return {text:'Pass with Distinction', badge:'#CC2222', cefrTxt:'B1'};
+  if(avg>=140) return {text:'Pass at Grade A', badge:'#CC2222', cefrTxt:'B1'};
   if(avg>=133) return {text:'Pass at Grade B',       badge:'#CC2222', cefrTxt:'A2'};
   if(avg>=120) return {text:'Pass at Grade C',       badge:'#CC2222', cefrTxt:'A2'};
   if(avg>=100) return {text:'Level A1',              badge:'#888',    cefrTxt:'A1'};
