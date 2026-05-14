@@ -774,18 +774,104 @@ async function startListeningCheck(){
 }
 
 // ── CALCULATE ──
+function buildDebugTable(){
+  var rwAnswers = _current.rwAnswers || {};
+  var lsAnswers = _current.lsAnswers || {};
+  var rwCA = _correctAnswers.reading  || {};
+  var lsCA = _correctAnswers.listening || {};
+
+  function rows(total, candObj, corrObj){
+    var out = '';
+    for(var i=1; i<=total; i++){
+      var c = String(candObj[i]!==undefined?candObj[i]:(candObj[String(i)]||'')).trim();
+      var r = String(corrObj[i]!==undefined?corrObj[i]:(corrObj[String(i)]||'')).trim();
+      var alts = r.toUpperCase().split('|').map(function(s){return s.trim();});
+      var ok = c && r && alts.indexOf(c.toUpperCase())!==-1;
+      var bg = !c?'':(ok?'#f0fdf4':'#fff1f2');
+      var col = !c?'#888':(ok?'#166534':'#991b1b');
+      out += '<tr style="background:'+bg+'">'
+        +'<td style="padding:2px 7px;border-bottom:1px solid #eee;color:#666;font-size:11px">'+i+'</td>'
+        +'<td style="padding:2px 7px;border-bottom:1px solid #eee;font-weight:600;color:'+col+';font-size:11px">'+(c||'—')+'</td>'
+        +'<td style="padding:2px 7px;border-bottom:1px solid #eee;color:#333;font-size:11px">'+r.replace(/\|/g,' / ')+'</td>'
+        +'<td style="padding:2px 7px;border-bottom:1px solid #eee;font-weight:700;color:'+col+';font-size:12px">'
+          +(!c?'—':ok?'✓':'✗')
+        +'</td></tr>';
+    }
+    return out;
+  }
+
+  var thS = 'background:#374151;color:#fff;padding:4px 8px;text-align:left;font-size:10px;font-weight:700';
+  var tS  = 'width:100%;border-collapse:collapse;font-family:Courier New,monospace';
+
+  return '<div style="margin-top:14px;border:1px solid var(--border);border-radius:4px;overflow:hidden">'
+    // RW
+    +'<div style="background:#1F2937;color:#fff;padding:6px 12px;font-size:11px;font-weight:700;font-family:Courier New,monospace">'
+      +'Reading — correct keys: '+Object.keys(rwCA).length+' | answers: '+Object.keys(rwAnswers).length
+    +'</div>'
+    +'<table style="'+tS+'"><thead><tr>'
+      +'<th style="'+thS+'">Q</th><th style="'+thS+'">Candidate</th>'
+      +'<th style="'+thS+'">Correct</th><th style="'+thS+'">Match</th>'
+    +'</tr></thead><tbody>'+rows(30,rwAnswers,rwCA)+'</tbody></table>'
+    // LS
+    +'<div style="background:#1F2937;color:#fff;padding:6px 12px;font-size:11px;font-weight:700;font-family:Courier New,monospace;border-top:2px solid #374151">'
+      +'Listening — correct keys: '+Object.keys(lsCA).length+' | answers: '+Object.keys(lsAnswers).length
+    +'</div>'
+    +'<table style="'+tS+'"><thead><tr>'
+      +'<th style="'+thS+'">Q</th><th style="'+thS+'">Candidate</th>'
+      +'<th style="'+thS+'">Correct</th><th style="'+thS+'">Match</th>'
+    +'</tr></thead><tbody>'+rows(25,lsAnswers,lsCA)+'</tbody></table>'
+  +'</div>';
+}
+
 function showCalculateReady(alreadyCalc){
   _phase = 'calculate';
   updateStepper(4);
   var content = document.getElementById('scoring-content');
   var rev = _current.review || {};
+  var calcInfo = alreadyCalc
+    ? '<div class="status-banner banner-info" style="margin-bottom:8px"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Scores calculated on '+new Date(rev.calculatedAt).toLocaleDateString()+'.</span></div>'
+    : '';
   content.innerHTML =
     '<div class="card-title">Calculate scores</div>'
-    +(alreadyCalc
-      ? '<div class="status-banner banner-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Scores already calculated on '+new Date(rev.calculatedAt).toLocaleDateString()+'.</span></div>'
-      : '')
-    +'<button class="btn-action" id="btn-calc" onclick="calculateScores()">Calculate all scores</button>';
+    +calcInfo
+    +'<button class="btn-action" id="btn-calc" onclick="calculateScores()">'+
+      (alreadyCalc ? 'Recalculate' : 'Calculate all scores')
+    +'</button>'
+    +'<button class="btn-primary" style="margin-top:6px;background:var(--bg-panel);color:var(--text);border:1px solid var(--border)" onclick="toggleDebug()">Show answer breakdown</button>'
+    +'<div id="debug-wrap" style="display:none"></div>';
 }
+
+window.toggleDebug = async function(){
+  var wrap = document.getElementById('debug-wrap');
+  if(!wrap) return;
+  if(wrap.style.display !== 'none'){ wrap.style.display='none'; return; }
+  // Load correct answers if not yet loaded
+  if(Object.keys(_correctAnswers.reading||{}).length === 0){
+    try {
+      var testsRaw = await getBin(TESTS_BIN);
+      var tests = (testsRaw.record||testsRaw);
+      var varKey = _current.variantKey || _current.variantId;
+      var variant = null;
+      if(tests.variants) variant = tests.variants[varKey]||tests.variants[varKey.toUpperCase()]||null;
+      if(!variant) variant = tests[varKey]||tests[varKey.toUpperCase()]||null;
+      if(variant){
+        var rwCA={}, lsCA={}, rwQ=1, lsQ=1;
+        (function(){ var p=variant['rw1']; if(!p) return; (Array.isArray(p)?p:(p.questions||[])).forEach(function(q){ rwCA[rwQ++]=String(q.correct||q.answer||'').trim(); }); })();
+        ['rw2','rw3'].forEach(function(k){ var p=variant[k]; if(!p) return; (p.questions||[]).forEach(function(q){ rwCA[rwQ++]=String(q.correct||q.answer||'').trim(); }); });
+        (function(){ var p=variant['rw4']; if(!p) return; (p.gaps||[]).forEach(function(g){ rwCA[rwQ++]=String(g.correct||g.answer||'').trim(); }); })();
+        (function(){ var p=variant['rw5']; if(!p) return; (p.answers||[]).forEach(function(a){ var pri=typeof a==='string'?a:String(a.answer||'').trim(); var also=(typeof a==='object'&&a.also)?String(a.also).trim():''; rwCA[rwQ]=pri+(also?'|'+also:''); rwQ++; }); })();
+        (function(){ var p=variant['ls1']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+        (function(){ var p=variant['ls2']; if(!p) return; (p.rows||[]).forEach(function(r){ var pri=String(r.answer||r.correct||'').trim(); var also=(r.also||'').trim(); lsCA[lsQ]=pri+(also?'|'+also:''); lsQ++; }); })();
+        (function(){ var p=variant['ls3']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+        (function(){ var p=variant['ls4']; if(!p) return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+        (function(){ var p=variant['ls5']; if(!p) return; (p.answers||[]).slice(1).forEach(function(a){ lsCA[lsQ++]=String(a).trim(); }); })();
+        _correctAnswers.reading=rwCA; _correctAnswers.listening=lsCA;
+      }
+    } catch(e){}
+  }
+  wrap.innerHTML = buildDebugTable();
+  wrap.style.display = 'block';
+};
 
 async function calculateScores(){
   var btn = document.getElementById('btn-calc');
@@ -864,9 +950,10 @@ async function calculateScores(){
     var lsCorrect = _correctAnswers.listening || {};
     var lsRaw = 0;
     for(var q=1; q<=25; q++){
-      var cand = String(lsAnswers[q] !== undefined ? lsAnswers[q] : (lsAnswers[String(q)]||'')).trim().toUpperCase();
-      var corr = String(lsCorrect[q] !== undefined ? lsCorrect[q] : (lsCorrect[String(q)]||'')).trim().toUpperCase();
-      var match = (cand && corr && cand===corr);
+      var cand    = String(lsAnswers[q] !== undefined ? lsAnswers[q] : (lsAnswers[String(q)]||'')).trim().toUpperCase();
+      var corrRaw = String(lsCorrect[q] !== undefined ? lsCorrect[q] : (lsCorrect[String(q)]||'')).trim();
+      var corrAlts = corrRaw.toUpperCase().split('|').map(function(s){ return s.trim(); });
+      var match = (cand && corrRaw && corrAlts.indexOf(cand) !== -1);
       if(match) lsRaw++;
     }
     var lsScale = scaleListening(lsRaw);
@@ -899,6 +986,8 @@ async function calculateScores(){
     showCalculateReady(true);
     var content = document.getElementById('scoring-content');
     content.innerHTML += '<button class="btn-action" style="margin-top:8px" onclick="publishResults()">Publish results</button>';
+    // Pre-load correct answers into debug table
+    _correctAnswers.reading = rwCA; _correctAnswers.listening = lsCA;
 
   } catch(e){
     if(btn){ btn.disabled=false; btn.textContent='Retry'; }
@@ -1018,7 +1107,12 @@ function showPublishedResults(){
     +'</table>'
 
     // ── ACTIONS ──
-+'</div>';
+    +'<div style="margin-top:16px;display:flex;gap:10px">'
+      +'<button class="btn-primary" style="flex:1" onclick="unpublishResults()">Unpublish</button>'
+      +'<button class="btn-action" style="flex:1;margin:0" onclick="recalculate()">Recalculate</button>'
+    +'</div>'
+
+  +'</div>';
 }
 
 
@@ -1076,6 +1170,35 @@ window.startListeningCheck = startListeningCheck;
 window.showCalculateReady  = showCalculateReady;
 window.calculateScores = calculateScores;
 window.publishResults  = publishResults;
+
+async function unpublishResults(){
+  showLoading('Unpublishing…');
+  try {
+    _current.review.published   = false;
+    delete _current.review.publishedAt;
+    await saveCandidate();
+    showCalculateReady(true);
+    var c = document.getElementById('scoring-content');
+    c.innerHTML += '<button class="btn-action" style="margin-top:8px" onclick="publishResults()">Publish results</button>';
+  } catch(e){ showLoading(null); alert('Failed: '+e.message); }
+}
+
+async function recalculate(){
+  if(!confirm('Reset all scores and restart from Speaking?')) return;
+  showLoading('Resetting…');
+  try {
+    _current.review = {};
+    _spScores = {ga:null,gv:null,pr:null,ic:null};
+    _wrP6 = {c:null,o:null,l:null};
+    _wrP7 = {c:null,o:null,l:null};
+    await saveCandidate();
+    _spCritIdx = 0;
+    showSpCrit(0);
+  } catch(e){ showLoading(null); alert('Failed: '+e.message); }
+}
+
+window.unpublishResults = unpublishResults;
+window.recalculate      = recalculate;
 
 document.addEventListener('DOMContentLoaded', function(){
   document.getElementById('btn-back').addEventListener('click', function(){
