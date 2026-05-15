@@ -227,7 +227,7 @@ function draw(){
     CTX.fillStyle=b.fill; CTX.fillRect(COL_RULER,y1,COL_CERT,h);
     if(b.border){
       CTX.strokeStyle='rgba(255,255,255,.35)'; CTX.lineWidth=1; CTX.setLineDash([]);
-      CTX.beginPath(); CTX.moveTo(COL_RULER,y2); CTX.lineTo(COL_RULER+COL_CERT,y2); CTX.stroke();
+      CTX.beginPath(); CTX.moveTo(0,y2); CTX.lineTo(CW,y2); CTX.stroke();
     }
     CTX.fillStyle=b.tc; CTX.font='bold 8.5px Arial'; CTX.textAlign='center'; CTX.textBaseline='middle';
     CTX.fillText(b.label, COL_RULER+COL_CERT/2, y1+h/2);
@@ -438,13 +438,12 @@ function stepDisclaimer(stepIdx){
   var skillsTotal = _steps.filter(function(s){ return s.type==='skill'; }).length;
 
   if(step.type==='skill'){
-    var v = barTargets[step.id];
     var isFirst = skillsDone===0;
     var isLast  = skillsDone===skillsTotal-1;
     return {
       icon: isFirst ? '📉' : isLast ? '📈' : '📊',
-      title: isFirst ? 'Lowest score' : isLast ? 'Highest score' : 'Next skill',
-      text: 'Revealing your score for\n' + step.id
+      title: isFirst ? 'Lowest score' : isLast ? 'Highest score' : 'Next skill · ' + (skillsDone+1) + ' of ' + skillsTotal,
+      text: isFirst ? 'Your weakest skill\nis about to be revealed' : isLast ? 'Your strongest skill\nis about to be revealed' : 'Next result\nis about to be revealed'
     };
   }
   if(step.type==='score') return {icon:'🎯', title:'Overall result', text:'Your overall scale score\nacross all four skills'};
