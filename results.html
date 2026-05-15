@@ -149,7 +149,7 @@ var CEFR_LABELS = [{val:147,lbl:'B1'},{val:128,lbl:'A2'},{val:109,lbl:'A1'}];
 
 function resultText(avg){
   if(!avg) return {text:'Participation', badge:'#888', cefrTxt:'—'};
-  if(avg>=140) return {text:'Pass at Grade A', badge:'#CC2222', cefrTxt:'B1'};
+  if(avg>=140) return {text:'Pass with Distinction', badge:'#CC2222', cefrTxt:'B1'};
   if(avg>=133) return {text:'Pass at Grade B',       badge:'#CC2222', cefrTxt:'A2'};
   if(avg>=120) return {text:'Pass at Grade C',       badge:'#CC2222', cefrTxt:'A2'};
   if(avg>=100) return {text:'Level A1',              badge:'#888',    cefrTxt:'A1'};
@@ -190,11 +190,9 @@ function render(cand){
   document.getElementById('session-val').textContent = fmtSession(cand.registeredAt||rev.publishedAt);
   document.getElementById('footer-cid').textContent  = cand.candidateId;
 
-  var sumR = document.getElementById('sum-result');
-  sumR.textContent = res.text; sumR.style.background = res.badge;
+  document.getElementById('sum-result').textContent = res.text;
   document.getElementById('sum-score').textContent = avg||'—';
-  var sumC = document.getElementById('sum-cefr');
-  sumC.textContent = res.cefrTxt; sumC.style.background = res.badge;
+  document.getElementById('sum-cefr').textContent = res.cefrTxt;
 
   document.getElementById('overlay').style.display='none';
   document.getElementById('sheet').style.display='block';
@@ -279,37 +277,45 @@ function buildChart(rev){
   function skillX(i){ return X_SKILLS + i * skillColW; }
 
   // ── LAYER 1: Cert Results column ──
+  var CORAL = '#CC2222';
   var certBands = [
-    {top:150, bot:140, label:'Grade A',  bg:[120,120,120]},
-    {top:140, bot:133, label:'Grade B',  bg:[120,120,120]},
-    {top:133, bot:120, label:'Grade C',  bg:[120,120,120]},
-    {top:120, bot:100, label:'Level A1', bg:[180,180,180]},
+    {top:150, bot:140, label:'Grade A',  fill:CORAL,   textColor:'#fff', borderBot:null},
+    {top:140, bot:133, label:'Grade B',  fill:CORAL,   textColor:'#fff', borderBot:'#222'},
+    {top:133, bot:120, label:'Grade C',  fill:CORAL,   textColor:'#fff', borderBot:null},
+    {top:120, bot:100, label:'Level A1', fill:'#F5C842', textColor:'#111', borderBot:null},
   ];
   certBands.forEach(function(b){
     var y1=s2y(b.top), y2=s2y(b.bot), h=y2-y1;
-    ctx.fillStyle='rgb('+b.bg[0]+','+b.bg[1]+','+b.bg[2]+')';
+    ctx.fillStyle=b.fill;
     ctx.fillRect(X_CERT, y1, COL_CERT, h);
-    ctx.fillStyle='#fff';
+    ctx.fillStyle=b.textColor;
     ctx.font='bold 9px Arial';
     ctx.textAlign='center';
     ctx.textBaseline='middle';
     ctx.fillText(b.label, X_CERT + COL_CERT/2, y1+h/2);
+    if(b.borderBot){
+      ctx.fillStyle=b.borderBot;
+      ctx.fillRect(X_CERT, y2-1, COL_CERT, 1);
+    }
   });
 
-  // Skill column backgrounds
+  // Skill column backgrounds: white with black borders
   for(var i=0;i<4;i++){
-    ctx.fillStyle = i%2===0 ? '#f4f4f4' : '#eeeeee';
+    ctx.fillStyle = '#fff';
     ctx.fillRect(skillX(i), 0, skillColW, CHART_H);
     // right border
-    ctx.fillStyle='#ddd';
+    ctx.fillStyle='#000';
     ctx.fillRect(skillX(i)+skillColW-1, 0, 1, CHART_H);
   }
+  // left border of first skill col
+  ctx.fillStyle='#000';
+  ctx.fillRect(skillX(0), 0, 1, CHART_H);
 
   // ── LAYER 2: Band divider lines (full width, under ruler) ──
   var bandLines = [140, 120, 100];
   bandLines.forEach(function(v){
     var y = s2y(v);
-    ctx.strokeStyle = 'rgba(40,40,40,0.7)';
+    ctx.strokeStyle = '#000';
     ctx.lineWidth = 1;
     ctx.setLineDash([]);
     ctx.beginPath();
@@ -320,11 +326,11 @@ function buildChart(rev){
 
   // ── LAYER 3: Ruler (drawn on top, covers band lines in ruler col) ──
   // Ruler background
-  ctx.fillStyle = '#f8f8f8';
+  ctx.fillStyle = '#fff';
   ctx.fillRect(X_RULER, 0, COL_RULER, CHART_H);
 
   // Right border of ruler (thick)
-  ctx.fillStyle = '#222';
+  ctx.fillStyle = '#000';
   ctx.fillRect(X_RULER + COL_RULER - 2, 0, 2, CHART_H);
 
   // Ticks: 82–150
@@ -334,12 +340,12 @@ function buildChart(rev){
     var mod5  = v%5===0 && !mod10;
     var tickLen = mod10 ? 11 : mod5 ? 6 : 3;
 
-    ctx.fillStyle = '#333';
+    ctx.fillStyle = '#000';
     ctx.fillRect(X_RULER + COL_RULER - 2 - tickLen, y-0.5, tickLen, 1);
 
     // Label every 10
     if(mod10 && v >= 90){
-      ctx.fillStyle = '#333';
+      ctx.fillStyle = '#000';
       ctx.font = '8px Arial';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
@@ -347,7 +353,7 @@ function buildChart(rev){
     }
     // Also label 150
     if(v === 150){
-      ctx.fillStyle = '#333';
+      ctx.fillStyle = '#000';
       ctx.font = '8px Arial';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
@@ -356,10 +362,10 @@ function buildChart(rev){
   }
 
   // ── LAYER 3b: CEFR labels (on ruler, covered by nothing) ──
-  var cefrLabels = [{v:145, l:'B1'},{v:127, l:'A2'},{v:109, l:'A1'}];
+  var cefrLabels = [{v:145, l:'B1'},{v:130, l:'A2'},{v:110, l:'A1'}];
   cefrLabels.forEach(function(lb){
     var y = s2y(lb.v);
-    ctx.fillStyle = '#222';
+    ctx.fillStyle = '#000';
     ctx.font = 'bold 13px Arial';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
@@ -376,8 +382,8 @@ function buildChart(rev){
     if(!skill.v || skill.v <= 0){
       // Draw "Not determined" vertically in the column
       ctx.save();
-      ctx.fillStyle = '#aaa';
-      ctx.font = '9px Arial';
+      ctx.fillStyle = '#555';
+      ctx.font = 'bold 18px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.translate(x0 + skillColW/2, CHART_H/2);
