@@ -142,7 +142,7 @@ function s2y(v){ return (S_HI-v)/(S_HI-S_LO)*CH; }
 // ── DRAW ──
 function draw(){
   if(!CTX) return;
-  CTX.clearRect(0,0,CW,CH);
+  CTX.clearRect(0,-22,CW,CH+22);
 
   var nSkills = 4;
   var skillW  = (CW - COL_RULER - COL_CERT) / nSkills;
@@ -249,6 +249,14 @@ function draw(){
     CTX.fillText(displayVal, x0+arrowW+(bw-arrowW)/2, y+barH/2);
   });
 
+  // ── Skill labels at TOP ──
+  SKILL_LABELS.forEach(function(id,i){
+    var x0 = COL_RULER+COL_CERT+i*skillW;
+    CTX.fillStyle = barRevealed[id]&&barTargets[id]>0 ? 'rgba(255,255,255,.75)' : 'rgba(255,255,255,.25)';
+    CTX.font='bold 8px Arial'; CTX.textAlign='center'; CTX.textBaseline='bottom';
+    CTX.fillText(id.toUpperCase(), x0+skillW/2, -4);
+  });
+
   // ── Skill labels at bottom ──
   SKILL_LABELS.forEach(function(id,i){
     var x0 = COL_RULER+COL_CERT+i*skillW;
@@ -297,11 +305,12 @@ function initCanvas(){
   var W = outer.getBoundingClientRect().width;
   CH_PX = Math.min(380, window.innerHeight*0.55);
   CW = W; CH = CH_PX;
-  canvas.width  = W*DPR; canvas.height = CH_PX*DPR;
+  canvas.width  = W*DPR; canvas.height = (CH_PX+22)*DPR;
   canvas.style.width  = W+'px';
-  canvas.style.height = CH_PX+'px';
+  canvas.style.height = (CH_PX+22)+'px';
   CTX = canvas.getContext('2d');
   CTX.scale(DPR,DPR);
+  CTX.translate(0,22); // shift drawing area down to leave room for top labels
   // Extra bottom space for labels
   canvas.style.marginBottom = '20px';
   draw();
