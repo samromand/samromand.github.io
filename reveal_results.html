@@ -5,546 +5,480 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your Results — Cambridge Assessment English</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --teal:#00686E;--teal-dark:#004F54;--teal-light:#E6F4F5;
-  --red:#CC2222;--red-dark:#991A1A;
-  --gold:#F5C842;
-  --text:#1A1A1A;--muted:#666;--border:#D0D0D0;
-  --header-h:56px;
-  --serif:'Source Serif 4',Georgia,serif;
-  --sans:'Noto Sans',system-ui,sans-serif;
-}
+html,body{min-height:100%;font-family:'Noto Sans',system-ui,sans-serif;font-size:15px;background:#0A1628;color:#fff;overflow-x:hidden}
 
-html,body{
-  min-height:100%;font-family:var(--sans);font-size:15px;
-  color:var(--text);background:#0A1628;
-  overflow-x:hidden;
-}
-
-/* ── HEADER ── */
-#header{
-  height:var(--header-h);background:rgba(10,22,40,.95);
-  border-bottom:1px solid rgba(255,255,255,.1);
-  display:flex;align-items:center;padding:0 24px;gap:16px;
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  backdrop-filter:blur(8px);
-}
-.cam-shield{width:38px;height:44px;flex-shrink:0;background:linear-gradient(180deg,#C00 50%,#FFD700 50%);border-radius:2px 2px 50% 50%;position:relative;overflow:hidden}
-.cam-shield::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
-.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none}
-.cam-logo-text .top{font-size:13px;font-weight:700;color:#fff}
-.cam-logo-text .bot{font-size:11px;color:rgba(255,255,255,.6)}
-.header-sep{width:1px;height:28px;background:rgba(255,255,255,.2);flex-shrink:0}
-#header-title{font-size:14px;font-weight:600;color:rgba(255,255,255,.9)}
-.header-right{margin-left:auto}
-.skip-btn{
-  font-family:var(--sans);font-size:12px;font-weight:600;
-  color:rgba(255,255,255,.5);background:none;border:1px solid rgba(255,255,255,.2);
-  border-radius:3px;padding:5px 14px;cursor:pointer;
-  transition:all .15s;letter-spacing:.02em;
-}
+/* HEADER */
+#header{height:56px;background:rgba(10,22,40,.97);border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;padding:0 24px;gap:16px;position:fixed;top:0;left:0;right:0;z-index:300;backdrop-filter:blur(8px)}
+.shield{width:38px;height:44px;flex-shrink:0;background:linear-gradient(180deg,#C00 50%,#FFD700 50%);border-radius:2px 2px 50% 50%;position:relative;overflow:hidden}
+.shield::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo .t{font-size:13px;font-weight:700;color:#fff}
+.logo .b{font-size:11px;color:rgba(255,255,255,.55)}
+.hsep{width:1px;height:28px;background:rgba(255,255,255,.2)}
+#htitle{font-size:14px;font-weight:600;color:rgba(255,255,255,.9)}
+.hright{margin-left:auto}
+.skip-btn{font-family:'Noto Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.45);background:none;border:1px solid rgba(255,255,255,.18);border-radius:3px;padding:5px 14px;cursor:pointer;transition:all .15s}
 .skip-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
 
-/* ── STAGE ── */
-#stage{
-  min-height:100vh;padding-top:var(--header-h);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
-}
+/* STAGE */
+#stage{min-height:100vh;padding:56px 20px 60px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+#stage::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(0,104,110,.2) 0%,transparent 70%);pointer-events:none}
 
-/* Background particles */
-#stage::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 40%, rgba(0,104,110,.25) 0%, transparent 70%);
-  pointer-events:none;
-}
+#cand-lbl{text-align:center;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:18px;margin-top:12px}
 
-/* Candidate name at top */
-#cand-name-display{
-  position:absolute;top:calc(var(--header-h) + 24px);left:0;right:0;
-  text-align:center;
-  font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.06em;
-  text-transform:uppercase;font-weight:600;
-}
+/* CHART CONTAINER */
+#chart-outer{width:100%;max-width:680px;position:relative}
+canvas#chart{display:block;width:100%;border-radius:6px}
 
-/* ── SKILL CARDS ── */
-.skill-cards{
-  display:flex;gap:12px;margin-bottom:32px;
-  flex-wrap:wrap;justify-content:center;
-  padding:0 20px;
-}
+/* OVERALL BLOCKS */
+#overall-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px;opacity:0;transition:opacity .6s}
+#overall-row.show{opacity:1}
+.ob{min-width:130px;padding:16px 20px;border-radius:8px;text-align:center;opacity:0;transform:translateY(12px) scale(.94);transition:all .55s cubic-bezier(.34,1.56,.64,1)}
+.ob.pop{opacity:1;transform:none}
+.ob-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px}
+.ob-val{font-family:'Source Serif 4',serif;font-size:28px;font-weight:700;color:#fff;line-height:1.1}
+.ob-score-wrap{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+.ob-result-wrap{background:#CC2222;border:1px solid #991A1A}
+.ob-cefr-wrap{background:#00686E;border:1px solid #004F54}
+.ob-result-wrap .ob-lbl,.ob-cefr-wrap .ob-lbl{color:rgba(255,255,255,.7)}
 
-.skill-card{
-  width:140px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:8px;
-  padding:16px 12px 14px;
-  text-align:center;
-  position:relative;
-  transition:all .5s cubic-bezier(.34,1.56,.64,1);
-  opacity:0;
-  transform:translateY(20px) scale(.95);
-}
-.skill-card.revealed{
-  opacity:1;transform:translateY(0) scale(1);
-  border-color:rgba(255,255,255,.15);
-  background:rgba(255,255,255,.07);
-}
-.skill-card.active-reveal{
-  border-color:rgba(204,34,34,.6);
-  box-shadow:0 0 30px rgba(204,34,34,.25), 0 0 60px rgba(204,34,34,.1);
-  background:rgba(204,34,34,.08);
-}
+/* NEXT BTN */
+#btn-next{margin-top:24px;padding:13px 32px;background:#CC2222;color:#fff;border:none;border-radius:4px;font-family:'Noto Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(14px);transition:all .4s}
+#btn-next.show{opacity:1;transform:none}
+#btn-next:hover{background:#991A1A}
+#btn-next svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5}
 
-.skill-card-label{
-  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:rgba(255,255,255,.4);margin-bottom:10px;
-}
-.skill-card.revealed .skill-card-label{color:rgba(255,255,255,.6)}
+/* CLICK PROMPT */
+#prompt{position:fixed;bottom:24px;left:0;right:0;text-align:center;font-size:12px;color:rgba(255,255,255,.3);letter-spacing:.05em;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:.7}}
+#prompt.hidden{opacity:0!important;pointer-events:none}
 
-.skill-card-score{
-  font-family:var(--serif);font-size:40px;font-weight:700;
-  color:#fff;line-height:1;margin-bottom:4px;
-  min-height:48px;display:flex;align-items:center;justify-content:center;
-}
-.skill-card-score .score-mask{
-  display:inline-block;
-  background:rgba(255,255,255,.08);border-radius:4px;
-  width:56px;height:40px;
-}
-.skill-card-score.show-score .score-mask{display:none}
-
-.skill-card-cefr{
-  font-size:11px;font-weight:700;
-  color:rgba(255,255,255,.3);
-  min-height:16px;
-}
-.skill-card.revealed .skill-card-cefr{color:rgba(255,255,255,.55)}
-
-/* ── OVERALL REVEAL AREA ── */
-#overall-area{
-  text-align:center;
-  opacity:0;transition:opacity .6s;
-}
-#overall-area.visible{opacity:1}
-
-.overall-row{
-  display:flex;gap:20px;justify-content:center;align-items:stretch;
-  flex-wrap:wrap;padding:0 20px;
-}
-
-.overall-block{
-  min-width:140px;padding:20px 24px;
-  border-radius:8px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.1);
-  text-align:center;
-  opacity:0;transform:scale(.9);
-  transition:all .6s cubic-bezier(.34,1.56,.64,1);
-}
-.overall-block.pop{
-  opacity:1;transform:scale(1);
-}
-.overall-block.ob-score{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.08)}
-.overall-block.ob-result{background:var(--red);border-color:var(--red-dark)}
-.overall-block.ob-cefr{background:var(--teal);border-color:var(--teal-dark)}
-
-.ob-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px}
-.ob-result .ob-label,.ob-cefr .ob-label{color:rgba(255,255,255,.7)}
-.ob-value{font-family:var(--serif);font-size:32px;font-weight:700;color:#fff;line-height:1.1}
-.ob-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:6px}
-
-/* ── NEXT BUTTON ── */
-#btn-next{
-  margin-top:32px;
-  padding:14px 36px;
-  background:var(--red);color:#fff;
-  border:none;border-radius:4px;
-  font-family:var(--sans);font-size:15px;font-weight:700;
-  cursor:pointer;
-  transition:all .3s;
-  opacity:0;transform:translateY(16px);
-  display:flex;align-items:center;gap:10px;
-  letter-spacing:.01em;
-}
-#btn-next.visible{opacity:1;transform:translateY(0)}
-#btn-next:hover{background:var(--red-dark);transform:translateY(-1px)}
-#btn-next svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5}
-
-/* ── CLICK PROMPT ── */
-#click-prompt{
-  position:fixed;bottom:28px;left:0;right:0;
-  text-align:center;
-  font-size:13px;color:rgba(255,255,255,.35);
-  letter-spacing:.04em;
-  animation:pulse 2s ease-in-out infinite;
-}
-@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.7}}
-#click-prompt.hidden{display:none}
-
-/* ── DRUMROLL OVERLAY ── */
-#drumroll{
-  position:fixed;inset:0;z-index:200;
-  background:rgba(10,22,40,.92);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .3s;
-}
+/* DRUMROLL */
+#drumroll{position:fixed;inset:0;z-index:200;background:rgba(10,22,40,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .25s}
 #drumroll.show{opacity:1;pointer-events:all}
-.dr-ring{
-  width:80px;height:80px;border-radius:50%;
-  border:3px solid transparent;
-  border-top-color:var(--red);
-  border-right-color:var(--red);
-  animation:spin 1s linear infinite;
-}
+.dr-ring{width:64px;height:64px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:#CC2222;border-right-color:#CC2222;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.dr-txt{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.06em}
 
-/* ── CONFETTI ── */
-.confetto{
-  position:fixed;width:8px;height:8px;border-radius:2px;
-  pointer-events:none;z-index:500;
-  animation:fall linear forwards;
-}
-@keyframes fall{
-  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
-  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
-}
+/* CONFETTI */
+.confetto{position:fixed;pointer-events:none;z-index:500;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 
-/* ── LOADING ── */
-#loading{
-  position:fixed;inset:0;background:#0A1628;
-  display:flex;align-items:center;justify-content:center;z-index:999;
-  font-family:var(--sans);font-size:14px;color:rgba(255,255,255,.5);gap:12px;
-}
-.spin2{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
+/* LOADING */
+#loading{position:fixed;inset:0;background:#0A1628;display:flex;align-items:center;justify-content:center;z-index:999;gap:10px;font-size:14px;color:rgba(255,255,255,.4)}
+.sp{width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:#CC2222;border-radius:50%;animation:spin .7s linear infinite}
 </style>
 </head>
 <body>
 
-<div id="loading"><div class="spin2"></div> Loading your results…</div>
+<div id="loading"><div class="sp"></div> Loading your results…</div>
 
 <div id="header">
-  <a class="cam-logo" href="https://samromand.github.io">
-    <div class="cam-shield"></div>
-    <div class="cam-logo-text">
-      <div class="top">Cambridge Assessment</div>
-      <div class="bot">English</div>
-    </div>
+  <a class="logo" href="https://samromand.github.io">
+    <div class="shield"></div>
+    <div><div class="t">Cambridge Assessment</div><div class="b">English</div></div>
   </a>
-  <div class="header-sep"></div>
-  <div id="header-title">A2 Key for Schools — Results</div>
-  <div class="header-right">
-    <button class="skip-btn" onclick="skipToEnd()">Skip →</button>
-  </div>
+  <div class="hsep"></div>
+  <div id="htitle">A2 Key for Schools — Results</div>
+  <div class="hright"><button class="skip-btn" onclick="skipAll()">Skip →</button></div>
 </div>
 
 <div id="stage">
-  <div id="cand-name-display"></div>
-
-  <div class="skill-cards" id="skill-cards">
-    <div class="skill-card" id="sc-Reading">
-      <div class="skill-card-label">Reading</div>
-      <div class="skill-card-score" id="scs-Reading"><div class="score-mask"></div></div>
-      <div class="skill-card-cefr" id="scc-Reading"></div>
-    </div>
-    <div class="skill-card" id="sc-Writing">
-      <div class="skill-card-label">Writing</div>
-      <div class="skill-card-score" id="scs-Writing"><div class="score-mask"></div></div>
-      <div class="skill-card-cefr" id="scc-Writing"></div>
-    </div>
-    <div class="skill-card" id="sc-Listening">
-      <div class="skill-card-label">Listening</div>
-      <div class="skill-card-score" id="scs-Listening"><div class="score-mask"></div></div>
-      <div class="skill-card-cefr" id="scc-Listening"></div>
-    </div>
-    <div class="skill-card" id="sc-Speaking">
-      <div class="skill-card-label">Speaking</div>
-      <div class="skill-card-score" id="scs-Speaking"><div class="score-mask"></div></div>
-      <div class="skill-card-cefr" id="scc-Speaking"></div>
-    </div>
+  <div id="cand-lbl"></div>
+  <div id="chart-outer"><canvas id="chart"></canvas></div>
+  <div id="overall-row">
+    <div class="ob ob-score-wrap" id="ob-score"><div class="ob-lbl">Overall Score</div><div class="ob-val" id="ob-score-v">—</div></div>
+    <div class="ob ob-result-wrap" id="ob-result"><div class="ob-lbl">Result</div><div class="ob-val" id="ob-result-v" style="font-size:18px">—</div></div>
+    <div class="ob ob-cefr-wrap" id="ob-cefr"><div class="ob-lbl">CEFR Level</div><div class="ob-val" id="ob-cefr-v">—</div></div>
   </div>
-
-  <div id="overall-area">
-    <div class="overall-row">
-      <div class="overall-block ob-score" id="ob-score">
-        <div class="ob-label">Overall Score</div>
-        <div class="ob-value" id="ob-score-val">—</div>
-      </div>
-      <div class="overall-block ob-result" id="ob-result">
-        <div class="ob-label">Result</div>
-        <div class="ob-value" id="ob-result-val">—</div>
-      </div>
-      <div class="overall-block ob-cefr" id="ob-cefr">
-        <div class="ob-label">CEFR Level</div>
-        <div class="ob-value" id="ob-cefr-val">—</div>
-        <div class="ob-sub" id="ob-cefr-sub"></div>
-      </div>
-    </div>
-
-    <button id="btn-next" onclick="goToResults()">
-      View full Statement of Results
-      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </button>
-  </div>
+  <button id="btn-next" onclick="goToResults()">
+    View Statement of Results
+    <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </button>
 </div>
 
-<div id="click-prompt">Click anywhere to continue</div>
-<div id="drumroll"><div class="dr-ring"></div></div>
+<div id="prompt">Click anywhere · Press Space to continue</div>
+<div id="drumroll"><div class="dr-ring"></div><div class="dr-txt">…</div></div>
 
 <script>
-var ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
-var MASTER_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
-var API         = 'https://api.jsonbin.io/v3/b';
+var API      = 'https://api.jsonbin.io/v3/b';
+var BIN      = '6a04a5a9c0954111d81aea23';
+var KEY      = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+var _params  = {};
+var _cand    = null;
+var _rev     = null;
+var _steps   = [];
+var _step    = -1;
+var _busy    = false;
+var _animId  = null;
 
-var _cand = null;
-var _rev  = null;
-var _params = {};
-var _step = -1;   // current reveal step index
-var _steps = [];  // ordered list of reveal actions
-var _busy = false;
+// ── SCALE CONFIG ──
+var S_LO = 80, S_HI = 152;
+var DPR, CW, CH, CTX;
+var COL_RULER = 54, COL_CERT = 72;
+var SKILL_LABELS = ['Reading','Writing','Listening','Speaking'];
+// current animated bar values (from 80, animated to target)
+var barVals = {Reading:0, Writing:0, Listening:0, Speaking:0};
+// revealed flags
+var barRevealed = {Reading:false, Writing:false, Listening:false, Speaking:false};
+// target values
+var barTargets  = {Reading:0, Writing:0, Listening:0, Speaking:0};
 
-// ── GRADING ──
-function gradeFromScale(s){
-  if(!s || s<=0) return {cefr:'—', text:'—'};
-  if(s>=140) return {cefr:'B1', text:'Pass with Distinction'};
-  if(s>=133) return {cefr:'A2', text:'Pass with Merit'};
-  if(s>=120) return {cefr:'A2', text:'Pass at Grade C'};
-  if(s>=100) return {cefr:'A1', text:'Level A1'};
-  if(s>=82)  return {cefr:'—',  text:'Participation'};
-  return           {cefr:'—',  text:'Participation'};
+// ── GRADE ──
+function grade(s){
+  if(!s||s<=0) return {cefr:'—',text:'—',color:'#888'};
+  if(s>=140) return {cefr:'B1',text:'Pass with Distinction',color:'#CC2222'};
+  if(s>=133) return {cefr:'A2',text:'Pass with Merit',color:'#CC2222'};
+  if(s>=120) return {cefr:'A2',text:'Pass at Grade C',color:'#CC2222'};
+  if(s>=100) return {cefr:'A1',text:'Level A1',color:'#888'};
+  return           {cefr:'—', text:'Participation',color:'#888'};
 }
 
-// ── LOAD ──
-async function init(){
-  var p = new URLSearchParams(window.location.search);
-  _params.candidateId = p.get('candidateId')||'';
-  _params.firstName   = p.get('firstName')||'';
-  _params.lastName    = p.get('lastName')||'';
+function s2y(v){ return (S_HI-v)/(S_HI-S_LO)*CH; }
 
-  try {
-    var raw   = await fetch(API+'/'+ANSWERS_BIN+'/latest',{headers:{'X-Master-Key':MASTER_KEY}});
-    var data  = await raw.json();
-    var store = data.record || data;
-    _cand = (store.candidates||[]).find(function(c){ return c.candidateId===_params.candidateId; });
-    if(!_cand || !_cand.review || !_cand.review.published){
-      window.location.href = 'https://samromand.github.io/check_results';
+// ── DRAW ──
+function draw(){
+  if(!CTX) return;
+  CTX.clearRect(0,0,CW,CH);
+
+  var nSkills = 4;
+  var skillW  = (CW - COL_RULER - COL_CERT) / nSkills;
+
+  // ── Cert bands ──
+  var certBands = [
+    {top:150,bot:140,label:'Grade A', fill:'#CC2222',tc:'#fff'},
+    {top:140,bot:133,label:'Grade B', fill:'#CC2222',tc:'#fff',border:true},
+    {top:133,bot:120,label:'Grade C', fill:'#CC2222',tc:'#fff'},
+    {top:120,bot:100,label:'Level A1',fill:'#F5C842',tc:'#111'},
+  ];
+  certBands.forEach(function(b){
+    var y1=s2y(b.top), y2=s2y(b.bot), h=y2-y1;
+    CTX.fillStyle=b.fill; CTX.fillRect(COL_RULER,y1,COL_CERT,h);
+    if(b.border){ CTX.fillStyle='#000'; CTX.fillRect(COL_RULER,y2-1,COL_CERT,1); }
+    CTX.fillStyle=b.tc; CTX.font='bold 8.5px Arial'; CTX.textAlign='center'; CTX.textBaseline='middle';
+    CTX.fillText(b.label, COL_RULER+COL_CERT/2, y1+h/2);
+  });
+
+  // ── Skill column backgrounds + dividers ──
+  for(var i=0;i<nSkills;i++){
+    var x = COL_RULER+COL_CERT+i*skillW;
+    CTX.fillStyle='rgba(255,255,255,.03)';
+    CTX.fillRect(x,0,skillW,CH);
+    CTX.fillStyle='rgba(255,255,255,.15)';
+    CTX.fillRect(x+skillW-1,0,1,CH);
+  }
+  CTX.fillStyle='rgba(255,255,255,.15)';
+  CTX.fillRect(COL_RULER+COL_CERT,0,1,CH);
+
+  // ── Band lines (full width) ──
+  [140,120,100].forEach(function(v){
+    var y=s2y(v);
+    CTX.strokeStyle='rgba(255,255,255,.35)'; CTX.lineWidth=1; CTX.setLineDash([]);
+    CTX.beginPath(); CTX.moveTo(0,y); CTX.lineTo(CW,y); CTX.stroke();
+  });
+
+  // ── RULER (on top of band lines) ──
+  CTX.fillStyle='rgba(15,30,60,.95)'; CTX.fillRect(0,0,COL_RULER,CH);
+  CTX.fillStyle='rgba(255,255,255,.9)'; CTX.fillRect(COL_RULER-2,0,2,CH);
+  for(var v=82;v<=150;v++){
+    var y=s2y(v);
+    var mod10=v%10===0, mod5=v%5===0&&!mod10;
+    var tlen=mod10?11:mod5?6:3;
+    CTX.fillStyle='#fff'; CTX.fillRect(COL_RULER-2-tlen,y-0.5,tlen,1);
+    if(mod10&&v>=90||v===150){
+      CTX.fillStyle='rgba(255,255,255,.85)'; CTX.font='8px Arial';
+      CTX.textAlign='right'; CTX.textBaseline='middle';
+      CTX.fillText(v, COL_RULER-15, y);
+    }
+  }
+
+  // ── CEFR labels ──
+  [{v:145,l:'B1'},{v:130,l:'A2'},{v:110,l:'A1'}].forEach(function(lb){
+    CTX.fillStyle='rgba(255,255,255,.8)'; CTX.font='bold 11px Arial';
+    CTX.textAlign='left'; CTX.textBaseline='middle';
+    CTX.fillText(lb.l, 3, s2y(lb.v));
+  });
+
+  // ── ANIMATED BARS ──
+  var barH=18, arrowW=10;
+  SKILL_LABELS.forEach(function(id,i){
+    var x0 = COL_RULER+COL_CERT+i*skillW;
+    var v  = barVals[id];
+
+    if(!barRevealed[id]) return;
+
+    if(barTargets[id]<=0){
+      // Not determined
+      CTX.save();
+      CTX.fillStyle='rgba(255,255,255,.4)'; CTX.font='bold 11px Arial';
+      CTX.textAlign='center'; CTX.textBaseline='middle';
+      CTX.translate(x0+skillW/2, CH/2);
+      CTX.rotate(-Math.PI/2);
+      CTX.fillText('Not determined',0,0);
+      CTX.restore();
       return;
     }
-    _rev = _cand.review;
-    setup();
-  } catch(e){
-    document.getElementById('loading').innerHTML = '<div style="color:rgba(255,255,255,.6)">Error loading results. <a href="https://samromand.github.io/check_results" style="color:#CC2222">← Back</a></div>';
+
+    if(v <= S_LO+0.1) return; // not started yet
+
+    var y = s2y(v) - barH/2;
+    var bw = skillW-4;
+
+    // Glow
+    var progress = (v-S_LO)/(barTargets[id]-S_LO||1);
+    var glowAlpha = Math.min(0.5, progress*0.5);
+    CTX.shadowColor='#CC2222'; CTX.shadowBlur=16*glowAlpha;
+
+    CTX.fillStyle='#CC2222';
+    CTX.beginPath();
+    CTX.moveTo(x0+arrowW, y);
+    CTX.lineTo(x0+bw,     y);
+    CTX.lineTo(x0+bw,     y+barH);
+    CTX.lineTo(x0+arrowW, y+barH);
+    CTX.lineTo(x0,        y+barH/2);
+    CTX.closePath(); CTX.fill();
+    CTX.shadowBlur=0;
+
+    // Score counter inside bar
+    var displayVal = Math.round(v);
+    CTX.fillStyle='#fff'; CTX.font='bold 10px Arial';
+    CTX.textAlign='center'; CTX.textBaseline='middle';
+    CTX.fillText(displayVal, x0+arrowW+(bw-arrowW)/2, y+barH/2);
+  });
+
+  // ── Skill labels at bottom ──
+  SKILL_LABELS.forEach(function(id,i){
+    var x0 = COL_RULER+COL_CERT+i*skillW;
+    CTX.fillStyle = barRevealed[id]&&barTargets[id]>0 ? 'rgba(255,255,255,.75)' : 'rgba(255,255,255,.25)';
+    CTX.font='bold 8px Arial'; CTX.textAlign='center'; CTX.textBaseline='top';
+    CTX.fillText(id.toUpperCase(), x0+skillW/2, CH+5);
+  });
+}
+
+// ── ANIMATION LOOP ──
+var _animating = false;
+function startLoop(){
+  if(_animating) return;
+  _animating = true;
+  loop();
+}
+function loop(){
+  var stillMoving = false;
+  SKILL_LABELS.forEach(function(id){
+    if(!barRevealed[id]||barTargets[id]<=0) return;
+    var target = barTargets[id];
+    var cur    = barVals[id];
+    if(cur < target-0.05){
+      // Ease-out: faster at start, slower near end
+      var dist = target - cur;
+      var speed = Math.max(0.05, dist*0.045);
+      barVals[id] = Math.min(target, cur+speed);
+      stillMoving = true;
+    } else {
+      barVals[id] = target;
+    }
+  });
+  draw();
+  if(stillMoving){
+    _animId = requestAnimationFrame(loop);
+  } else {
+    _animating = false;
   }
 }
 
+// ── CANVAS INIT ──
+function initCanvas(){
+  var outer = document.getElementById('chart-outer');
+  var canvas = document.getElementById('chart');
+  DPR = window.devicePixelRatio||1;
+  var W = outer.getBoundingClientRect().width;
+  CH_PX = Math.min(380, window.innerHeight*0.55);
+  CW = W; CH = CH_PX;
+  canvas.width  = W*DPR; canvas.height = CH_PX*DPR;
+  canvas.style.width  = W+'px';
+  canvas.style.height = CH_PX+'px';
+  CTX = canvas.getContext('2d');
+  CTX.scale(DPR,DPR);
+  // Extra bottom space for labels
+  canvas.style.marginBottom = '20px';
+  draw();
+}
+
+// ── STEPS ──
 function setup(){
   document.getElementById('loading').style.display='none';
+  document.getElementById('cand-lbl').textContent = (_cand.firstName+' '+_cand.lastName).toUpperCase();
 
-  // Candidate name
-  document.getElementById('cand-name-display').textContent =
-    (_cand.firstName + ' ' + _cand.lastName).toUpperCase();
+  // Set targets
+  barTargets.Reading  = _rev.rwScale||0;
+  barTargets.Writing  = _rev.wrScale||0;
+  barTargets.Listening= _rev.lsScale||0;
+  barTargets.Speaking = _rev.spScale||0;
 
-  // Build skill order: sort by score ascending, tiebreak by canonical order
-  var skills = [
-    {id:'Reading',  v:_rev.rwScale||0},
-    {id:'Writing',  v:_rev.wrScale||0},
-    {id:'Listening',v:_rev.lsScale||0},
-    {id:'Speaking', v:_rev.spScale||0}
-  ];
+  // Sort: ascending score, tiebreak canonical
   var order = ['Reading','Writing','Listening','Speaking'];
-  var sorted = skills.slice().sort(function(a,b){
-    if(a.v !== b.v) return a.v - b.v;  // ascending: lowest first
-    return order.indexOf(a.id) - order.indexOf(b.id);
+  var sorted = order.slice().sort(function(a,b){
+    if(barTargets[a]!==barTargets[b]) return barTargets[a]-barTargets[b];
+    return order.indexOf(a)-order.indexOf(b);
   });
 
-  // Build steps
   _steps = [];
-  sorted.forEach(function(s){ _steps.push({type:'skill', id:s.id, v:s.v}); });
+  sorted.forEach(function(id){ _steps.push({type:'skill',id:id}); });
   _steps.push({type:'score'});
   _steps.push({type:'result'});
   _steps.push({type:'cefr'});
 
-  // Listen for click / space / enter to advance
-  document.addEventListener('click', advance);
-  document.addEventListener('keydown', function(e){
-    if(e.key===' '||e.key==='Enter') advance();
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      initCanvas();
+      draw();
+      // Listen
+      document.addEventListener('click', advance);
+      document.addEventListener('keydown', function(e){ if(e.key===' '||e.key==='Enter') advance(); });
+      setTimeout(advance, 900);
+    });
   });
-
-  // Kick off first step automatically after a short pause
-  setTimeout(advance, 800);
 }
 
 function advance(){
   if(_busy) return;
   _step++;
-  if(_step >= _steps.length) return;
-  var step = _steps[_step];
+  if(_step>=_steps.length) return;
   _busy = true;
-
-  // Hide prompt during animation
-  document.getElementById('click-prompt').classList.add('hidden');
-
-  showDrumroll(function(){
-    executeStep(step);
+  document.getElementById('prompt').classList.add('hidden');
+  showDrum(function(){
+    doStep(_steps[_step]);
     _busy = false;
-    // Show prompt unless last step
-    if(_step < _steps.length - 1){
-      document.getElementById('click-prompt').classList.remove('hidden');
-    }
+    if(_step<_steps.length-1) document.getElementById('prompt').classList.remove('hidden');
   });
 }
 
-function showDrumroll(cb){
-  var dr = document.getElementById('drumroll');
-  dr.classList.add('show');
-  var delay = 900 + Math.random()*400;  // 900–1300ms suspense
-  setTimeout(function(){
-    dr.classList.remove('show');
-    setTimeout(cb, 300);
-  }, delay);
+function showDrum(cb){
+  var el = document.getElementById('drumroll');
+  el.classList.add('show');
+  var d = 800+Math.random()*500;
+  setTimeout(function(){ el.classList.remove('show'); setTimeout(cb,250); }, d);
 }
 
-function executeStep(step){
-  if(step.type === 'skill'){
-    revealSkill(step.id, step.v);
-    // If last skill, also show overall area shell
-    if(_step === _steps.filter(function(s){return s.type==='skill';}).length - 1){
-      setTimeout(function(){
-        document.getElementById('overall-area').classList.add('visible');
-      }, 400);
+function doStep(step){
+  if(step.type==='skill'){
+    var id = step.id;
+    barRevealed[id] = true;
+    if(barTargets[id]>0){
+      barVals[id] = S_LO; // start from bottom of scale
+      startLoop();
+      // Confetti when bar reaches target
+      var checkDone = setInterval(function(){
+        if(barVals[id]>=barTargets[id]-0.1){
+          clearInterval(checkDone);
+          if(barTargets[id]>=120) confetti(false);
+        }
+      },50);
+    } else {
+      draw(); // just show "Not determined"
     }
-  } else if(step.type === 'score'){
-    popBlock('ob-score', function(){
-      document.getElementById('ob-score-val').textContent = _rev.avgScale||'—';
-    });
-    confetti();
-  } else if(step.type === 'result'){
-    var g = gradeFromScale(_rev.avgScale);
-    popBlock('ob-result', function(){
-      document.getElementById('ob-result-val').textContent = g.text;
-    });
-    if(_rev.avgScale >= 120) confetti(true);
-  } else if(step.type === 'cefr'){
-    var g = gradeFromScale(_rev.avgScale);
-    popBlock('ob-cefr', function(){
-      document.getElementById('ob-cefr-val').textContent = g.cefr;
-    });
-    // Show next button
-    setTimeout(function(){
-      document.getElementById('btn-next').classList.add('visible');
-    }, 600);
-    if(_rev.avgScale >= 120) confetti(true);
+    // After last skill, show overall row shell
+    var skillsDone = SKILL_LABELS.filter(function(id){ return barRevealed[id]; }).length;
+    if(skillsDone===4){
+      setTimeout(function(){ document.getElementById('overall-row').classList.add('show'); }, 600);
+    }
+  } else if(step.type==='score'){
+    var avg = _rev.avgScale;
+    if(avg){ rollNumber('ob-score-v', 0, avg, 1400); }
+    else document.getElementById('ob-score-v').textContent='—';
+    document.getElementById('ob-score').classList.add('pop');
+    confetti(false);
+  } else if(step.type==='result'){
+    var g = grade(_rev.avgScale);
+    document.getElementById('ob-result-v').textContent = g.text;
+    document.getElementById('ob-result').classList.add('pop');
+    if(_rev.avgScale>=120) confetti(true);
+  } else if(step.type==='cefr'){
+    var g = grade(_rev.avgScale);
+    document.getElementById('ob-cefr-v').textContent = g.cefr;
+    document.getElementById('ob-cefr').classList.add('pop');
+    if(_rev.avgScale>=120) confetti(true);
+    setTimeout(function(){ document.getElementById('btn-next').classList.add('show'); }, 700);
   }
 }
 
-function revealSkill(id, v){
-  var card  = document.getElementById('sc-'+id);
-  var score = document.getElementById('scs-'+id);
-  var cefr  = document.getElementById('scc-'+id);
-
-  // Light up active
-  card.classList.add('active-reveal');
-
-  setTimeout(function(){
-    // Reveal score
-    score.classList.add('show-score');
-    score.innerHTML = v > 0 ? v : '<span style="font-size:18px;opacity:.5">—</span>';
-
-    var g = gradeFromScale(v);
-    cefr.textContent = g.cefr !== '—' ? g.cefr : '';
-
-    card.classList.remove('active-reveal');
-    card.classList.add('revealed');
-
-    if(v >= 120) confetti();
-  }, 200);
+// ── ROLL NUMBER ──
+function rollNumber(elId, from, to, duration){
+  var el = document.getElementById(elId);
+  var start = null;
+  function frame(ts){
+    if(!start) start=ts;
+    var p = Math.min((ts-start)/duration, 1);
+    // ease-out cubic
+    var ep = 1-Math.pow(1-p,3);
+    el.textContent = Math.round(from+(to-from)*ep);
+    if(p<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
-function popBlock(id, onReveal){
-  var el = document.getElementById(id);
-  setTimeout(onReveal, 100);
-  setTimeout(function(){ el.classList.add('pop'); }, 200);
+// ── SKIP ──
+function skipAll(){
+  _busy=false;
+  document.getElementById('drumroll').classList.remove('show');
+  document.getElementById('prompt').classList.add('hidden');
+
+  SKILL_LABELS.forEach(function(id){
+    barRevealed[id]=true;
+    barVals[id]=barTargets[id]>0?barTargets[id]:0;
+  });
+  draw();
+
+  document.getElementById('overall-row').classList.add('show');
+  var avg=_rev.avgScale;
+  document.getElementById('ob-score-v').textContent=avg||'—';
+  document.getElementById('ob-score').classList.add('pop');
+  var g=grade(avg);
+  document.getElementById('ob-result-v').textContent=g.text;
+  document.getElementById('ob-result').classList.add('pop');
+  document.getElementById('ob-cefr-v').textContent=g.cefr;
+  document.getElementById('ob-cefr').classList.add('pop');
+  document.getElementById('btn-next').classList.add('show');
+  _step=_steps.length;
 }
 
 // ── CONFETTI ──
 function confetti(big){
-  var colors = ['#CC2222','#F5C842','#00686E','#fff','#E05C00'];
-  var count = big ? 80 : 30;
-  for(var i=0;i<count;i++){
-    (function(){
-      var c = document.createElement('div');
-      c.className = 'confetto';
-      var size = 5 + Math.random()*8;
-      c.style.cssText =
-        'left:'+(Math.random()*100)+'vw;'
-        +'top:-10px;'
-        +'width:'+size+'px;height:'+size+'px;'
-        +'background:'+colors[Math.floor(Math.random()*colors.length)]+';'
-        +'animation-duration:'+(1.5+Math.random()*2)+'s;'
-        +'animation-delay:'+(Math.random()*0.5)+'s;'
-        +'border-radius:'+(Math.random()>0.5?'50%':'2px')+';';
-      document.body.appendChild(c);
-      setTimeout(function(){ c.remove(); }, 3500);
-    })();
-  }
+  var cols=['#CC2222','#F5C842','#00686E','#fff','#E05C00'];
+  var n=big?80:35;
+  for(var i=0;i<n;i++){(function(){
+    var c=document.createElement('div'); c.className='confetto';
+    var s=5+Math.random()*8;
+    c.style.cssText='left:'+(Math.random()*100)+'vw;top:-10px;width:'+s+'px;height:'+s+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';animation-duration:'+(1.5+Math.random()*2)+'s;animation-delay:'+(Math.random()*.4)+'s;border-radius:'+(Math.random()>.5?'50%':'2px')+';';
+    document.body.appendChild(c);
+    setTimeout(function(){ c.remove(); },3500);
+  })();}
 }
 
-// ── SKIP ──
-function skipToEnd(){
-  _busy = false;
-  document.getElementById('drumroll').classList.remove('show');
-
-  // Reveal all skills
-  var skills = ['Reading','Writing','Listening','Speaking'];
-  var rev = _rev;
-  var scores = {Reading:rev.rwScale, Writing:rev.wrScale, Listening:rev.lsScale, Speaking:rev.spScale};
-  skills.forEach(function(id){
-    var v = scores[id]||0;
-    var card  = document.getElementById('sc-'+id);
-    var score = document.getElementById('scs-'+id);
-    var cefr  = document.getElementById('scc-'+id);
-    score.classList.add('show-score');
-    score.innerHTML = v > 0 ? v : '<span style="font-size:18px;opacity:.5">—</span>';
-    var g = gradeFromScale(v);
-    cefr.textContent = g.cefr !== '—' ? g.cefr : '';
-    card.classList.remove('active-reveal');
-    card.classList.add('revealed');
-  });
-
-  // Reveal overall
-  document.getElementById('overall-area').classList.add('visible');
-  document.getElementById('ob-score-val').textContent  = rev.avgScale||'—';
-  document.getElementById('ob-score').classList.add('pop');
-  var g = gradeFromScale(rev.avgScale);
-  document.getElementById('ob-result-val').textContent = g.text;
-  document.getElementById('ob-result').classList.add('pop');
-  document.getElementById('ob-cefr-val').textContent   = g.cefr;
-  document.getElementById('ob-cefr').classList.add('pop');
-  document.getElementById('btn-next').classList.add('visible');
-  document.getElementById('click-prompt').classList.add('hidden');
-
-  // Disable further advancing
-  _step = _steps.length;
+// ── LOAD ──
+async function init(){
+  var p=new URLSearchParams(window.location.search);
+  _params={candidateId:p.get('candidateId')||'',firstName:p.get('firstName')||'',lastName:p.get('lastName')||''};
+  try{
+    var r=await fetch(API+'/'+BIN+'/latest',{headers:{'X-Master-Key':KEY}});
+    var d=await r.json(); var store=d.record||d;
+    _cand=(store.candidates||[]).find(function(c){ return c.candidateId===_params.candidateId; });
+    if(!_cand||!_cand.review||!_cand.review.published){ window.location.href='https://samromand.github.io/check_results'; return; }
+    _rev=_cand.review;
+    setup();
+  }catch(e){ document.getElementById('loading').innerHTML='<div style="color:rgba(255,255,255,.5)">Error. <a href="https://samromand.github.io/check_results" style="color:#CC2222">← Back</a></div>'; }
 }
 
 function goToResults(){
-  var p = new URLSearchParams({
-    candidateId: _params.candidateId,
-    firstName:   _params.firstName,
-    lastName:    _params.lastName
-  });
-  window.location.href = 'https://samromand.github.io/results?' + p.toString();
+  var p=new URLSearchParams({candidateId:_params.candidateId,firstName:_params.firstName,lastName:_params.lastName});
+  window.location.href='https://samromand.github.io/results?'+p.toString();
 }
 
-window.skipToEnd = skipToEnd;
-window.goToResults = goToResults;
-
-window.addEventListener('load', init);
+window.skipAll=skipAll; window.goToResults=goToResults;
+window.addEventListener('load',init);
 </script>
 </body>
 </html>
