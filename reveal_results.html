@@ -70,9 +70,42 @@ canvas#chart{display:block;width:100%;border-radius:6px}
 /* LOADING */
 #loading{position:fixed;inset:0;background:#0A1628;display:flex;align-items:center;justify-content:center;z-index:999;gap:10px;font-size:14px;color:rgba(255,255,255,.4)}
 .sp{width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:#CC2222;border-radius:50%;animation:spin .7s linear infinite}
+
+/* DISCLAIMER */
+#disclaimer-overlay{position:fixed;inset:0;z-index:250;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .35s}
+#disclaimer-overlay.show{opacity:1;pointer-events:all}
+.disc-box{
+  background:rgba(10,22,40,.97);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;padding:28px 36px;text-align:center;
+  max-width:340px;width:90%;
+  box-shadow:0 8px 48px rgba(0,0,0,.6);
+}
+.disc-icon{font-size:32px;margin-bottom:12px}
+.disc-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.45);margin-bottom:8px}
+.disc-text{font-size:17px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:20px}
+.disc-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 24px;background:#CC2222;color:#fff;
+  border:none;border-radius:4px;font-family:'Noto Sans',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;
+  font-size:13px;
+}
+.disc-btn:hover{background:#991A1A}
+.disc-btn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5}
 </style>
 </head>
 <body>
+
+<div id="disclaimer-overlay">
+  <div class="disc-box">
+    <div class="disc-icon" id="disc-icon">🎯</div>
+    <div class="disc-title" id="disc-title">Up next</div>
+    <div class="disc-text" id="disc-text">—</div>
+    <button class="disc-btn" id="disc-btn" onclick="dismissDisclaimer()">
+      Reveal <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
 
 <div id="loading"><div class="sp"></div> Loading your results…</div>
 
@@ -130,8 +163,8 @@ var barTargets  = {Reading:0, Writing:0, Listening:0, Speaking:0};
 // ── GRADE ──
 function grade(s){
   if(!s||s<=0) return {cefr:'—',text:'—',color:'#888'};
-  if(s>=140) return {cefr:'B1',text:'Pass with Distinction',color:'#CC2222'};
-  if(s>=133) return {cefr:'A2',text:'Pass with Merit',color:'#CC2222'};
+  if(s>=140) return {cefr:'B1',text:'Pass at Grade A',color:'#CC2222'};
+  if(s>=133) return {cefr:'A2',text:'Pass at Grade B',color:'#CC2222'};
   if(s>=120) return {cefr:'A2',text:'Pass at Grade C',color:'#CC2222'};
   if(s>=100) return {cefr:'A1',text:'Level A1',color:'#888'};
   return           {cefr:'—', text:'Participation',color:'#888'};
@@ -157,7 +190,7 @@ function draw(){
   certBands.forEach(function(b){
     var y1=s2y(b.top), y2=s2y(b.bot), h=y2-y1;
     CTX.fillStyle=b.fill; CTX.fillRect(COL_RULER,y1,COL_CERT,h);
-    if(b.border){ CTX.fillStyle='#000'; CTX.fillRect(COL_RULER,y2-1,COL_CERT,1); }
+    if(b.border){ CTX.fillStyle='#fff'; CTX.fillRect(COL_RULER,y2-1,COL_CERT,1); }
     CTX.fillStyle=b.tc; CTX.font='bold 8.5px Arial'; CTX.textAlign='center'; CTX.textBaseline='middle';
     CTX.fillText(b.label, COL_RULER+COL_CERT/2, y1+h/2);
   });
@@ -345,25 +378,72 @@ function setup(){
       initCanvas();
       draw();
       // Listen
-      document.addEventListener('click', advance);
+      document.addEventListener('click', function(e){
+        if(e.target.closest('#disclaimer-overlay')) return;
+        advance();
+      });
       document.addEventListener('keydown', function(e){ if(e.key===' '||e.key==='Enter') advance(); });
-      setTimeout(advance, 900);
+      // Show first disclaimer instead of auto-advancing
+      showDisclaimer(0);
     });
   });
 }
 
-function advance(){
-  if(_busy) return;
-  _step++;
-  if(_step>=_steps.length) return;
-  _busy = true;
-  document.getElementById('prompt').classList.add('hidden');
-  showDrum(function(){
-    doStep(_steps[_step]);
-    _busy = false;
-    if(_step<_steps.length-1) document.getElementById('prompt').classList.remove('hidden');
-  });
+// ── DISCLAIMERS ──
+var _pendingStep = -1;
+
+function stepDisclaimer(stepIdx){
+  if(stepIdx >= _steps.length) return null;
+  var step = _steps[stepIdx];
+  var skillOrder = ['Reading','Writing','Listening','Speaking'];
+  var skillsDone = _steps.slice(0, stepIdx).filter(function(s){ return s.type==='skill'; }).length;
+  var skillsTotal = _steps.filter(function(s){ return s.type==='skill'; }).length;
+
+  if(step.type==='skill'){
+    var v = barTargets[step.id];
+    var isFirst = skillsDone===0;
+    var isLast  = skillsDone===skillsTotal-1;
+    return {
+      icon: isFirst ? '📉' : isLast ? '📈' : '📊',
+      title: isFirst ? 'Lowest score' : isLast ? 'Highest score' : 'Next skill',
+      text: 'Revealing your score for\n' + step.id
+    };
+  }
+  if(step.type==='score') return {icon:'🎯', title:'Overall result', text:'Your overall scale score\nacross all four skills'};
+  if(step.type==='result') return {icon:'🏆', title:'Pass / Fail', text:'Your official exam result'};
+  if(step.type==='cefr')  return {icon:'🌍', title:'CEFR Level', text:'Your Common European Framework\nlevel of English'};
+  return null;
 }
+
+function showDisclaimer(stepIdx){
+  _pendingStep = stepIdx;
+  var info = stepDisclaimer(stepIdx);
+  if(!info){ dismissDisclaimer(); return; }
+  document.getElementById('disc-icon').textContent  = info.icon;
+  document.getElementById('disc-title').textContent = info.title;
+  document.getElementById('disc-text').innerHTML    = info.text.replace(/\n/g,'<br>');
+  document.getElementById('disclaimer-overlay').classList.add('show');
+  document.getElementById('prompt').classList.add('hidden');
+}
+
+function dismissDisclaimer(){
+  document.getElementById('disclaimer-overlay').classList.remove('show');
+  // Trigger the actual reveal after a tiny pause
+  setTimeout(function(){
+    _busy = true;
+    showDrum(function(){
+      doStep(_steps[_pendingStep]);
+      _busy = false;
+      // Queue next disclaimer or prompt
+      if(_pendingStep < _steps.length-1){
+        setTimeout(function(){ showDisclaimer(_pendingStep+1); }, 1200);
+      }
+    });
+  }, 250);
+  _step = _pendingStep;
+}
+
+window.dismissDisclaimer = dismissDisclaimer;
 
 function showDrum(cb){
   var el = document.getElementById('drumroll');
