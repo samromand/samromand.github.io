@@ -365,7 +365,6 @@ window.submitVariant = async function() {
     document.getElementById('cand-name2').textContent   = _candidate.firstName+' '+_candidate.lastName;
     document.getElementById('cand-id2').textContent     = _candidate.candidateId;
     document.getElementById('cand-variant').textContent = code;
-    document.getElementById('q-count').textContent      = qCount ? qCount+' questions' : 'Ready';
     document.getElementById('section2').classList.add('section-hidden');
     document.getElementById('section3').classList.remove('section-hidden');
 
@@ -541,7 +540,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="var-badge-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
         </div>
       </div>
-      <div class="var-info">Questions: <strong id="q-count">—</strong></div>
       <button class="btn-go" onclick="goToExam()">
         Go to exam
         <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
