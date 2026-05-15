@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Results — Cambridge Assessment English</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#00686E;--teal-dark:#004F54;--teal-light:#E6F4F5;
+  --red:#CC2222;--red-dark:#991A1A;
+  --gold:#F5C842;
+  --text:#1A1A1A;--muted:#666;--border:#D0D0D0;
+  --header-h:56px;
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'Noto Sans',system-ui,sans-serif;
+}
+
+html,body{
+  min-height:100%;font-family:var(--sans);font-size:15px;
+  color:var(--text);background:#0A1628;
+  overflow-x:hidden;
+}
+
+/* ── HEADER ── */
+#header{
+  height:var(--header-h);background:rgba(10,22,40,.95);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  backdrop-filter:blur(8px);
+}
+.cam-shield{width:38px;height:44px;flex-shrink:0;background:linear-gradient(180deg,#C00 50%,#FFD700 50%);border-radius:2px 2px 50% 50%;position:relative;overflow:hidden}
+.cam-shield::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 44'%3E%3Cpath d='M19 4 L34 10 L34 26 Q34 38 19 42 Q4 38 4 26 L4 10 Z' fill='none' stroke='rgba(255,255,255,.3)' stroke-width='1.5'/%3E%3C/svg%3E") center/cover}
+.cam-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none}
+.cam-logo-text .top{font-size:13px;font-weight:700;color:#fff}
+.cam-logo-text .bot{font-size:11px;color:rgba(255,255,255,.6)}
+.header-sep{width:1px;height:28px;background:rgba(255,255,255,.2);flex-shrink:0}
+#header-title{font-size:14px;font-weight:600;color:rgba(255,255,255,.9)}
+.header-right{margin-left:auto}
+.skip-btn{
+  font-family:var(--sans);font-size:12px;font-weight:600;
+  color:rgba(255,255,255,.5);background:none;border:1px solid rgba(255,255,255,.2);
+  border-radius:3px;padding:5px 14px;cursor:pointer;
+  transition:all .15s;letter-spacing:.02em;
+}
+.skip-btn:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+
+/* ── STAGE ── */
+#stage{
+  min-height:100vh;padding-top:var(--header-h);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+
+/* Background particles */
+#stage::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 40%, rgba(0,104,110,.25) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+/* Candidate name at top */
+#cand-name-display{
+  position:absolute;top:calc(var(--header-h) + 24px);left:0;right:0;
+  text-align:center;
+  font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.06em;
+  text-transform:uppercase;font-weight:600;
+}
+
+/* ── SKILL CARDS ── */
+.skill-cards{
+  display:flex;gap:12px;margin-bottom:32px;
+  flex-wrap:wrap;justify-content:center;
+  padding:0 20px;
+}
+
+.skill-card{
+  width:140px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;
+  padding:16px 12px 14px;
+  text-align:center;
+  position:relative;
+  transition:all .5s cubic-bezier(.34,1.56,.64,1);
+  opacity:0;
+  transform:translateY(20px) scale(.95);
+}
+.skill-card.revealed{
+  opacity:1;transform:translateY(0) scale(1);
+  border-color:rgba(255,255,255,.15);
+  background:rgba(255,255,255,.07);
+}
+.skill-card.active-reveal{
+  border-color:rgba(204,34,34,.6);
+  box-shadow:0 0 30px rgba(204,34,34,.25), 0 0 60px rgba(204,34,34,.1);
+  background:rgba(204,34,34,.08);
+}
+
+.skill-card-label{
+  font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.4);margin-bottom:10px;
+}
+.skill-card.revealed .skill-card-label{color:rgba(255,255,255,.6)}
+
+.skill-card-score{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  color:#fff;line-height:1;margin-bottom:4px;
+  min-height:48px;display:flex;align-items:center;justify-content:center;
+}
+.skill-card-score .score-mask{
+  display:inline-block;
+  background:rgba(255,255,255,.08);border-radius:4px;
+  width:56px;height:40px;
+}
+.skill-card-score.show-score .score-mask{display:none}
+
+.skill-card-cefr{
+  font-size:11px;font-weight:700;
+  color:rgba(255,255,255,.3);
+  min-height:16px;
+}
+.skill-card.revealed .skill-card-cefr{color:rgba(255,255,255,.55)}
+
+/* ── OVERALL REVEAL AREA ── */
+#overall-area{
+  text-align:center;
+  opacity:0;transition:opacity .6s;
+}
+#overall-area.visible{opacity:1}
+
+.overall-row{
+  display:flex;gap:20px;justify-content:center;align-items:stretch;
+  flex-wrap:wrap;padding:0 20px;
+}
+
+.overall-block{
+  min-width:140px;padding:20px 24px;
+  border-radius:8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  text-align:center;
+  opacity:0;transform:scale(.9);
+  transition:all .6s cubic-bezier(.34,1.56,.64,1);
+}
+.overall-block.pop{
+  opacity:1;transform:scale(1);
+}
+.overall-block.ob-score{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.08)}
+.overall-block.ob-result{background:var(--red);border-color:var(--red-dark)}
+.overall-block.ob-cefr{background:var(--teal);border-color:var(--teal-dark)}
+
+.ob-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px}
+.ob-result .ob-label,.ob-cefr .ob-label{color:rgba(255,255,255,.7)}
+.ob-value{font-family:var(--serif);font-size:32px;font-weight:700;color:#fff;line-height:1.1}
+.ob-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:6px}
+
+/* ── NEXT BUTTON ── */
+#btn-next{
+  margin-top:32px;
+  padding:14px 36px;
+  background:var(--red);color:#fff;
+  border:none;border-radius:4px;
+  font-family:var(--sans);font-size:15px;font-weight:700;
+  cursor:pointer;
+  transition:all .3s;
+  opacity:0;transform:translateY(16px);
+  display:flex;align-items:center;gap:10px;
+  letter-spacing:.01em;
+}
+#btn-next.visible{opacity:1;transform:translateY(0)}
+#btn-next:hover{background:var(--red-dark);transform:translateY(-1px)}
+#btn-next svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* ── CLICK PROMPT ── */
+#click-prompt{
+  position:fixed;bottom:28px;left:0;right:0;
+  text-align:center;
+  font-size:13px;color:rgba(255,255,255,.35);
+  letter-spacing:.04em;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.7}}
+#click-prompt.hidden{display:none}
+
+/* ── DRUMROLL OVERLAY ── */
+#drumroll{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(10,22,40,.92);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+#drumroll.show{opacity:1;pointer-events:all}
+.dr-ring{
+  width:80px;height:80px;border-radius:50%;
+  border:3px solid transparent;
+  border-top-color:var(--red);
+  border-right-color:var(--red);
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CONFETTI ── */
+.confetto{
+  position:fixed;width:8px;height:8px;border-radius:2px;
+  pointer-events:none;z-index:500;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+
+/* ── LOADING ── */
+#loading{
+  position:fixed;inset:0;background:#0A1628;
+  display:flex;align-items:center;justify-content:center;z-index:999;
+  font-family:var(--sans);font-size:14px;color:rgba(255,255,255,.5);gap:12px;
+}
+.spin2{width:20px;height:20px;border:2px solid rgba(255,255,255,.15);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spin2"></div> Loading your results…</div>
+
+<div id="header">
+  <a class="cam-logo" href="https://samromand.github.io">
+    <div class="cam-shield"></div>
+    <div class="cam-logo-text">
+      <div class="top">Cambridge Assessment</div>
+      <div class="bot">English</div>
+    </div>
+  </a>
+  <div class="header-sep"></div>
+  <div id="header-title">A2 Key for Schools — Results</div>
+  <div class="header-right">
+    <button class="skip-btn" onclick="skipToEnd()">Skip →</button>
+  </div>
+</div>
+
+<div id="stage">
+  <div id="cand-name-display"></div>
+
+  <div class="skill-cards" id="skill-cards">
+    <div class="skill-card" id="sc-Reading">
+      <div class="skill-card-label">Reading</div>
+      <div class="skill-card-score" id="scs-Reading"><div class="score-mask"></div></div>
+      <div class="skill-card-cefr" id="scc-Reading"></div>
+    </div>
+    <div class="skill-card" id="sc-Writing">
+      <div class="skill-card-label">Writing</div>
+      <div class="skill-card-score" id="scs-Writing"><div class="score-mask"></div></div>
+      <div class="skill-card-cefr" id="scc-Writing"></div>
+    </div>
+    <div class="skill-card" id="sc-Listening">
+      <div class="skill-card-label">Listening</div>
+      <div class="skill-card-score" id="scs-Listening"><div class="score-mask"></div></div>
+      <div class="skill-card-cefr" id="scc-Listening"></div>
+    </div>
+    <div class="skill-card" id="sc-Speaking">
+      <div class="skill-card-label">Speaking</div>
+      <div class="skill-card-score" id="scs-Speaking"><div class="score-mask"></div></div>
+      <div class="skill-card-cefr" id="scc-Speaking"></div>
+    </div>
+  </div>
+
+  <div id="overall-area">
+    <div class="overall-row">
+      <div class="overall-block ob-score" id="ob-score">
+        <div class="ob-label">Overall Score</div>
+        <div class="ob-value" id="ob-score-val">—</div>
+      </div>
+      <div class="overall-block ob-result" id="ob-result">
+        <div class="ob-label">Result</div>
+        <div class="ob-value" id="ob-result-val">—</div>
+      </div>
+      <div class="overall-block ob-cefr" id="ob-cefr">
+        <div class="ob-label">CEFR Level</div>
+        <div class="ob-value" id="ob-cefr-val">—</div>
+        <div class="ob-sub" id="ob-cefr-sub"></div>
+      </div>
+    </div>
+
+    <button id="btn-next" onclick="goToResults()">
+      View full Statement of Results
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="click-prompt">Click anywhere to continue</div>
+<div id="drumroll"><div class="dr-ring"></div></div>
+
+<script>
+var ANSWERS_BIN = '6a04a5a9c0954111d81aea23';
+var MASTER_KEY  = '$2a$10$mzFKZQiWaJbULoSLOjldAOZ03PJNwcg0FFO30DaOrFAAjQZP5dgFi';
+var API         = 'https://api.jsonbin.io/v3/b';
+
+var _cand = null;
+var _rev  = null;
+var _params = {};
+var _step = -1;   // current reveal step index
+var _steps = [];  // ordered list of reveal actions
+var _busy = false;
+
+// ── GRADING ──
+function gradeFromScale(s){
+  if(!s || s<=0) return {cefr:'—', text:'—'};
+  if(s>=140) return {cefr:'B1', text:'Pass with Distinction'};
+  if(s>=133) return {cefr:'A2', text:'Pass with Merit'};
+  if(s>=120) return {cefr:'A2', text:'Pass at Grade C'};
+  if(s>=100) return {cefr:'A1', text:'Level A1'};
+  if(s>=82)  return {cefr:'—',  text:'Participation'};
+  return           {cefr:'—',  text:'Participation'};
+}
+
+// ── LOAD ──
+async function init(){
+  var p = new URLSearchParams(window.location.search);
+  _params.candidateId = p.get('candidateId')||'';
+  _params.firstName   = p.get('firstName')||'';
+  _params.lastName    = p.get('lastName')||'';
+
+  try {
+    var raw   = await fetch(API+'/'+ANSWERS_BIN+'/latest',{headers:{'X-Master-Key':MASTER_KEY}});
+    var data  = await raw.json();
+    var store = data.record || data;
+    _cand = (store.candidates||[]).find(function(c){ return c.candidateId===_params.candidateId; });
+    if(!_cand || !_cand.review || !_cand.review.published){
+      window.location.href = 'https://samromand.github.io/check_results';
+      return;
+    }
+    _rev = _cand.review;
+    setup();
+  } catch(e){
+    document.getElementById('loading').innerHTML = '<div style="color:rgba(255,255,255,.6)">Error loading results. <a href="https://samromand.github.io/check_results" style="color:#CC2222">← Back</a></div>';
+  }
+}
+
+function setup(){
+  document.getElementById('loading').style.display='none';
+
+  // Candidate name
+  document.getElementById('cand-name-display').textContent =
+    (_cand.firstName + ' ' + _cand.lastName).toUpperCase();
+
+  // Build skill order: sort by score ascending, tiebreak by canonical order
+  var skills = [
+    {id:'Reading',  v:_rev.rwScale||0},
+    {id:'Writing',  v:_rev.wrScale||0},
+    {id:'Listening',v:_rev.lsScale||0},
+    {id:'Speaking', v:_rev.spScale||0}
+  ];
+  var order = ['Reading','Writing','Listening','Speaking'];
+  var sorted = skills.slice().sort(function(a,b){
+    if(a.v !== b.v) return a.v - b.v;  // ascending: lowest first
+    return order.indexOf(a.id) - order.indexOf(b.id);
+  });
+
+  // Build steps
+  _steps = [];
+  sorted.forEach(function(s){ _steps.push({type:'skill', id:s.id, v:s.v}); });
+  _steps.push({type:'score'});
+  _steps.push({type:'result'});
+  _steps.push({type:'cefr'});
+
+  // Listen for click / space / enter to advance
+  document.addEventListener('click', advance);
+  document.addEventListener('keydown', function(e){
+    if(e.key===' '||e.key==='Enter') advance();
+  });
+
+  // Kick off first step automatically after a short pause
+  setTimeout(advance, 800);
+}
+
+function advance(){
+  if(_busy) return;
+  _step++;
+  if(_step >= _steps.length) return;
+  var step = _steps[_step];
+  _busy = true;
+
+  // Hide prompt during animation
+  document.getElementById('click-prompt').classList.add('hidden');
+
+  showDrumroll(function(){
+    executeStep(step);
+    _busy = false;
+    // Show prompt unless last step
+    if(_step < _steps.length - 1){
+      document.getElementById('click-prompt').classList.remove('hidden');
+    }
+  });
+}
+
+function showDrumroll(cb){
+  var dr = document.getElementById('drumroll');
+  dr.classList.add('show');
+  var delay = 900 + Math.random()*400;  // 900–1300ms suspense
+  setTimeout(function(){
+    dr.classList.remove('show');
+    setTimeout(cb, 300);
+  }, delay);
+}
+
+function executeStep(step){
+  if(step.type === 'skill'){
+    revealSkill(step.id, step.v);
+    // If last skill, also show overall area shell
+    if(_step === _steps.filter(function(s){return s.type==='skill';}).length - 1){
+      setTimeout(function(){
+        document.getElementById('overall-area').classList.add('visible');
+      }, 400);
+    }
+  } else if(step.type === 'score'){
+    popBlock('ob-score', function(){
+      document.getElementById('ob-score-val').textContent = _rev.avgScale||'—';
+    });
+    confetti();
+  } else if(step.type === 'result'){
+    var g = gradeFromScale(_rev.avgScale);
+    popBlock('ob-result', function(){
+      document.getElementById('ob-result-val').textContent = g.text;
+    });
+    if(_rev.avgScale >= 120) confetti(true);
+  } else if(step.type === 'cefr'){
+    var g = gradeFromScale(_rev.avgScale);
+    popBlock('ob-cefr', function(){
+      document.getElementById('ob-cefr-val').textContent = g.cefr;
+    });
+    // Show next button
+    setTimeout(function(){
+      document.getElementById('btn-next').classList.add('visible');
+    }, 600);
+    if(_rev.avgScale >= 120) confetti(true);
+  }
+}
+
+function revealSkill(id, v){
+  var card  = document.getElementById('sc-'+id);
+  var score = document.getElementById('scs-'+id);
+  var cefr  = document.getElementById('scc-'+id);
+
+  // Light up active
+  card.classList.add('active-reveal');
+
+  setTimeout(function(){
+    // Reveal score
+    score.classList.add('show-score');
+    score.innerHTML = v > 0 ? v : '<span style="font-size:18px;opacity:.5">—</span>';
+
+    var g = gradeFromScale(v);
+    cefr.textContent = g.cefr !== '—' ? g.cefr : '';
+
+    card.classList.remove('active-reveal');
+    card.classList.add('revealed');
+
+    if(v >= 120) confetti();
+  }, 200);
+}
+
+function popBlock(id, onReveal){
+  var el = document.getElementById(id);
+  setTimeout(onReveal, 100);
+  setTimeout(function(){ el.classList.add('pop'); }, 200);
+}
+
+// ── CONFETTI ──
+function confetti(big){
+  var colors = ['#CC2222','#F5C842','#00686E','#fff','#E05C00'];
+  var count = big ? 80 : 30;
+  for(var i=0;i<count;i++){
+    (function(){
+      var c = document.createElement('div');
+      c.className = 'confetto';
+      var size = 5 + Math.random()*8;
+      c.style.cssText =
+        'left:'+(Math.random()*100)+'vw;'
+        +'top:-10px;'
+        +'width:'+size+'px;height:'+size+'px;'
+        +'background:'+colors[Math.floor(Math.random()*colors.length)]+';'
+        +'animation-duration:'+(1.5+Math.random()*2)+'s;'
+        +'animation-delay:'+(Math.random()*0.5)+'s;'
+        +'border-radius:'+(Math.random()>0.5?'50%':'2px')+';';
+      document.body.appendChild(c);
+      setTimeout(function(){ c.remove(); }, 3500);
+    })();
+  }
+}
+
+// ── SKIP ──
+function skipToEnd(){
+  _busy = false;
+  document.getElementById('drumroll').classList.remove('show');
+
+  // Reveal all skills
+  var skills = ['Reading','Writing','Listening','Speaking'];
+  var rev = _rev;
+  var scores = {Reading:rev.rwScale, Writing:rev.wrScale, Listening:rev.lsScale, Speaking:rev.spScale};
+  skills.forEach(function(id){
+    var v = scores[id]||0;
+    var card  = document.getElementById('sc-'+id);
+    var score = document.getElementById('scs-'+id);
+    var cefr  = document.getElementById('scc-'+id);
+    score.classList.add('show-score');
+    score.innerHTML = v > 0 ? v : '<span style="font-size:18px;opacity:.5">—</span>';
+    var g = gradeFromScale(v);
+    cefr.textContent = g.cefr !== '—' ? g.cefr : '';
+    card.classList.remove('active-reveal');
+    card.classList.add('revealed');
+  });
+
+  // Reveal overall
+  document.getElementById('overall-area').classList.add('visible');
+  document.getElementById('ob-score-val').textContent  = rev.avgScale||'—';
+  document.getElementById('ob-score').classList.add('pop');
+  var g = gradeFromScale(rev.avgScale);
+  document.getElementById('ob-result-val').textContent = g.text;
+  document.getElementById('ob-result').classList.add('pop');
+  document.getElementById('ob-cefr-val').textContent   = g.cefr;
+  document.getElementById('ob-cefr').classList.add('pop');
+  document.getElementById('btn-next').classList.add('visible');
+  document.getElementById('click-prompt').classList.add('hidden');
+
+  // Disable further advancing
+  _step = _steps.length;
+}
+
+function goToResults(){
+  var p = new URLSearchParams({
+    candidateId: _params.candidateId,
+    firstName:   _params.firstName,
+    lastName:    _params.lastName
+  });
+  window.location.href = 'https://samromand.github.io/results?' + p.toString();
+}
+
+window.skipToEnd = skipToEnd;
+window.goToResults = goToResults;
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
