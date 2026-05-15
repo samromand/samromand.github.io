@@ -300,6 +300,11 @@ main{flex:1;overflow-y:auto;padding:22px 26px 48px}
       <div class="mpills"><span class="mp">Questions: <strong>7–13</strong></span><span class="mp">Format: <strong>A / B / C</strong></span></div>
     </div></div>
     <div class="stitle">Three person profiles</div>
+    <div class="fi" style="margin-bottom:16px;max-width:520px">
+      <label>Common title (optional)</label>
+      <input type="text" id="rw2-title" placeholder="e.g. School gardens competition" style="width:100%">
+      <span class="fh">Shown as a heading above all three profiles in the exam.</span>
+    </div>
     <div class="fg fg3" id="profiles-grid" style="margin-bottom:18px"></div>
     <div class="stitle">Questions 7–13</div>
     <div class="ql" id="ql-rw2"></div>
@@ -591,6 +596,7 @@ function emptyVariant() {
   return {
     rw1: Array.from({length:6}, () => ({img:'',text:'',question:'',optA:'',optB:'',optC:'',correct:''})),
     rw2: {
+      title: '',
       persons: [{name:'',photo:'',profile:''},{name:'',photo:'',profile:''},{name:'',photo:'',profile:''}],
       questions: Array.from({length:7}, () => ({text:'',correct:''}))
     },
@@ -611,6 +617,7 @@ function emptyVariant() {
     ls4: {audio:'',context:'',
       questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
     ls5: {audio:'',context:'',
+      namesTitle:'People', actsTitle:'Help with',
       names: Array(6).fill(''), activities: Array(8).fill(''), answers: Array(6).fill('')}
   };
 }
@@ -791,6 +798,9 @@ function bRW1() {
 // ── RW2 ──
 function bRW2() {
   const d = D().rw2;
+  // Populate optional title
+  const titleEl = document.getElementById('rw2-title');
+  if (titleEl) titleEl.value = d.title || '';
   const pg = document.getElementById('profiles-grid');
   pg.innerHTML = '';
   ['A','B','C'].forEach((letter, i) => {
@@ -1132,6 +1142,10 @@ function bLS5() {
       <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg>
     </div>
     <div class="qcb">
+      <div class="fg fg2" style="margin-bottom:14px">
+        <div class="fi"><label>Left column heading</label><input type="text" data-ls5="namesTitle" placeholder="e.g. People" value="${esc(d.namesTitle||'People')}"></div>
+        <div class="fi"><label>Right column heading</label><input type="text" data-ls5="actsTitle" placeholder="e.g. Help with" value="${esc(d.actsTitle||'Help with')}"></div>
+      </div>
       <div class="mgrid">
         <div>
           <div class="mch">Six names — Q 0 (example) + Q 21–25</div>
@@ -1178,6 +1192,8 @@ function collect() {
   });
 
   // RW2 persons
+  const rw2TitleEl = document.getElementById('rw2-title');
+  if (rw2TitleEl) d.rw2.title = rw2TitleEl.value;
   document.querySelectorAll('[data-pi]').forEach(el => {
     const i = +el.dataset.pi; if (!d.rw2.persons[i]) return;
     d.rw2.persons[i][el.dataset.pk] = el.value;
