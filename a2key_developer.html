@@ -602,7 +602,7 @@ function emptyVariant() {
     },
     rw3: {title:'',byline:'',body:'',illustration:'',
       questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
-    rw4: {title:'',body:'',
+    rw4: {title:'',body:'',img:'',
       gaps: Array.from({length:6}, () => ({optA:'',optB:'',optC:'',correct:''}))},
     rw5: {from:'',to:'',example:'',body:'',reply:'',
       answers: Array.from({length:6}, () => ({answer:'',also:''}))},
@@ -891,6 +891,9 @@ function bRW4() {
       <div class="fi" style="margin-top:11px"><label>Cloze text</label>
         <textarea style="min-height:150px" data-rw4="body">${esc(d.body)}</textarea>
         <span class="fh">Mark gaps as (19), (20)… (24) within the text.</span></div>
+      <div class="fi" style="margin-top:11px"><label>Image below text (optional)</label>
+        <input type="text" data-rw4="img" placeholder="https://… image URL" value="${esc(d.img||'')}">
+        <span class="fh">Leave blank if no image needed.</span></div>
       <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save text</button></div>
     </div>
   </div>`;

@@ -1577,6 +1577,7 @@ function buildP4() {
   });
 
   html += rendered.join('') + '</div>';
+  if(d.img) html += `<div style="margin-top:18px;text-align:center"><img src="${esc(d.img)}" style="max-width:100%;max-height:260px;border-radius:4px;border:1px solid var(--border)" alt=""></div>`;
   wrap.innerHTML = html;
 }
 
