@@ -1826,7 +1826,7 @@ function buildP5() {
       ondragover="ls5BankDragOver(event)" ondrop="ls5BankDrop(event)" ondragleave="ls5BankDragLeave(event)">
       ${acts.map((a, ai) => {
         const ltr = String.fromCharCode(65+ai);
-        const used = usedLtrs.has(ltr) || ltr === exampleAns;
+        const used = usedLtrs.has(ltr);  // example tag stays available for reuse
         return `<div class="ls5-tag${used?' ls5-tag-hidden':''}" draggable="${!used}" id="ls5-tag-${ltr}" data-ltr="${ltr}"
           ondragstart="ls5DragStart(event)" ondragend="ls5DragEnd(event)">
           ${esc(a || ltr)}
