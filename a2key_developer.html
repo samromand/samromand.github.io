@@ -604,9 +604,9 @@ function emptyVariant() {
       questions: Array.from({length:5}, () => ({text:'',optA:'',optB:'',optC:'',correct:''}))},
     rw4: {title:'',body:'',img:'',
       gaps: Array.from({length:6}, () => ({optA:'',optB:'',optC:'',correct:''}))},
-    rw5: {from:'',to:'',example:'',body:'',reply:'',
+    rw5: {from:'',to:'',example:'',body:'',reply:'',img:'',
       answers: Array.from({length:6}, () => ({answer:'',also:''}))},
-    rw6: {scenario:'',bullet1:'',bullet2:'',bullet3:'',recipient:'',sayLabel:'Say:'},
+    rw6: {scenario:'',bullet1:'',bullet2:'',bullet3:'',recipient:''},
     rw7: {img1:'',img2:'',img3:'',note:''},
     ls1: {audio:'',context:'',
       questions: Array.from({length:5}, () => ({text:'',picA:'',picB:'',picC:'',correct:''}))},
@@ -937,6 +937,9 @@ function bRW5() {
         <span class="fh">Use (0) for example gap and (25)–(30) for answer gaps.</span></div>
       <div class="fi" style="margin-top:10px"><label>Reply email (optional)</label>
         <textarea style="min-height:68px" data-rw5="reply">${esc(d.reply)}</textarea></div>
+      <div class="fi" style="margin-top:11px"><label>Image below text (optional)</label>
+        <input type="text" data-rw5="img" placeholder="https://… image URL" value="${esc(d.img||'')}">
+        <span class="fh">Leave blank if no image needed.</span></div>
       <div class="brow"><button class="btn btn-p" onclick="saveNow()">Save email</button></div>
     </div>
   </div>`;
@@ -970,12 +973,7 @@ function bRW6() {
       <div class="fi"><label>Scenario instruction</label>
         <textarea style="min-height:80px" data-rw6="scenario">${esc(d.scenario)}</textarea></div>
       <div class="sdiv"></div>
-      <div class="fi"><label>Bullet label</label>
-        <select data-rw6="sayLabel">
-          <option value="Say:" ${(d.sayLabel||'Say:')==='Say:'?'selected':''}>Say:</option>
-          <option value="In your email:" ${(d.sayLabel||'')==='In your email:'?'selected':''}>In your email:</option>
-        </select></div>
-      <div class="stitle">Three bullet points</div>
+      <div class="stitle">Three "Say:" bullet points</div>
       <div class="fg fg2">
         <div class="fi"><label>Bullet 1</label><input type="text" data-rw6="bullet1" placeholder="e.g. when the party is" value="${esc(d.bullet1)}"></div>
         <div class="fi"><label>Bullet 2</label><input type="text" data-rw6="bullet2" placeholder="e.g. where the party is" value="${esc(d.bullet2)}"></div>
