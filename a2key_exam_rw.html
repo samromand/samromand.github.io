@@ -1739,7 +1739,7 @@ function buildP6() {
 
   left.innerHTML = `
     <div class="p6-scenario">${esc(d.scenario||'').replace(/\n/g,'<br>')}</div>
-    <div class="p6-say-label">Say:</div>
+    <div class="p6-say-label">${esc(d.sayLabel||'Say:')}</div>
     <ul class="p6-bullets">
       ${[d.bullet1,d.bullet2,d.bullet3].filter(Boolean).map(b=>`<li>${esc(b)}</li>`).join('')}
     </ul>
