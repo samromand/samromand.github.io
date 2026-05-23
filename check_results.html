@@ -181,7 +181,7 @@ window.lookup = async function(){
     if(rev.published){
       showState('published', cand.firstName, cand.lastName, cand.candidateId, rev);
     } else if(!examDone){
-      showState('incomplete', cand.firstName, cand.lastName, cand.candidateId);
+      showState('incomplete', cand.firstName, cand.lastName, cand.candidateId, null, cand);
     } else {
       showState('pending', cand.firstName, cand.lastName, cand.candidateId);
     }
@@ -194,7 +194,7 @@ window.lookup = async function(){
   }
 };
 
-function showState(type, first, last, cid, rev){
+function showState(type, first, last, cid, rev, candObj){
   document.getElementById('form-section').style.display  = 'none';
   document.getElementById('result-section').style.display = 'block';
 
@@ -209,11 +209,33 @@ function showState(type, first, last, cid, rev){
       +'<div class="status-desc">We could not find a candidate with these details. Please check your first name, last name and Candidate ID and try again.</div>';
 
   } else if(type === 'incomplete'){
+    var progress = (candObj && candObj.progress) || [];
+    var sections = [
+      {key:'tutorial',  label:'Tutorial'},
+      {key:'rw',        label:'Reading & Writing'},
+      {key:'listening', label:'Listening'},
+      {key:'speaking',  label:'Speaking'}
+    ];
+    var progHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">';
+    sections.forEach(function(s){
+      var done = progress.includes(s.key);
+      progHtml += '<span style="font-size:12px;font-weight:600;padding:3px 10px;border-radius:2px;'
+        +(done ? 'background:#E6F4F5;color:#004F54;border:1px solid #A0CED0' : 'background:#F8F8F8;color:#888;border:1px solid #D0D0D0')
+        +'">'+( done ? '✓ ' : '')+s.label+'</span>';
+    });
+    progHtml += '</div>';
+    var continueUrl = 'https://samromand.github.io/exam_home?candidateId='+esc(cid)
+      +'&variant='+esc((candObj&&candObj.variantId)||'');
     html =
       '<div class="status-icon notfound"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,8 12,12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>'
       +'<div class="status-title">Exam not completed</div>'
-      +'<div class="status-desc">It looks like you have not completed all sections of the exam. Results can only be checked after all sections have been submitted.</div>'
-      +chip;
+      +'<div class="status-desc">It looks like you have not finished all sections yet.</div>'
+      +progHtml
+      +chip
+      +'<a href="'+continueUrl+'" style="display:block;margin-top:16px;height:44px;background:#00686E;color:#fff;border:none;border-radius:3px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px">'
+        +'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
+        +'Continue exam'
+      +'</a>';
 
   } else if(type === 'pending'){
     html =
