@@ -48,6 +48,33 @@ canvas#chart{display:block;width:100%}
 /* ── PRINT ── */
 .print-btn{display:block;margin:16px auto 0;padding:8px 26px;background:#CC2222;color:#fff;border:none;border-radius:2px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .print-btn:hover{background:#991A1A}
+/* ── DETAIL ── */
+.detail{padding:0 22px 24px}
+.det-section{margin-bottom:20px;break-inside:avoid}
+.det-head{background:#CC2222;color:#fff;padding:7px 12px;display:flex;align-items:center;justify-content:space-between}
+.det-head-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.det-head-stats{display:flex;gap:16px}
+.det-stat{text-align:right}
+.det-stat .ds-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.75;display:block}
+.det-stat .ds-val{font-size:13px;font-weight:700}
+.det-table{width:100%;border-collapse:collapse;font-size:11px}
+.det-table th{background:#f5f5f5;border:1px solid #ddd;padding:4px 8px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#555}
+.det-table th.left{text-align:left}
+.det-table td{border:1px solid #eee;padding:4px 8px;vertical-align:top}
+.det-table td.num{text-align:center;font-family:'Courier New',monospace;font-weight:700;font-size:12px;color:#333}
+.det-table td.ans{font-family:'Courier New',monospace;font-size:11px}
+.det-table td.match{text-align:center;font-size:13px}
+.det-table td.match.ok{color:#166534}
+.det-table td.match.no{color:#991B1B}
+.det-table tr:nth-child(even) td{background:#fafafa}
+.det-essay{font-size:12px;line-height:1.7;white-space:pre-wrap;color:#222;background:#fafafa;border:1px solid #eee;padding:10px 12px}
+.det-crit-table{width:100%;border-collapse:collapse;font-size:11px}
+.det-crit-table td{border:1px solid #eee;padding:5px 10px}
+.det-crit-table td.cname{font-weight:600;color:#333;width:130px}
+.det-crit-table td.cscore{text-align:center;font-family:'Courier New',monospace;font-weight:700;font-size:14px;width:60px}
+.det-crit-table tr:nth-child(even) td{background:#fafafa}
+.sp-formula{font-size:10px;color:#555;padding:6px 12px;background:#f5f5f5;border:1px solid #eee;border-top:none;font-family:'Courier New',monospace}
+.det-divider{height:1px;background:#ddd;margin:20px 0}
 @media print{
   body{background:#fff;padding:0}
   .sheet{box-shadow:none;max-width:none;width:100%}
@@ -117,6 +144,9 @@ canvas#chart{display:block;width:100%}
   <!-- CHART -->
   <div class="chart-wrap" id="chart-wrap"></div>
 
+  <!-- DETAIL -->
+  <div class="detail" id="detail-section"></div>
+
   <!-- FOOTER -->
   <div class="footer">
     This Statement of Results is computer generated and does not require a signature. Results are reported on the Cambridge English Scale. &nbsp;|&nbsp; Candidate ID: <strong id="footer-cid">—</strong>
@@ -162,6 +192,131 @@ function fmtSession(iso){
   return d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
 }
 
+// ── SCALE TABLES ──
+var TABLE_R={30:150,29:145,28:140,27:138,26:135,25:133,24:130,23:128,22:125,21:123,20:120,19:117,18:114,17:111,16:109,15:106,14:103,13:100,12:97,11:94,10:91,9:88,8:85,7:82,6:0,5:0,4:0,3:0,2:0,1:0,0:0};
+var TABLE_W={30:150,29:148,28:145,27:143,26:140,25:138,24:135,23:133,22:130,21:128,20:125,19:123,18:120,17:117,16:113,15:110,14:107,13:103,12:100,11:96,10:91,9:87,8:82,7:0,6:0,5:0,4:0,3:0,2:0,1:0,0:0};
+var TABLE_L={25:150,24:145,23:140,22:137,21:133,20:130,19:127,18:123,17:120,16:117,15:113,14:110,13:107,12:103,11:100,10:96,9:93,8:89,7:86,6:82,5:0,4:0,3:0,2:0,1:0,0:0};
+var TABLE_SP=[0,0,0,0,0,0,0,0,0,0,82,83,87,90,91,92,93,94,96,96,97,98,98,99,100,101,102,103,103,104,104,105,106,107,108,108,109,110,111,111,112,113,114,115,115,116,117,118,118,119,120,121,122,123,124,125,126,126,127,127,128,129,129,130,131,131,132,132,133,134,134,135,136,136,137,138,139,140,141,141,143,144,145,146,147,148,149,150,150,0,0];
+
+var TESTS_BIN = '6a022b31c0954111d80b71d2';
+var _correctAnswers = {reading:{}, listening:{}};
+
+function scaleToCEFR(s){ if(!s||s<=0)return'—'; if(s>=140)return'B1'; if(s>=120)return'A2'; if(s>=100)return'A1'; return'—'; }
+function scaleToResult(s){ if(!s||s<=0)return'—'; if(s>=140)return'Pass at Grade A'; if(s>=133)return'Pass at Grade B'; if(s>=120)return'Pass at Grade C'; if(s>=100)return'Level A1'; return'Participation'; }
+function checkAns(cand,corr){ var c=String(cand||'').trim().toUpperCase(); var r=String(corr||'').trim(); if(!c||!r)return null; return r.toUpperCase().split('|').map(function(s){return s.trim();}).indexOf(c)!==-1; }
+function escH(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function loadCorrectAnswers(variantKey){
+  try {
+    var raw = await fetch(API+'/'+TESTS_BIN+'/latest',{headers:{'X-Master-Key':MASTER_KEY}});
+    var data = await raw.json();
+    var tests = data.record||data;
+    var variant = null;
+    if(tests.variants) variant=tests.variants[variantKey]||tests.variants[variantKey.toUpperCase()]||null;
+    if(!variant) return;
+    var rwCA={},lsCA={},rwQ=1,lsQ=1;
+    (function(){ var p=variant['rw1']; if(!p)return; (Array.isArray(p)?p:(p.questions||[])).forEach(function(q){ rwCA[rwQ++]=String(q.correct||q.answer||'').trim(); }); })();
+    ['rw2','rw3'].forEach(function(k){ var p=variant[k]; if(!p)return; (p.questions||[]).forEach(function(q){ rwCA[rwQ++]=String(q.correct||q.answer||'').trim(); }); });
+    (function(){ var p=variant['rw4']; if(!p)return; (p.gaps||[]).forEach(function(g){ rwCA[rwQ++]=String(g.correct||g.answer||'').trim(); }); })();
+    (function(){ var p=variant['rw5']; if(!p)return; (p.answers||[]).forEach(function(a){ var pri=typeof a==='string'?a:String(a.answer||'').trim(); var also=(typeof a==='object'&&a.also)?String(a.also).trim():''; rwCA[rwQ]=pri+(also?'|'+also:''); rwQ++; }); })();
+    (function(){ var p=variant['ls1']; if(!p)return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+    (function(){ var p=variant['ls2']; if(!p)return; (p.rows||[]).forEach(function(r){ var pri=String(r.answer||r.correct||'').trim(); var also=(r.also||'').trim(); lsCA[lsQ]=pri+(also?'|'+also:''); lsQ++; }); })();
+    (function(){ var p=variant['ls3']; if(!p)return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+    (function(){ var p=variant['ls4']; if(!p)return; (p.questions||[]).forEach(function(q){ lsCA[lsQ++]=String(q.correct||q.answer||'').trim(); }); })();
+    (function(){ var p=variant['ls5']; if(!p)return; (p.answers||[]).slice(1).forEach(function(a){ lsCA[lsQ++]=String(a).trim(); }); })();
+    _correctAnswers.reading=rwCA; _correctAnswers.listening=lsCA;
+  } catch(e){ console.error('loadCorrectAnswers:',e); }
+}
+
+function buildDetail(cand){
+  var rev=cand.review;
+  var rw=rev.rwScale||0, wr=rev.wrScale||0, ls=rev.lsScale||0, sp=rev.spScale||0;
+  var rwA=cand.rwAnswers||{}, lsA=cand.lsAnswers||{};
+  var rwCA=_correctAnswers.reading, lsCA=_correctAnswers.listening;
+  var wrP6=rev.wrP6||{}, wrP7=rev.wrP7||{};
+  var spSc=rev.spScores||{};
+  var det=document.getElementById('detail-section');
+  if(!det) return;
+
+  function detHead(title,rawLabel,rawVal,suffix,scale){
+    return '<div class="det-head"><span class="det-head-title">'+title+'</span>'
+      +'<div class="det-head-stats">'
+        +'<div class="det-stat"><span class="ds-lbl">'+rawLabel+'</span><span class="ds-val">'+rawVal+(suffix||'')+'</span></div>'
+        +'<div class="det-stat"><span class="ds-lbl">Scale</span><span class="ds-val">'+(scale||'—')+'</span></div>'
+        +'<div class="det-stat"><span class="ds-lbl">CEFR</span><span class="ds-val">'+scaleToCEFR(scale)+'</span></div>'
+        +'<div class="det-stat"><span class="ds-lbl">Result</span><span class="ds-val">'+scaleToResult(scale)+'</span></div>'
+      +'</div></div>';
+  }
+
+  function ansTable(candObj,corrObj,total){
+    var rows='',right=0;
+    for(var q=1;q<=total;q++){
+      var c=String(candObj[q]!==undefined?candObj[q]:(candObj[String(q)]||'')).trim();
+      var r=String(corrObj[q]!==undefined?corrObj[q]:(corrObj[String(q)]||'')).trim();
+      var ok=checkAns(c,r); if(ok)right++;
+      rows+='<tr><td class="num">'+q+'</td>'
+        +'<td class="ans">'+(escH(c)||'<span style="color:#aaa">—</span>')+'</td>'
+        +'<td class="ans" style="color:#166534">'+escH(r.replace(/\|/g,' / '))+'</td>'
+        +'<td class="match '+(c?(ok?'ok':'no'):'')+'">'+(c?(ok?'✓':'✗'):'—')+'</td></tr>';
+    }
+    return {html:rows,raw:right};
+  }
+
+  function critTable(scores){
+    var rows='',total=0;
+    [{id:'c',lbl:'Content'},{id:'o',lbl:'Organisation'},{id:'l',lbl:'Language'}].forEach(function(cr){
+      var v=scores[cr.id]||0; total+=v;
+      rows+='<tr><td class="cname">'+cr.lbl+'</td><td class="cscore">'+v+' / 5</td></tr>';
+    });
+    return {html:rows,total:total};
+  }
+
+  var html='<div class="det-divider"></div>';
+
+  // Reading
+  var rwT=ansTable(rwA,rwCA,30);
+  html+='<div class="det-section">'+detHead('Reading — Parts 1–5','Raw',rwT.raw,' / 30',rw)
+    +'<table class="det-table"><thead><tr><th>Q</th><th class="left">Candidate</th><th class="left">Correct</th><th>✓</th></tr></thead>'
+    +'<tbody>'+rwT.html+'</tbody></table></div>';
+
+  // Writing
+  var p6=critTable(wrP6), p7=critTable(wrP7), wrRaw=p6.total+p7.total;
+  html+='<div class="det-section">'+detHead('Writing — Parts 6–7','Raw',wrRaw,' / 30',wr)
+    +'<table style="width:100%;border-collapse:collapse"><tr>'
+    +'<td style="width:50%;vertical-align:top;padding-right:8px">'
+      +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#555;padding:4px 0 3px">Part 6</div>'
+      +'<div class="det-essay">'+(escH(cand.rwAnswers&&cand.rwAnswers[31]?cand.rwAnswers[31]:'—'))+'</div>'
+      +'<table class="det-crit-table" style="margin-top:4px"><tbody>'+p6.html
+        +'<tr><td class="cname" style="font-weight:700">Total P6</td><td class="cscore">'+p6.total+' / 15</td></tr></tbody></table>'
+    +'</td><td style="width:50%;vertical-align:top;padding-left:8px">'
+      +'<div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#555;padding:4px 0 3px">Part 7</div>'
+      +'<div class="det-essay">'+(escH(cand.rwAnswers&&cand.rwAnswers[32]?cand.rwAnswers[32]:'—'))+'</div>'
+      +'<table class="det-crit-table" style="margin-top:4px"><tbody>'+p7.html
+        +'<tr><td class="cname" style="font-weight:700">Total P7</td><td class="cscore">'+p7.total+' / 15</td></tr></tbody></table>'
+    +'</td></tr></table></div>';
+
+  // Listening
+  var lsT=ansTable(lsA,lsCA,25);
+  html+='<div class="det-section">'+detHead('Listening — Parts 1–5','Raw',lsT.raw,' / 25',ls)
+    +'<table class="det-table"><thead><tr><th>Q</th><th class="left">Candidate</th><th class="left">Correct</th><th>✓</th></tr></thead>'
+    +'<tbody>'+lsT.html+'</tbody></table></div>';
+
+  // Speaking
+  var ga=spSc.ga||0,gv=spSc.gv||0,pr=spSc.pr||0,ic=spSc.ic||0;
+  var spRaw=ga*3+gv*2+pr*2+ic*2;
+  html+='<div class="det-section">'+detHead('Speaking','Raw',spRaw.toFixed(1),' / 45',sp)
+    +'<table class="det-crit-table"><tbody>'
+      +'<tr><td class="cname">Global Achievement</td><td class="cscore">'+ga+'</td><td style="font-size:10px;color:#555;border:1px solid #eee;padding:5px 10px">Interlocutor · ×3</td></tr>'
+      +'<tr><td class="cname">Grammar & Vocabulary</td><td class="cscore">'+gv+'</td><td style="font-size:10px;color:#555;border:1px solid #eee;padding:5px 10px">Assessor · ×2</td></tr>'
+      +'<tr><td class="cname">Pronunciation</td><td class="cscore">'+pr+'</td><td style="font-size:10px;color:#555;border:1px solid #eee;padding:5px 10px">Assessor · ×2</td></tr>'
+      +'<tr><td class="cname">Interactive Comm.</td><td class="cscore">'+ic+'</td><td style="font-size:10px;color:#555;border:1px solid #eee;padding:5px 10px">Assessor · ×2</td></tr>'
+    +'</tbody></table>'
+    +'<div class="sp-formula">Raw = '+ga+'×3 + '+gv+'×2 + '+pr+'×2 + '+ic+'×2 = '+spRaw.toFixed(1)+' / 45</div>'
+    +'</div>';
+
+  det.innerHTML=html;
+}
+
 async function loadAndRender(){
   var p   = new URLSearchParams(window.location.search);
   var cid = p.get('candidateId')||'';
@@ -197,10 +352,11 @@ function render(cand){
   document.getElementById('overlay').style.display='none';
   document.getElementById('sheet').style.display='block';
   window._lastRev = rev;
-  // Defer canvas render until layout is complete
+  var varKey = cand.variantKey||cand.variantId||'';
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
       buildChart(rev);
+      loadCorrectAnswers(varKey).then(function(){ buildDetail(cand); });
     });
   });
 }
